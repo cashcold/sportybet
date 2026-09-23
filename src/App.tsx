@@ -28,8 +28,8 @@ const MainContent: React.FC = () => {
     <div className="min-h-screen bg-[#0d1218] flex justify-center text-white antialiased font-sans">
       {/* Mobile viewport container */}
       <div className="w-full max-w-md min-h-screen bg-[#141a22] relative flex flex-col shadow-2xl">
-        {/* Top Header - shown on Sports, AZ Menu, and Games; Open Bets, Profile (Me), and Deposit have their own exact screenshot layouts */}
-        {activeTab !== 'open_bets' && activeTab !== 'deposit' && activeTab !== 'me' && <Header />}
+        {/* Top Header - shown on Sports and AZ Menu; Open Bets, Profile (Me), Deposit, and Aviator have their own exact screenshot layouts */}
+        {activeTab !== 'open_bets' && activeTab !== 'deposit' && activeTab !== 'me' && activeTab !== 'games' && <Header />}
 
         {/* Dynamic Views */}
         <main className="flex-1 overflow-x-hidden">
@@ -42,12 +42,12 @@ const MainContent: React.FC = () => {
         </main>
 
         {/* Floating Betslip Ticket & Sticky Quick Bar */}
-        {activeTab !== 'deposit' && (
+        {activeTab !== 'deposit' && activeTab !== 'games' && (
           <FloatingBetslipButton />
         )}
 
         {/* Bottom Navigation Bar */}
-        {activeTab !== 'deposit' && <BottomNav />}
+        {activeTab !== 'deposit' && activeTab !== 'games' && <BottomNav />}
 
         {/* Global Modals & Drawers */}
         <BetslipModal />
