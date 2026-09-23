@@ -23,6 +23,7 @@ import { useBetting } from '../context/BettingContext';
 import { ProfileDetailsSubpage } from './ProfileDetailsSubpage';
 import { AuthModal } from './AuthModal';
 import { ApiConsoleModal } from './ApiConsoleModal';
+import { SportyBetLogo } from './SportyBetLogo';
 
 interface ProfileViewProps {
   onOpenWithdraw: () => void;
@@ -507,7 +508,7 @@ function renderFooter(
 
       {/* Official Sports Betting Partner: LaLiga */}
       <div className="flex items-center justify-center space-x-3 py-3 border-y border-[#1e2733]/80">
-        <span className="text-base font-black italic text-[#de1a22]">SportyBet</span>
+        <SportyBetLogo size="sm" variant="red" />
         <div className="h-5 w-px bg-neutral-600/70" />
         <span className="text-[9px] uppercase font-bold text-neutral-300 leading-tight text-left">
           Official Sports<br />Betting Partner

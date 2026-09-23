@@ -1,6 +1,7 @@
 import { Match, PlacedBet, UserProfile, BetSelection } from '../types';
+import { getApiBaseUrl } from '../config/apiConfig';
 
-const BASE_URL = '/api';
+const getBaseUrl = () => getApiBaseUrl();
 
 function getAuthHeader(): Record<string, string> {
   const token = localStorage.getItem('sportybet_auth_token') || 'sporty-session-default';
@@ -15,7 +16,7 @@ export const api = {
   auth: {
     async login(phone: string, password?: string): Promise<{ success: boolean; user?: UserProfile; token?: string; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/auth/login`, {
+        const res = await fetch(`${getBaseUrl()}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone, password })
@@ -32,7 +33,7 @@ export const api = {
 
     async register(phone: string, password?: string): Promise<{ success: boolean; user?: UserProfile; token?: string; message?: string; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/auth/register`, {
+        const res = await fetch(`${getBaseUrl()}/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone, password })
@@ -49,7 +50,7 @@ export const api = {
 
     async getMe(): Promise<{ success: boolean; user?: UserProfile; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/auth/me`, {
+        const res = await fetch(`${getBaseUrl()}/auth/me`, {
           headers: getAuthHeader()
         });
         return await res.json();
@@ -60,7 +61,7 @@ export const api = {
 
     async updateProfile(updates: Partial<UserProfile>): Promise<{ success: boolean; user?: UserProfile; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/auth/profile`, {
+        const res = await fetch(`${getBaseUrl()}/auth/profile`, {
           method: 'PUT',
           headers: getAuthHeader(),
           body: JSON.stringify(updates)
@@ -73,7 +74,7 @@ export const api = {
 
     async claimDailyStreak(): Promise<{ success: boolean; dailyStreak?: number; balance?: number; message?: string; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/auth/daily-streak`, {
+        const res = await fetch(`${getBaseUrl()}/auth/daily-streak`, {
           method: 'POST',
           headers: getAuthHeader()
         });
@@ -85,7 +86,7 @@ export const api = {
 
     async logout(): Promise<{ success: boolean }> {
       try {
-        await fetch(`${BASE_URL}/auth/logout`, {
+        await fetch(`${getBaseUrl()}/auth/logout`, {
           method: 'POST',
           headers: getAuthHeader()
         });
@@ -101,7 +102,7 @@ export const api = {
   wallet: {
     async getBalance(): Promise<{ success: boolean; balance?: number; currency?: string; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/wallet/balance`, {
+        const res = await fetch(`${getBaseUrl()}/wallet/balance`, {
           headers: getAuthHeader()
         });
         return await res.json();
@@ -112,7 +113,7 @@ export const api = {
 
     async deposit(amount: number, provider: string, accountNumber?: string): Promise<{ success: boolean; balance?: number; message?: string; transaction?: any; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/wallet/deposit`, {
+        const res = await fetch(`${getBaseUrl()}/wallet/deposit`, {
           method: 'POST',
           headers: getAuthHeader(),
           body: JSON.stringify({ amount, provider, accountNumber })
@@ -125,7 +126,7 @@ export const api = {
 
     async withdraw(amount: number, provider: string, accountNumber?: string): Promise<{ success: boolean; balance?: number; message?: string; transaction?: any; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/wallet/withdraw`, {
+        const res = await fetch(`${getBaseUrl()}/wallet/withdraw`, {
           method: 'POST',
           headers: getAuthHeader(),
           body: JSON.stringify({ amount, provider, accountNumber })
@@ -138,7 +139,7 @@ export const api = {
 
     async getTransactions(): Promise<{ success: boolean; transactions?: any[]; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/wallet/transactions`, {
+        const res = await fetch(`${getBaseUrl()}/wallet/transactions`, {
           headers: getAuthHeader()
         });
         return await res.json();
@@ -152,7 +153,7 @@ export const api = {
   bets: {
     async placeBet(selections: BetSelection[], stake: number, type: 'Single' | 'Multiple'): Promise<{ success: boolean; bet?: PlacedBet; remainingBalance?: number; ticketId?: string; message?: string; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/bets/place`, {
+        const res = await fetch(`${getBaseUrl()}/bets/place`, {
           method: 'POST',
           headers: getAuthHeader(),
           body: JSON.stringify({ selections, stake, type })
@@ -165,7 +166,7 @@ export const api = {
 
     async getOpenBets(): Promise<{ success: boolean; bets?: PlacedBet[]; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/bets/open`, {
+        const res = await fetch(`${getBaseUrl()}/bets/open`, {
           headers: getAuthHeader()
         });
         return await res.json();
@@ -176,7 +177,7 @@ export const api = {
 
     async getBetHistory(): Promise<{ success: boolean; bets?: PlacedBet[]; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/bets/history`, {
+        const res = await fetch(`${getBaseUrl()}/bets/history`, {
           headers: getAuthHeader()
         });
         return await res.json();
@@ -187,7 +188,7 @@ export const api = {
 
     async cashout(betId: string): Promise<{ success: boolean; cashoutAmount?: number; newBalance?: number; message?: string; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/bets/cashout`, {
+        const res = await fetch(`${getBaseUrl()}/bets/cashout`, {
           method: 'POST',
           headers: getAuthHeader(),
           body: JSON.stringify({ betId })
@@ -200,7 +201,7 @@ export const api = {
 
     async generateBookingCode(selections: BetSelection[]): Promise<{ success: boolean; bookingCode?: string; totalOdds?: number; expiresAt?: string; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/bets/booking-code`, {
+        const res = await fetch(`${getBaseUrl()}/bets/booking-code`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ selections })
@@ -213,7 +214,7 @@ export const api = {
 
     async loadBookingCode(code: string): Promise<{ success: boolean; selections?: BetSelection[]; totalOdds?: number; bookingCode?: string; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/bets/booking-code/${encodeURIComponent(code)}`);
+        const res = await fetch(`${getBaseUrl()}/bets/booking-code/${encodeURIComponent(code)}`);
         return await res.json();
       } catch (err: any) {
         return { success: false, error: err.message };
@@ -231,7 +232,7 @@ export const api = {
         if (params?.league) query.append('league', params.league);
         if (params?.search) query.append('search', params.search);
 
-        const res = await fetch(`${BASE_URL}/matches?${query.toString()}`);
+        const res = await fetch(`${getBaseUrl()}/matches?${query.toString()}`);
         return await res.json();
       } catch (err: any) {
         return { success: false, error: err.message };
@@ -240,7 +241,7 @@ export const api = {
 
     async getMatch(id: string): Promise<{ success: boolean; match?: Match; error?: string }> {
       try {
-        const res = await fetch(`${BASE_URL}/matches/${encodeURIComponent(id)}`);
+        const res = await fetch(`${getBaseUrl()}/matches/${encodeURIComponent(id)}`);
         return await res.json();
       } catch (err: any) {
         return { success: false, error: err.message };
@@ -252,7 +253,7 @@ export const api = {
   system: {
     async getStatus(): Promise<any> {
       try {
-        const res = await fetch(`${BASE_URL}`);
+        const res = await fetch(`${getBaseUrl()}`);
         return await res.json();
       } catch (err: any) {
         return { status: 'offline', error: err.message };

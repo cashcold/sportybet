@@ -64,11 +64,16 @@ app.get('/api', (req, res) => {
   });
 });
 
-// Mount Routes
+// Mount Routes (supports both direct server /api/* and Vercel serverless rewrites)
 app.use('/api/auth', authRouter);
+app.use('/auth', authRouter);
 app.use('/api/wallet', walletRouter);
+app.use('/wallet', walletRouter);
 app.use('/api/bets', betRouter);
+app.use('/bets', betRouter);
 app.use('/api/matches', matchesRouter);
+app.use('/matches', matchesRouter);
 app.use('/api/football', footballRouter);
+app.use('/football', footballRouter);
 
 export default app;

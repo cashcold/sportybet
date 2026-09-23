@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Lock, Phone, UserCheck, Shield } from 'lucide-react';
 import { useBetting } from '../context/BettingContext';
+import { SportyBetLogo } from './SportyBetLogo';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -34,7 +35,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
         {/* Top Header */}
         <div className="bg-[#de1a22] text-white px-4 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span className="text-lg font-black italic tracking-tight">SportyBet</span>
+            <SportyBetLogo size="sm" variant="white" />
             <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-1.5 py-0.5 rounded">
               Ghana
             </span>

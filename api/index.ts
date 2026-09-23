@@ -1,17 +1,9 @@
-import express from 'express';
 import dotenv from 'dotenv';
-import { footballRouter } from '../src/server/footballApi';
+import { app } from '../src/server/app';
 
 dotenv.config();
 
-const app = express();
-app.use(express.json());
-
-// API Routes (supports /api/football/* and rewrite to /football/*)
-app.use('/api/football', footballRouter);
-app.use('/football', footballRouter);
-
-// Basic health check endpoint
+// Basic health check endpoint on root vercel route
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', platform: 'vercel' });
 });

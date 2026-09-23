@@ -1,0 +1,12 @@
+{
+	"appId": "com.sportybet.ghana",
+	"appName": "SportyBet Ghana",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https",
+		"cleartext": true
+	},
+	"android": {
+		"allowMixedContent": true
+	}
+}

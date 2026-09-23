@@ -14,6 +14,7 @@ import {
   INITIAL_USER
 } from '../data/mockData';
 import { api } from '../services/api';
+import { resolveApiUrl } from '../config/apiConfig';
 
 interface BettingContextType {
   matches: Match[];
@@ -92,12 +93,12 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Check API-Football backend status and fetch live fixtures
   const refreshLiveOdds = async () => {
     try {
-      const statusRes = await fetch('/api/football/status');
+      const statusRes = await fetch(resolveApiUrl('/football/status'));
       if (statusRes.ok) {
         const statusData = await statusRes.json();
         setApiFootballConfigured(Boolean(statusData.configured));
         if (statusData.configured) {
-          const liveRes = await fetch('/api/football/live');
+          const liveRes = await fetch(resolveApiUrl('/football/live'));
           if (liveRes.ok) {
             const liveData = await liveRes.json();
             if (liveData.success && liveData.data && liveData.data.length > 0) {

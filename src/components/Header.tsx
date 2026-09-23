@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { useBetting } from '../context/BettingContext';
 import { AuthModal } from './AuthModal';
+import { SportyBetLogo } from './SportyBetLogo';
 
 export const Header: React.FC = () => {
   const { user, setIsSearchOpen, setActiveTab } = useBetting();
@@ -16,14 +17,13 @@ export const Header: React.FC = () => {
   return (
     <>
       <header className="sticky top-0 z-40 bg-[#de1a22] text-white px-3 py-2 flex items-center justify-between shadow-md select-none h-12">
-        {/* SportyBet Brand Logo */}
+        {/* SportyBet Brand Logo matching exact typography and signature 2-dot 'S' */}
         <div 
-          className="flex items-center space-x-1 cursor-pointer"
+          className="flex items-center cursor-pointer hover:opacity-95 active:scale-[0.98] transition-all"
           onClick={() => setActiveTab('sports')}
+          title="SportyBet Home"
         >
-          <span className="text-[23px] font-black italic tracking-tight font-sans">
-            Sporty<span className="font-extrabold text-[#ffffff]">Bet</span>
-          </span>
+          <SportyBetLogo size="md" variant="white" />
         </div>
 
         {/* Right controls */}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Play, Copy, Check, Server, Terminal, Globe, ShieldCheck, ArrowRight } from 'lucide-react';
 import { useBetting } from '../context/BettingContext';
+import { resolveApiUrl } from '../config/apiConfig';
 
 interface ApiEndpoint {
   id: string;
@@ -146,7 +147,8 @@ export const ApiConsoleModal: React.FC<{ isOpen: boolean; onClose: () => void }>
         options.body = requestBody;
       }
 
-      const res = await fetch(selectedEndpoint.path, options);
+      const resolvedUrl = resolveApiUrl(selectedEndpoint.path);
+      const res = await fetch(resolvedUrl, options);
       const elapsed = Math.round(performance.now() - startTime);
       setLatencyMs(elapsed);
       setResponseStatus(res.status);
