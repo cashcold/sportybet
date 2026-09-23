@@ -25,9 +25,15 @@ export const FloatingBetslipButton: React.FC = () => {
           aria-label="View Betslip"
           title="Open Betslip"
         >
-          <Ticket className="w-5 h-5 stroke-[2.4] group-hover:rotate-6 transition-transform" />
+          {betslip.length > 0 ? (
+            <span className="text-[10px] font-black tracking-tighter leading-none px-0.5 truncate max-w-[42px]">
+              {totalOdds >= 1000 ? `${totalOdds.toFixed(0)}...` : totalOdds >= 100 ? `${totalOdds.toFixed(0)}` : totalOdds.toFixed(2)}
+            </span>
+          ) : (
+            <Ticket className="w-5 h-5 stroke-[2.4] group-hover:rotate-6 transition-transform" />
+          )}
 
-          {/* Exact white circle badge with black count number (0, 1, 2...) */}
+          {/* Exact white circle badge with black count number (0, 1, 7...) */}
           <span className="absolute -top-1 -right-1 bg-white text-black font-black text-[11px] min-w-[20px] h-5 rounded-full flex items-center justify-center px-1 shadow border border-neutral-300">
             {betslip.length}
           </span>

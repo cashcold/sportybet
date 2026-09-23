@@ -42,6 +42,9 @@ interface BettingContextType {
   toastMessage: string | null;
   showToast: (msg: string) => void;
   updateUsername: (name: string) => void;
+  updateProfile: (updates: Partial<UserProfile>) => void;
+  login: (phone?: string) => void;
+  logout: () => void;
   loadBookingCode: (code: string) => boolean;
   apiFootballConfigured: boolean;
   refreshLiveOdds: () => Promise<void>;
@@ -344,6 +347,28 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     showToast('Username updated');
   };
 
+  const updateProfile = (updates: Partial<UserProfile>) => {
+    setUser(prev => ({ ...prev, ...updates }));
+    showToast('Profile updated');
+  };
+
+  const login = (phone?: string) => {
+    setUser(prev => ({
+      ...prev,
+      isLoggedIn: true,
+      phone: phone || prev.phone || '20******5'
+    }));
+    showToast('Logged in successfully');
+  };
+
+  const logout = () => {
+    setUser(prev => ({
+      ...prev,
+      isLoggedIn: false
+    }));
+    showToast('Logged out');
+  };
+
   const loadBookingCode = (code: string): boolean => {
     if (!code.trim()) return false;
     // Simulate loading selections
@@ -396,6 +421,9 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         toastMessage,
         showToast,
         updateUsername,
+        updateProfile,
+        login,
+        logout,
         loadBookingCode,
         apiFootballConfigured,
         refreshLiveOdds

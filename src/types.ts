@@ -77,4 +77,13 @@ export interface UserProfile {
   nextUpdate: string;
   dailyStreak: number;
   unreadNotifications: number;
+  phone: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  location: string;
+  email: string;
+  isEmailVerified: boolean;
+  avatarUrl: string;
+  isLoggedIn: boolean;
 }

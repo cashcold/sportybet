@@ -28,8 +28,8 @@ const MainContent: React.FC = () => {
     <div className="min-h-screen bg-[#0d1218] flex justify-center text-white antialiased font-sans">
       {/* Mobile viewport container */}
       <div className="w-full max-w-md min-h-screen bg-[#141a22] relative flex flex-col shadow-2xl">
-        {/* Top Header - shown on Sports, AZ Menu, Games, and Profile; Open Bets and Deposit have their own exact screenshot headers */}
-        {activeTab !== 'open_bets' && activeTab !== 'deposit' && <Header />}
+        {/* Top Header - shown on Sports, AZ Menu, and Games; Open Bets, Profile (Me), and Deposit have their own exact screenshot layouts */}
+        {activeTab !== 'open_bets' && activeTab !== 'deposit' && activeTab !== 'me' && <Header />}
 
         {/* Dynamic Views */}
         <main className="flex-1 overflow-x-hidden">

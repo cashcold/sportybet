@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Gamepad2, Repeat, User } from 'lucide-react';
+import { Menu, Gamepad2, User } from 'lucide-react';
 import { useBetting } from '../context/BettingContext';
 import { ActiveTab } from '../types';
 
@@ -31,7 +31,52 @@ export const BottomNav: React.FC = () => {
     {
       id: 'open_bets',
       label: 'Open Bets',
-      icon: <Repeat className="w-5 h-5" />,
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+          {/* Top-right curving clockwise arrow */}
+          <path
+            d="M20.5 10.5A8.5 8.5 0 0 0 6 5.5L3.5 8"
+            stroke="currentColor"
+            strokeWidth="1.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <polyline
+            points="3.5 3.5 3.5 8 8 8"
+            stroke="currentColor"
+            strokeWidth="1.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Bottom-left curving clockwise arrow */}
+          <path
+            d="M3.5 13.5A8.5 8.5 0 0 0 18 18.5L20.5 16"
+            stroke="currentColor"
+            strokeWidth="1.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <polyline
+            points="20.5 20.5 20.5 16 16 16"
+            stroke="currentColor"
+            strokeWidth="1.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Central currency $ symbol */}
+          <text
+            x="12"
+            y="15.2"
+            textAnchor="middle"
+            fontSize="10"
+            fontWeight="bold"
+            fill="currentColor"
+            fontFamily="system-ui, -apple-system, sans-serif"
+          >
+            $
+          </text>
+        </svg>
+      ),
       badge: openBets.length > 0 ? openBets.length : undefined
     },
     {

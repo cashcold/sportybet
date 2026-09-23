@@ -41,8 +41,15 @@ export const OpenBetsView: React.FC = () => {
 
         {/* Profile Avatar + GHS 0.00 in bright gold/yellow */}
         <div className="flex items-center space-x-1.5">
-          <div className="w-5 h-5 rounded-full bg-amber-200 overflow-hidden flex items-center justify-center text-[11px] text-amber-900 font-bold border border-white/20">
-            👤
+          <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center border border-white/20 bg-neutral-800">
+            <img
+              src={user.avatarUrl || '/user_beach_avatar.jpg'}
+              alt="User"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = 'none';
+              }}
+            />
           </div>
           <span className="text-xs font-black text-[#ffde00] tracking-wide">
             {user.currency} {user.balance.toFixed(2)}

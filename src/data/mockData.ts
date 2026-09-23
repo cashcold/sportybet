@@ -585,13 +585,22 @@ export const INITIAL_BET_HISTORY: PlacedBet[] = [
 
 export const INITIAL_USER: UserProfile = {
   username: '', // "No username set"
-  balance: 35.50, // default friendly balance so user can test betting right away
+  balance: 0.00, // matches GHS 0.00 in screenshots 1, 2, 14
   currency: 'GHS',
-  loyaltyTier: 'I',
+  loyaltyTier: 'Tier 1',
   loyaltyProgress: 68,
   nextUpdate: '01 Oct',
-  dailyStreak: 4,
-  unreadNotifications: 2
+  dailyStreak: 5,
+  unreadNotifications: 1,
+  phone: '20******5',
+  firstName: 'CHARLES',
+  lastName: 'ASUMAH',
+  dateOfBirth: '15/05/1998',
+  location: 'Ghana',
+  email: '',
+  isEmailVerified: false,
+  avatarUrl: '/user_beach_avatar.jpg',
+  isLoggedIn: true
 };
 
 export const SPORTS_LIST = [

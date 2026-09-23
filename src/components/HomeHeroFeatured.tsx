@@ -30,37 +30,38 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
   onSelectTournament
 }) => {
   const { toggleSelection, betslip, showToast, setActiveTab } = useBetting();
-  const [activeTournamentTab, setActiveTournamentTab] = useState("TODAY'S FOOTBALL");
+  const [activeTournamentTab, setActiveTournamentTab] = useState("Brasileiro Serie B");
   const [activeFeaturedTab, setActiveFeaturedTab] = useState<'Matches' | 'Games' | 'Codes' | 'Virtuals'>('Matches');
 
-  // Featured live match: Real Madrid W vs Paris Saint-Germain W (from screenshot)
+  // Featured live match: Criciuma EC SC vs Operario Ferroviario EC PR (from screenshot 1 & 5)
   const featuredMatch: Match = {
-    id: 'feat-uefa-rm-psg',
-    gameId: '29810',
+    id: 'feat-criciuma-operario',
+    gameId: '38921',
     sport: 'football',
-    league: 'UEFA Champions League Women',
-    countryOrCategory: 'International Clubs',
-    homeTeam: 'Real Madrid W',
-    awayTeam: 'Paris Saint-Germain W',
-    homeScore: 1,
-    awayScore: 0,
-    minute: "2:41 H1",
-    period: "H1",
+    league: 'Brasileiro Serie B',
+    countryOrCategory: 'Brazil',
+    homeTeam: 'Criciuma EC SC',
+    awayTeam: 'Operario Ferroviario EC PR',
+    homeScore: 0,
+    awayScore: 1,
+    minute: "72:16 H2",
+    period: "H2",
     isLive: true,
     startTime: 'Live',
     isHot: true,
     hasLiveStream: true,
-    marketsCount: 145,
+    marketsCount: 107,
     markets: {
       '1X2': [
-        { id: 'feat-rm-1', name: '1', value: 1.22, trend: 'same' },
-        { id: 'feat-rm-x', name: 'X', value: 6.00, trend: 'same' },
-        { id: 'feat-rm-2', name: '2', value: 8.75, trend: 'same' }
+        { id: 'feat-cr-1', name: '1', value: 8.90, trend: 'same' },
+        { id: 'feat-cr-x', name: 'X', value: 3.10, trend: 'same' },
+        { id: 'feat-cr-2', name: '2', value: 1.61, trend: 'same' }
       ]
     }
   };
 
   const tournamentFilters = [
+    "Brasileiro Serie B",
     "TODAY'S FOOTBALL",
     "FOOTBALL IN NEXT 3 HOURS",
     "AFCON QUALIFIERS",
