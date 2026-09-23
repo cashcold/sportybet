@@ -1,22 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Tv,
   Share2,
   Plane,
-  Grid,
   MoreHorizontal,
-  Flame,
   BarChart2,
   Ticket,
-  ChevronRight,
-  Globe,
-  Trophy,
-  Dices,
-  Sparkles,
-  Gamepad2
 } from 'lucide-react';
 import { useBetting } from '../context/BettingContext';
-import { Match, OddItem } from '../types';
+import { Match } from '../types';
+import { PromoFeatureModal, PromoFeatureItem } from './PromoFeatureModal';
+
+// High-fidelity generated image assets for cards
+import luckynumbersImg from '../assets/images/luckynumbers_card_1790159844507.jpg';
+import aviatorImg from '../assets/images/aviator_card_1790159858969.jpg';
+import jackpotImg from '../assets/images/jackpot_card_1790159870643.jpg';
+import tadaHalloweenImg from '../assets/images/tada_halloween_card_1790159882420.jpg';
+import sportypicksImg from '../assets/images/sportypicks_card_1790159897219.jpg';
+import casinocashbackImg from '../assets/images/casinocashback_card_1790159908672.jpg';
+import autobetImg from '../assets/images/autobet_card_1790159921668.jpg';
+import sportysimImg from '../assets/images/sportysim_card_1790159934597.jpg';
+import sportypenaltyImg from '../assets/images/sportypenalty_card_1790159944350.jpg';
+import dogracingImg from '../assets/images/dogracing_card_1790159959872.jpg';
+import basketballImg from '../assets/images/basketball_card_1790159971798.jpg';
 
 interface HomeHeroFeaturedProps {
   onOpenBookingCode: () => void;
@@ -32,6 +38,140 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
   const { toggleSelection, betslip, showToast, setActiveTab } = useBetting();
   const [activeTournamentTab, setActiveTournamentTab] = useState("Brasileiro Serie B");
   const [activeFeaturedTab, setActiveFeaturedTab] = useState<'Matches' | 'Games' | 'Codes' | 'Virtuals'>('Matches');
+  const [selectedPromo, setSelectedPromo] = useState<PromoFeatureItem | null>(null);
+
+  // Exact 11 cards sequence from user screenshots starting from Lucky Numbers to 24/7 Basketball
+  const featuredCards: PromoFeatureItem[] = [
+    {
+      id: 'lucky_numbers',
+      title: 'Lucky Numbers',
+      lines: ['Lucky', 'Numbers'],
+      image: luckynumbersImg,
+      posterImage: '/luckynumbers.jpg',
+      tagline: "Don't miss the next level of winning",
+      description: 'Pick your lucky balls and play global instant lotteries and draws with rapid multipliers and huge jackpot payouts!',
+      actionText: 'Bet Now',
+      actionType: 'lottery'
+    },
+    {
+      id: 'aviator',
+      title: 'Aviator',
+      lines: ['Aviator'],
+      image: aviatorImg,
+      posterImage: '/Aviator.jpg',
+      tagline: 'Next-gen crash game',
+      description: 'Fly high with the red airplane! Cash out before the aircraft flies away to secure up to 10,000x multiplier payouts!',
+      actionText: 'Play Now',
+      actionType: 'aviator'
+    },
+    {
+      id: 'jackpot',
+      title: 'Jackpot',
+      lines: ['Jackpot'],
+      image: jackpotImg,
+      posterImage: '/jackpot.jpg',
+      tagline: 'Sporty 12 Jackpot',
+      description: 'Predict 12 matches correctly to win the guaranteed GHS 150,000 jackpot prize with weekly consolations!',
+      actionText: 'Bet Now',
+      actionType: 'modal'
+    },
+    {
+      id: 'tada_halloween',
+      title: 'TaDa Halloween',
+      lines: ['TaDa', 'Halloween'],
+      image: tadaHalloweenImg,
+      posterImage: '/tada_halloween.jpg',
+      tagline: 'Spooky Season Slots',
+      description: 'Spin the magical witch cauldron with wild multipliers, free spins, and instant spooky treats!',
+      actionText: 'Play Now',
+      actionType: 'modal'
+    },
+    {
+      id: 'sporty_picks',
+      title: 'SportyPicks',
+      lines: ['SportyPicks'],
+      image: sportypicksImg,
+      posterImage: '/sportyPicks.jpg',
+      tagline: 'Betting simplified: Just YES or NO',
+      description: 'Free sports prediction challenge! Answer simple YES/NO questions on European football and win real cash!',
+      actionText: 'Play Now',
+      actionType: 'modal'
+    },
+    {
+      id: 'casino_cashback',
+      title: 'Casino Cashback',
+      lines: ['Casino', 'Cashback'],
+      image: casinocashbackImg,
+      posterImage: '/CasinoCashback.jpg',
+      tagline: '400,000 GHS in daily cashback',
+      description: 'Enjoy daily cashback on net casino losses up to 10%. Play your favorite casino tables and crash games worry-free!',
+      actionText: 'Play Now',
+      actionType: 'modal'
+    },
+    {
+      id: 'autobet',
+      title: 'AutoBet',
+      lines: ['AutoBet'],
+      image: autobetImg,
+      posterImage: '/autoBet.jpg',
+      tagline: 'Never miss your odds again!',
+      description: 'Set your target odds threshold and let SportyBet automatically place your bet the instant the market reaches your target!',
+      actionText: 'Try Now',
+      actionType: 'modal'
+    },
+    {
+      id: 'sportysim',
+      title: 'SportySIM',
+      lines: ['SportySIM'],
+      image: sportysimImg,
+      posterImage: '/simbet.jpg',
+      tagline: 'Lead by 2? You win! 1/2 Up in SIM',
+      description: 'Non-stop virtual football simulations available 24/7 with instant early payouts whenever your team takes a 2-goal lead!',
+      actionText: 'Bet Now',
+      actionType: 'modal'
+    },
+    {
+      id: 'sporty_penalty',
+      title: 'Sporty Penalty',
+      lines: ['Sporty Penalty'],
+      image: sportypenaltyImg,
+      posterImage: '/sportyPenalty.jpg',
+      tagline: 'Predict virtual football shootouts',
+      description: 'Step up to the penalty spot! Guess where the ball will go or pick the goalie dive direction to win instant cash!',
+      actionText: 'Bet Now',
+      actionType: 'penalty'
+    },
+    {
+      id: 'dog_racing',
+      title: '24/7 Dog Racing',
+      lines: ['24/7 Dog', 'Racing'],
+      image: dogracingImg,
+      posterImage: '/24+7.jpg',
+      tagline: 'Instant Greyhound Racing',
+      description: 'High-speed 6-greyhound races run every 2 minutes. Bet on Win, Exacta, Quinella, and Trifecta with live virtual tracking!',
+      actionText: 'Play Now',
+      actionType: 'modal'
+    },
+    {
+      id: 'basketball',
+      title: '24/7 Basketball',
+      lines: ['24/7', 'Basketball'],
+      image: basketballImg,
+      posterImage: '/24+7Basketball.jpg',
+      tagline: 'Instant Basketball Virtuals',
+      description: 'Non-stop simulated basketball court action! Real-time quarters, team handicaps, and over/under markets on every fixture.',
+      actionText: 'Play Now',
+      actionType: 'modal'
+    }
+  ];
+
+  const handleCardClick = (card: PromoFeatureItem) => {
+    if (card.id === 'aviator') {
+      onOpenAviator();
+    } else {
+      setSelectedPromo(card);
+    }
+  };
 
   // Featured live match: Criciuma EC SC vs Operario Ferroviario EC PR (from screenshot 1 & 5)
   const featuredMatch: Match = {
@@ -134,88 +274,43 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
   return (
     <div className="w-full bg-[#121922] text-white border-b border-[#1f2835]">
       {/* =================================================================== */}
-      {/* 1. TOP STORY BANNERS ROW (Exact visual match to yellow circle top) */}
+      {/* 1. TOP PROMO & GAME CARDS ROW (Exact match to Screenshots 1 & 2)   */}
+      {/* Starting from Lucky Numbers to 24/7 Basketball                     */}
       {/* =================================================================== */}
-      <div className="px-3 pt-3 pb-2 flex items-center space-x-2.5 overflow-x-auto no-scrollbar">
-        {/* Banner 1: Aviator Missions */}
-        <div
-          onClick={onOpenAviator}
-          className="shrink-0 w-22 h-24 rounded-lg bg-gradient-to-b from-[#2d1120] to-[#5a1628] border border-[#782236]/60 p-2 flex flex-col justify-between cursor-pointer relative overflow-hidden shadow-md group hover:border-[#ff3344] transition-all"
-        >
-          <div className="absolute -right-2 top-0 opacity-40 group-hover:scale-110 transition-transform">
-            <Plane className="w-14 h-14 text-[#ff2e43] -rotate-12 fill-current" />
-          </div>
-          <div className="w-6 h-6 rounded-full bg-[#ff2e43]/20 flex items-center justify-center text-[#ff4455]">
-            <Plane className="w-3.5 h-3.5 fill-current -rotate-12" />
-          </div>
-          <span className="text-[11px] font-black leading-tight text-white relative z-10">
-            Aviator<br />Missions
-          </span>
-        </div>
+      <div className="px-3 pt-3 pb-2.5 flex items-center space-x-2.5 overflow-x-auto no-scrollbar">
+        {featuredCards.map((card) => (
+          <div
+            key={card.id}
+            onClick={() => handleCardClick(card)}
+            className="shrink-0 w-20 h-20 rounded-xl overflow-hidden relative shadow-lg cursor-pointer border border-[#2b3648]/80 group hover:scale-[1.03] active:scale-95 transition-all duration-200 bg-[#161f2c]"
+          >
+            {/* Background Image */}
+            <img
+              src={card.image}
+              alt={card.title}
+              referrerPolicy="no-referrer"
+              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300 select-none"
+              onError={(e) => {
+                e.currentTarget.src = card.posterImage;
+              }}
+            />
 
-        {/* Banner 2: Lucky Numbers */}
-        <div
-          onClick={() => showToast('Lucky Numbers: Pick & Win Instant Jackpots')}
-          className="shrink-0 w-22 h-24 rounded-lg bg-gradient-to-b from-[#251515] to-[#451818] border border-[#6b2727]/60 p-2 flex flex-col justify-between cursor-pointer relative overflow-hidden shadow-md group hover:border-amber-400 transition-all"
-        >
-          <div className="absolute right-0 top-1 text-2xl opacity-80 group-hover:scale-110 transition-transform">
-            ⚽🪙
-          </div>
-          <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
-            <Dices className="w-3.5 h-3.5" />
-          </div>
-          <span className="text-[11px] font-black leading-tight text-white relative z-10">
-            Lucky<br />Numbers
-          </span>
-        </div>
+            {/* Dark gradient overlay for bottom text legibility */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
 
-        {/* Banner 3: Jackpot */}
-        <div
-          onClick={() => showToast('SportyBet 12-Match Super Jackpot: Win GHS 350,000!')}
-          className="shrink-0 w-22 h-24 rounded-lg bg-gradient-to-b from-[#13222e] to-[#14374a] border border-[#20526e]/60 p-2 flex flex-col justify-between cursor-pointer relative overflow-hidden shadow-md group hover:border-cyan-400 transition-all"
-        >
-          <div className="absolute -right-1 top-1 opacity-70 group-hover:scale-110 transition-transform text-cyan-300">
-            <Trophy className="w-11 h-11 text-amber-300 fill-amber-300/30" />
+            {/* Bold white title label placed at bottom-left */}
+            <div className="absolute bottom-1.5 left-2 right-1 pointer-events-none text-left leading-[1.1]">
+              {card.lines.map((line, idx) => (
+                <span
+                  key={idx}
+                  className="block text-white font-black text-[11px] tracking-tight drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)]"
+                >
+                  {line}
+                </span>
+              ))}
+            </div>
           </div>
-          <div className="w-6 h-6 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-300 font-black text-xs">
-            S
-          </div>
-          <span className="text-[11px] font-black leading-tight text-white relative z-10">
-            Jackpot
-          </span>
-        </div>
-
-        {/* Banner 4: SportyPicks */}
-        <div
-          onClick={() => showToast('SportyPicks: Free predictor with cash prizes')}
-          className="shrink-0 w-22 h-24 rounded-lg bg-gradient-to-b from-[#1d1b2e] to-[#2e2652] border border-[#483c7d]/60 p-2 flex flex-col justify-between cursor-pointer relative overflow-hidden shadow-md group hover:border-purple-400 transition-all"
-        >
-          <div className="absolute right-1 top-1 text-xl opacity-75 group-hover:scale-110 transition-transform">
-            👥⚡
-          </div>
-          <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300">
-            <Sparkles className="w-3.5 h-3.5" />
-          </div>
-          <span className="text-[11px] font-black leading-tight text-white relative z-10">
-            SportyPicks
-          </span>
-        </div>
-
-        {/* Banner 5: Promotions */}
-        <div
-          onClick={() => showToast('Promotions: 1000% Multi-Bet Bonus & Free Bets')}
-          className="shrink-0 w-22 h-24 rounded-lg bg-gradient-to-b from-[#2e2311] to-[#573e16] border border-[#785926]/60 p-2 flex flex-col justify-between cursor-pointer relative overflow-hidden shadow-md group hover:border-amber-300 transition-all"
-        >
-          <div className="absolute right-1 top-1 text-2xl opacity-75 group-hover:scale-110 transition-transform">
-            ⚡👑
-          </div>
-          <div className="w-6 h-6 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-300">
-            <Trophy className="w-3.5 h-3.5" />
-          </div>
-          <span className="text-[11px] font-black leading-tight text-white relative z-10">
-            Promotions
-          </span>
-        </div>
+        ))}
       </div>
 
       {/* =================================================================== */}
@@ -449,6 +544,13 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Interactive Modal for Selected Promo Card */}
+      <PromoFeatureModal
+        item={selectedPromo}
+        onClose={() => setSelectedPromo(null)}
+        onOpenAviator={onOpenAviator}
+      />
     </div>
   );
 };
