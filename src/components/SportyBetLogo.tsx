@@ -24,27 +24,27 @@ export const SportyBetLogo: React.FC<SportyBetLogoProps> = ({
   const sizeStyles = {
     sm: { 
       container: 'h-5 text-[14.5px]', 
-      dot: 'w-[2.5px] h-[2.5px]', 
-      dotTop: '-top-[0.5px] -right-[1px]', 
-      dotBottom: '-bottom-[0.5px] -left-[1.3px]' 
+      dot: 'w-[2.8px] h-[2.8px]', 
+      dotTop: '-top-[0.5px] -right-[1.1px]', 
+      dotBottom: '-bottom-[0.5px] -left-[1.4px]' 
     },
     md: { 
       container: 'h-6 text-[17.5px]', 
-      dot: 'w-[3px] h-[3px]', 
-      dotTop: '-top-[0.5px] -right-[1.3px]', 
-      dotBottom: '-bottom-[0.5px] -left-[1.6px]' 
+      dot: 'w-[3.4px] h-[3.4px]', 
+      dotTop: '-top-[0.5px] -right-[1.4px]', 
+      dotBottom: '-bottom-[0.5px] -left-[1.7px]' 
     },
     lg: { 
       container: 'h-7 text-[20px]', 
-      dot: 'w-[3.4px] h-[3.4px]', 
-      dotTop: '-top-[1px] -right-[1.5px]', 
-      dotBottom: '-bottom-[1px] -left-[1.8px]' 
+      dot: 'w-[3.8px] h-[3.8px]', 
+      dotTop: '-top-[1px] -right-[1.6px]', 
+      dotBottom: '-bottom-[1px] -left-[2px]' 
     },
     xl: { 
       container: 'h-8 text-[23px]', 
-      dot: 'w-[4px] h-[4px]', 
+      dot: 'w-[4.4px] h-[4.4px]', 
       dotTop: '-top-[1px] -right-[2px]', 
-      dotBottom: '-bottom-[1px] -left-[2.2px]' 
+      dotBottom: '-bottom-[1px] -left-[2.4px]' 
     }
   };
 
@@ -55,7 +55,7 @@ export const SportyBetLogo: React.FC<SportyBetLogoProps> = ({
       className={`inline-flex items-center select-none font-['Montserrat','Plus_Jakarta_Sans',system-ui,sans-serif] ${currentSize.container} ${className}`}
       style={{
         fontStyle: 'italic',
-        fontWeight: 700,
+        fontWeight: 800,
         letterSpacing: '-0.025em',
         lineHeight: 1
       }}
@@ -76,7 +76,7 @@ export const SportyBetLogo: React.FC<SportyBetLogoProps> = ({
 
         {/* Capital 'S' */}
         <span 
-          className="font-bold text-inherit"
+          className="font-extrabold text-inherit"
           style={{ color: textColor }}
         >
           S
@@ -85,7 +85,7 @@ export const SportyBetLogo: React.FC<SportyBetLogoProps> = ({
 
       {/* 'porty' in athletic geometric sans with matching bold weight */}
       <span 
-        className="font-bold tracking-[-0.025em]"
+        className="font-extrabold tracking-[-0.025em]"
         style={{ color: textColor }}
       >
         porty
@@ -93,7 +93,7 @@ export const SportyBetLogo: React.FC<SportyBetLogoProps> = ({
 
       {/* 'Bet' in matching font and weight */}
       <span 
-        className="font-bold tracking-[-0.025em]"
+        className="font-extrabold tracking-[-0.025em]"
         style={{ color: textColor }}
       >
         Bet
@@ -125,18 +125,18 @@ export const SportyBetLogoSvg: React.FC<{
     >
       <g transform="skewX(-7) translate(3, 0)">
         {/* S top-right dot */}
-        <circle cx="16" cy="5.5" r="1.8" fill={fill} />
+        <circle cx="16" cy="5.5" r="2.1" fill={fill} />
         
         {/* S bottom-left dot */}
-        <circle cx="2" cy="19.5" r="1.8" fill={fill} />
+        <circle cx="2" cy="19.5" r="2.1" fill={fill} />
 
-        {/* Text rendered with Montserrat/Plus Jakarta Sans bold */}
+        {/* Text rendered with Montserrat/Plus Jakarta Sans extra bold */}
         <text
           x="3"
           y="20.5"
           fill={fill}
           fontFamily="'Montserrat', 'Plus Jakarta Sans', system-ui, sans-serif"
-          fontWeight="700"
+          fontWeight="800"
           fontSize="19"
           letterSpacing="-0.025em"
           fontStyle="italic"
