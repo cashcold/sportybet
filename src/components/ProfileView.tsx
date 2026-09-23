@@ -16,11 +16,13 @@ import {
   ChevronRight,
   ShieldCheck,
   Moon,
-  Sun
+  Sun,
+  Server
 } from 'lucide-react';
 import { useBetting } from '../context/BettingContext';
 import { ProfileDetailsSubpage } from './ProfileDetailsSubpage';
 import { AuthModal } from './AuthModal';
+import { ApiConsoleModal } from './ApiConsoleModal';
 
 interface ProfileViewProps {
   onOpenWithdraw: () => void;
@@ -32,6 +34,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
   const [showSubpage, setShowSubpage] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'join'>('login');
+  const [apiConsoleOpen, setApiConsoleOpen] = useState(false);
 
   // If subpage is open, display Image 3
   if (showSubpage) {
@@ -115,12 +118,17 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
         {renderFooter(false, () => {}, () => {
           setAuthMode('login');
           setAuthModalOpen(true);
-        }, showToast)}
+        }, showToast, () => setApiConsoleOpen(true))}
 
         <AuthModal
           isOpen={authModalOpen}
           onClose={() => setAuthModalOpen(false)}
           initialMode={authMode}
+        />
+
+        <ApiConsoleModal
+          isOpen={apiConsoleOpen}
+          onClose={() => setApiConsoleOpen(false)}
         />
       </div>
     );
@@ -440,10 +448,36 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
           </div>
           <ChevronRight className="w-4 h-4 text-neutral-400 stroke-[2]" />
         </button>
+
+        {/* Serverless API Console */}
+        <button
+          onClick={() => setApiConsoleOpen(true)}
+          className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-[#16212e] transition-colors group"
+        >
+          <div className="flex items-center space-x-3">
+            <Server className="w-5 h-5 text-[#00df59] stroke-[1.8]" />
+            <div className="text-left">
+              <div className="text-sm font-medium text-white flex items-center space-x-2">
+                <span>Serverless API Console</span>
+                <span className="bg-[#00a826]/20 text-[#00df59] text-[9px] font-bold px-1.5 py-0.2 rounded border border-[#00a826]/40">
+                  LIVE
+                </span>
+              </div>
+              <span className="text-[10px] text-neutral-400">Interactive REST endpoints test suite</span>
+            </div>
+          </div>
+          <div className="flex items-center space-x-1 text-xs text-[#00df59] font-medium">
+            <span>Docs</span>
+            <ChevronRight className="w-4 h-4 stroke-[2]" />
+          </div>
+        </button>
       </div>
 
       {/* Footer Section (Screenshot 4 & 14) */}
-      {renderFooter(true, logout, () => {}, showToast)}
+      {renderFooter(true, logout, () => {}, showToast, () => setApiConsoleOpen(true))}
+
+      {/* Full-Stack Serverless API Console Modal */}
+      <ApiConsoleModal isOpen={apiConsoleOpen} onClose={() => setApiConsoleOpen(false)} />
     </div>
   );
 };
@@ -452,7 +486,8 @@ function renderFooter(
   isLoggedIn: boolean,
   logout: () => void,
   openLogin: () => void,
-  showToast: (m: string) => void
+  showToast: (m: string) => void,
+  onOpenApiConsole?: () => void
 ) {
   return (
     <div className="mt-8 px-4 pb-8 text-center text-xs text-neutral-400 space-y-4">
@@ -587,8 +622,11 @@ function renderFooter(
           About Us
         </button>
         <span>|</span>
-        <button onClick={() => showToast('All Systems Operational')} className="hover:text-neutral-200">
-          System Status
+        <button 
+          onClick={() => onOpenApiConsole ? onOpenApiConsole() : showToast('All Systems Operational - Serverless API Online')} 
+          className="hover:text-neutral-200"
+        >
+          System Status (API)
         </button>
       </div>
 

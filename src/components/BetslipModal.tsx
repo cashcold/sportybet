@@ -21,7 +21,8 @@ export const BetslipModal: React.FC = () => {
     placeBet,
     user,
     showToast,
-    loadBookingCode
+    loadBookingCode,
+    generateBookingCode
   } = useBetting();
 
   const [mode, setMode] = useState<'REAL' | 'SIM'>('REAL');
@@ -38,12 +39,12 @@ export const BetslipModal: React.FC = () => {
     ? parseFloat(betslip.reduce((acc, curr) => acc * curr.odd, 1).toFixed(2))
     : 0;
 
-  const handlePlaceBet = () => {
+  const handlePlaceBet = async () => {
     if (betslip.length === 0) {
       showToast('Betslip is empty');
       return;
     }
-    const res = placeBet(stake, tab === 'Single' ? 'Single' : 'Multiple');
+    const res = await placeBet(stake, tab === 'Single' ? 'Single' : 'Multiple');
     if (res.success) {
       confetti({
         particleCount: 80,
@@ -56,18 +57,15 @@ export const BetslipModal: React.FC = () => {
     }
   };
 
-  const handleBookBet = () => {
+  const handleBookBet = async () => {
     if (betslip.length === 0) {
       showToast('Select matches first to book');
       return;
     }
-    const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-    let code = 'GH';
-    for (let i = 0; i < 4; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    const code = await generateBookingCode();
+    if (code) {
+      navigator.clipboard?.writeText(code);
     }
-    navigator.clipboard?.writeText(code);
-    showToast(`Booking Code: ${code} (Copied!) Share with friends.`);
   };
 
   return (

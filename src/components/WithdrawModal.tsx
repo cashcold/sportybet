@@ -27,8 +27,8 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ isOpen, onClose })
     }
 
     setIsProcessing(true);
-    setTimeout(() => {
-      const res = withdraw(amount, `${provider} Mobile Money`);
+    setTimeout(async () => {
+      const res = await withdraw(amount, `${provider} Mobile Money`);
       setIsProcessing(false);
       if (res.success) {
         onClose();

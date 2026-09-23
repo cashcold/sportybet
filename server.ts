@@ -1,18 +1,12 @@
-import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
-import { footballRouter } from './src/server/footballApi';
+import express from 'express';
+import { app } from './src/server/app';
 
 dotenv.config();
 
-const app = express();
 const PORT = 3000;
-
-app.use(express.json());
-
-// Mount API routes
-app.use('/api/football', footballRouter);
 
 async function startServer() {
   // Mount Vite middleware in development
@@ -31,7 +25,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`SportyBet Ghana Server running on port ${PORT}`);
+    console.log(`SportyBet Ghana Full-Stack Server running on port ${PORT}`);
   });
 }
 

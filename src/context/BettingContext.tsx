@@ -13,6 +13,7 @@ import {
   INITIAL_BET_HISTORY,
   INITIAL_USER
 } from '../data/mockData';
+import { api } from '../services/api';
 
 interface BettingContextType {
   matches: Match[];
@@ -35,17 +36,18 @@ interface BettingContextType {
   toggleSelection: (match: Match, marketName: string, odd: OddItem) => void;
   removeSelection: (matchId: string, marketName: string, selectionName: string) => void;
   clearBetslip: () => void;
-  placeBet: (stake: number, type: 'Single' | 'Multiple') => { success: boolean; error?: string };
-  cashoutBet: (betId: string) => void;
-  deposit: (amount: number, provider: string) => void;
-  withdraw: (amount: number, provider: string) => { success: boolean; error?: string };
+  placeBet: (stake: number, type: 'Single' | 'Multiple') => Promise<{ success: boolean; error?: string }>;
+  cashoutBet: (betId: string) => Promise<void>;
+  deposit: (amount: number, provider: string) => Promise<void>;
+  withdraw: (amount: number, provider: string) => Promise<{ success: boolean; error?: string }>;
   toastMessage: string | null;
   showToast: (msg: string) => void;
   updateUsername: (name: string) => void;
   updateProfile: (updates: Partial<UserProfile>) => void;
-  login: (phone?: string) => void;
-  logout: () => void;
-  loadBookingCode: (code: string) => boolean;
+  login: (phone?: string) => Promise<void>;
+  logout: () => Promise<void>;
+  loadBookingCode: (code: string) => Promise<boolean>;
+  generateBookingCode: () => Promise<string | null>;
   apiFootballConfigured: boolean;
   refreshLiveOdds: () => Promise<void>;
 }
@@ -247,7 +249,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setBetslip([]);
   };
 
-  const placeBet = (stake: number, type: 'Single' | 'Multiple'): { success: boolean; error?: string } => {
+  const placeBet = async (stake: number, type: 'Single' | 'Multiple'): Promise<{ success: boolean; error?: string }> => {
     if (betslip.length === 0) {
       return { success: false, error: 'Your betslip is empty' };
     }
@@ -283,7 +285,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       cashoutAmount: parseFloat((stake * 0.95).toFixed(2))
     };
 
-    // Deduct balance
+    // Optimistically deduct balance
     setUser(prev => ({
       ...prev,
       balance: parseFloat((prev.balance - stake).toFixed(2)),
@@ -293,12 +295,27 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setOpenBets(prev => [newBet, ...prev]);
     setBetslip([]);
     setIsBetslipOpen(false);
-    showToast(`Bet placed successfully! Ticket: ${newBet.ticketId}`);
 
+    // Call Server API
+    try {
+      const serverRes = await api.bets.placeBet(betslip, stake, type);
+      if (serverRes.success && serverRes.bet) {
+        setOpenBets(prev => [serverRes.bet!, ...prev.filter(b => b.id !== newBet.id)]);
+        if (serverRes.remainingBalance !== undefined) {
+          setUser(prev => ({ ...prev, balance: serverRes.remainingBalance! }));
+        }
+        showToast(`Bet placed! Ticket: ${serverRes.ticketId || newBet.ticketId}`);
+        return { success: true };
+      }
+    } catch {
+      // Keep optimistic bet
+    }
+
+    showToast(`Bet placed successfully! Ticket: ${newBet.ticketId}`);
     return { success: true };
   };
 
-  const cashoutBet = (betId: string) => {
+  const cashoutBet = async (betId: string) => {
     const bet = openBets.find(b => b.id === betId);
     if (!bet || !bet.cashoutAmount) return;
 
@@ -318,19 +335,40 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ...prev
     ]);
 
+    // Call Server API
+    try {
+      const res = await api.bets.cashout(betId);
+      if (res.success && res.newBalance !== undefined) {
+        setUser(prev => ({ ...prev, balance: res.newBalance! }));
+      }
+    } catch {
+      // Already handled optimistically
+    }
+
     showToast(`Cashed out GHS ${returnAmount.toFixed(2)} successfully!`);
   };
 
-  const deposit = (amount: number, provider: string) => {
+  const deposit = async (amount: number, provider: string) => {
     setUser(prev => ({
       ...prev,
       balance: parseFloat((prev.balance + amount).toFixed(2))
     }));
     setIsDepositModalOpen(false);
+
+    // Call Server API
+    try {
+      const res = await api.wallet.deposit(amount, provider, user.phone);
+      if (res.success && res.balance !== undefined) {
+        setUser(prev => ({ ...prev, balance: res.balance! }));
+      }
+    } catch {
+      // handled optimistically
+    }
+
     showToast(`Deposited GHS ${amount.toFixed(2)} via ${provider}!`);
   };
 
-  const withdraw = (amount: number, provider: string): { success: boolean; error?: string } => {
+  const withdraw = async (amount: number, provider: string): Promise<{ success: boolean; error?: string }> => {
     if (amount <= 0) return { success: false, error: 'Invalid amount' };
     if (user.balance < amount) return { success: false, error: 'Insufficient funds' };
 
@@ -338,30 +376,67 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ...prev,
       balance: parseFloat((prev.balance - amount).toFixed(2))
     }));
+
+    // Call Server API
+    try {
+      const res = await api.wallet.withdraw(amount, provider, user.phone);
+      if (res.success && res.balance !== undefined) {
+        setUser(prev => ({ ...prev, balance: res.balance! }));
+      }
+    } catch {
+      // handled optimistically
+    }
+
     showToast(`Withdrawal of GHS ${amount.toFixed(2)} sent via ${provider}!`);
     return { success: true };
   };
 
-  const updateUsername = (name: string) => {
+  const updateUsername = async (name: string) => {
     setUser(prev => ({ ...prev, username: name }));
+    try {
+      await api.auth.updateProfile({ username: name });
+    } catch {
+      //
+    }
     showToast('Username updated');
   };
 
-  const updateProfile = (updates: Partial<UserProfile>) => {
+  const updateProfile = async (updates: Partial<UserProfile>) => {
     setUser(prev => ({ ...prev, ...updates }));
+    try {
+      await api.auth.updateProfile(updates);
+    } catch {
+      //
+    }
     showToast('Profile updated');
   };
 
-  const login = (phone?: string) => {
+  const login = async (phone?: string) => {
+    const phoneNumber = phone || user.phone || '20******5';
+    try {
+      const res = await api.auth.login(phoneNumber);
+      if (res.success && res.user) {
+        setUser(res.user);
+        showToast('Logged in successfully');
+        return;
+      }
+    } catch {
+      //
+    }
     setUser(prev => ({
       ...prev,
       isLoggedIn: true,
-      phone: phone || prev.phone || '20******5'
+      phone: phoneNumber
     }));
     showToast('Logged in successfully');
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await api.auth.logout();
+    } catch {
+      //
+    }
     setUser(prev => ({
       ...prev,
       isLoggedIn: false
@@ -369,9 +444,43 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     showToast('Logged out');
   };
 
-  const loadBookingCode = (code: string): boolean => {
+  const generateBookingCode = async (): Promise<string | null> => {
+    if (betslip.length === 0) {
+      showToast('Add selections to betslip first');
+      return null;
+    }
+    try {
+      const res = await api.bets.generateBookingCode(betslip);
+      if (res.success && res.bookingCode) {
+        showToast(`Booking Code: ${res.bookingCode} generated!`);
+        return res.bookingCode;
+      }
+    } catch {
+      // Fallback
+    }
+    const fallbackCode = `BC${Math.floor(1000 + Math.random() * 9000)}`;
+    showToast(`Booking Code: ${fallbackCode} generated!`);
+    return fallbackCode;
+  };
+
+  const loadBookingCode = async (code: string): Promise<boolean> => {
     if (!code.trim()) return false;
-    // Simulate loading selections
+    const cleanCode = code.trim().toUpperCase();
+
+    // Try fetching from server API first
+    try {
+      const serverRes = await api.bets.loadBookingCode(cleanCode);
+      if (serverRes.success && serverRes.selections && serverRes.selections.length > 0) {
+        setBetslip(serverRes.selections);
+        setIsBetslipOpen(true);
+        showToast(`Booking Code ${cleanCode} loaded! (${serverRes.selections.length} events)`);
+        return true;
+      }
+    } catch {
+      // Fallback to local match resolution
+    }
+
+    // Fallback simulation
     const randomMatches = matches.slice(0, 3);
     const loadedSelections: BetSelection[] = randomMatches.map(m => {
       const odd = m.markets['1X2'] ? m.markets['1X2'][0] : { name: '1', value: 1.5 };
@@ -387,7 +496,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
     setBetslip(loadedSelections);
     setIsBetslipOpen(true);
-    showToast(`Booking Code ${code.toUpperCase()} loaded! (${loadedSelections.length} events)`);
+    showToast(`Booking Code ${cleanCode} loaded! (${loadedSelections.length} events)`);
     return true;
   };
 
@@ -425,6 +534,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         login,
         logout,
         loadBookingCode,
+        generateBookingCode,
         apiFootballConfigured,
         refreshLiveOdds
       }}

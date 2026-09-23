@@ -46,10 +46,10 @@ export const SportsView: React.FC = () => {
   const liveMatches = matches.filter(m => m.isLive);
   const upcomingMatches = matches.filter(m => !m.isLive);
 
-  const handleLoadBookingCodeSubmit = (e: React.FormEvent) => {
+  const handleLoadBookingCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!bookingCodeInput.trim()) return;
-    const ok = loadBookingCode(bookingCodeInput.trim());
+    const ok = await loadBookingCode(bookingCodeInput.trim());
     if (ok) {
       setIsBookingCodeModalOpen(false);
       setBookingCodeInput('');
