@@ -25,6 +25,22 @@ jobs:
       - name: Build web application
         run: npm run build
 
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Accept Android SDK Licenses & Install Platform 35
+        run: |
+          if [ -n "$ANDROID_HOME" ] && [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+            "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0" || true
+          elif command -v sdkmanager >/dev/null 2>&1; then
+            yes | sdkmanager --licenses || true
+            sdkmanager "platforms;android-35" "build-tools;35.0.0" || true
+          fi
+
       - name: Prepare and Sync Capacitor Android
         run: |
           if [ ! -f "android/gradlew" ]; then
@@ -33,26 +49,16 @@ jobs:
             npx cap add android
             sed -i "s/compileSdkVersion = 36/compileSdkVersion = 35/g" android/variables.gradle || true
             sed -i "s/targetSdkVersion = 36/targetSdkVersion = 35/g" android/variables.gradle || true
+            sed -i 's/gradle-8.14.3-all.zip/gradle-8.14.3-bin.zip/g' android/gradle/wrapper/gradle-wrapper.properties || true
             if ! grep -q "usesCleartextTraffic" android/app/src/main/AndroidManifest.xml 2>/dev/null; then
               sed -i 's/<application/<application android:usesCleartextTraffic="true"/' android/app/src/main/AndroidManifest.xml || true
             fi
           else
             echo "Existing Android native project detected in repository. Syncing web assets..."
+            sed -i "s/compileSdkVersion = 36/compileSdkVersion = 35/g" android/variables.gradle || true
+            sed -i "s/targetSdkVersion = 36/targetSdkVersion = 35/g" android/variables.gradle || true
+            sed -i 's/gradle-8.14.3-all.zip/gradle-8.14.3-bin.zip/g' android/gradle/wrapper/gradle-wrapper.properties || true
             npx cap sync android
-          fi
-
-      - name: Setup Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Accept Android SDK Licenses
-        run: |
-          if command -v sdkmanager >/dev/null 2>&1; then
-            yes | sdkmanager --licenses || true
-          elif [ -n "$ANDROID_HOME" ] && [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
-            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
           fi
 
       - name: Setup Gradle
@@ -60,13 +66,12 @@ jobs:
 
       - name: Make Gradle executable and normalize line endings
         run: |
-          ls -la android/gradlew
           sed -i 's/\r$//' android/gradlew
           chmod +x android/gradlew
 
       - name: Build Debug APK
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: ./gradlew assembleDebug --no-daemon --info --stacktrace
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
