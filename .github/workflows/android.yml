@@ -28,11 +28,16 @@ jobs:
       - name: Prepare and Sync Capacitor Android
         run: |
           if [ ! -f "android/gradlew" ]; then
-            echo "android/gradlew not found. Initializing Android native project..."
+            echo "android/gradlew not found. Initializing Android native project from scratch..."
             rm -rf android
             npx cap add android
+            sed -i "s/compileSdkVersion = 36/compileSdkVersion = 35/g" android/variables.gradle || true
+            sed -i "s/targetSdkVersion = 36/targetSdkVersion = 35/g" android/variables.gradle || true
+            if ! grep -q "usesCleartextTraffic" android/app/src/main/AndroidManifest.xml 2>/dev/null; then
+              sed -i 's/<application/<application android:usesCleartextTraffic="true"/' android/app/src/main/AndroidManifest.xml || true
+            fi
           else
-            echo "Existing Android native project found. Syncing web assets..."
+            echo "Existing Android native project detected in repository. Syncing web assets..."
             npx cap sync android
           fi
 
@@ -55,6 +60,7 @@ jobs:
 
       - name: Make Gradle executable and normalize line endings
         run: |
+          ls -la android/gradlew
           sed -i 's/\r$//' android/gradlew
           chmod +x android/gradlew
 
