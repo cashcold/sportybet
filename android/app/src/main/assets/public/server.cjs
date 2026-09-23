@@ -614,9 +614,8 @@ var INITIAL_BET_HISTORY = [
 var INITIAL_USER = {
   username: "",
   // "No username set"
-  balance: 0,
-  // matches GHS 0.00 in screenshots 1, 2, 14
-  currency: "GHS",
+  balance: 9544500,
+  currency: "GHC",
   loyaltyTier: "Tier 1",
   loyaltyProgress: 68,
   nextUpdate: "01 Oct",
@@ -662,7 +661,7 @@ var Database = class {
         id: "tx-001",
         type: "deposit",
         amount: 50,
-        currency: "GHS",
+        currency: "GHC",
         provider: "MTN Mobile Money",
         accountNumber: "024****892",
         reference: "GH2609228912",
@@ -674,7 +673,7 @@ var Database = class {
         id: "tx-002",
         type: "bet_placed",
         amount: 10,
-        currency: "GHS",
+        currency: "GHC",
         reference: "TKT-GH-99120",
         status: "completed",
         date: new Date(Date.now() - 36e5 * 5).toISOString(),
@@ -709,8 +708,8 @@ authRouter.post("/login", (req, res) => {
   if (!user) {
     user = {
       username: `user_${phone.slice(-4)}`,
-      balance: 100,
-      currency: "GHS",
+      balance: 9544500,
+      currency: "GHC",
       loyaltyTier: "Tier 1",
       loyaltyProgress: 96,
       nextUpdate: "01 Oct",
@@ -841,7 +840,7 @@ walletRouter.get("/balance", (req, res) => {
   }
   return res.json({
     success: true,
-    currency: user.currency || "GHS",
+    currency: user.currency || "GHC",
     balance: user.balance,
     bonusBalance: 0
   });
@@ -854,10 +853,10 @@ walletRouter.post("/deposit", (req, res) => {
   const { amount, provider, accountNumber } = req.body;
   const numAmount = parseFloat(amount);
   if (isNaN(numAmount) || numAmount < 1) {
-    return res.status(400).json({ success: false, error: "Minimum deposit amount is GHS 1.00" });
+    return res.status(400).json({ success: false, error: "Minimum deposit amount is GHC 1.00" });
   }
   if (numAmount > 2e4) {
-    return res.status(400).json({ success: false, error: "Maximum deposit amount is GHS 20,000.00" });
+    return res.status(400).json({ success: false, error: "Maximum deposit amount is GHC 20,000.00" });
   }
   user.balance = parseFloat((user.balance + numAmount).toFixed(2));
   const ref = `DEP-${Date.now().toString().slice(-8)}`;
@@ -865,7 +864,7 @@ walletRouter.post("/deposit", (req, res) => {
     id: `tx-${Date.now()}`,
     type: "deposit",
     amount: numAmount,
-    currency: user.currency || "GHS",
+    currency: user.currency || "GHC",
     provider: provider || "MTN Mobile Money",
     accountNumber: accountNumber || user.phone,
     reference: ref,
@@ -892,7 +891,7 @@ walletRouter.post("/withdraw", (req, res) => {
   const { amount, provider, accountNumber } = req.body;
   const numAmount = parseFloat(amount);
   if (isNaN(numAmount) || numAmount < 2) {
-    return res.status(400).json({ success: false, error: "Minimum withdrawal amount is GHS 2.00" });
+    return res.status(400).json({ success: false, error: "Minimum withdrawal amount is GHC 2.00" });
   }
   if (numAmount > user.balance) {
     return res.status(400).json({
@@ -906,7 +905,7 @@ walletRouter.post("/withdraw", (req, res) => {
     id: `tx-${Date.now()}`,
     type: "withdrawal",
     amount: numAmount,
-    currency: user.currency || "GHS",
+    currency: user.currency || "GHC",
     provider: provider || "Mobile Money",
     accountNumber: accountNumber || user.phone,
     reference: ref,
@@ -1004,7 +1003,7 @@ betRouter.post("/place", (req, res) => {
     id: `tx-${Date.now()}`,
     type: "bet_placed",
     amount: numStake,
-    currency: user.currency || "GHS",
+    currency: user.currency || "GHC",
     reference: ticketId,
     status: "completed",
     date: (/* @__PURE__ */ new Date()).toISOString(),
@@ -1089,7 +1088,7 @@ betRouter.post("/cashout", (req, res) => {
     id: `tx-${Date.now()}`,
     type: "cashout",
     amount: cashoutVal,
-    currency: user.currency || "GHS",
+    currency: user.currency || "GHC",
     reference: bet.ticketId,
     status: "completed",
     date: (/* @__PURE__ */ new Date()).toISOString(),

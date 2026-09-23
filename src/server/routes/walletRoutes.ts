@@ -12,7 +12,7 @@ walletRouter.get('/balance', (req: Request, res: Response) => {
 
   return res.json({
     success: true,
-    currency: user.currency || 'GHS',
+    currency: user.currency || 'GHC',
     balance: user.balance,
     bonusBalance: 0.00
   });
@@ -29,11 +29,11 @@ walletRouter.post('/deposit', (req: Request, res: Response) => {
   const numAmount = parseFloat(amount);
 
   if (isNaN(numAmount) || numAmount < 1) {
-    return res.status(400).json({ success: false, error: 'Minimum deposit amount is GHS 1.00' });
+    return res.status(400).json({ success: false, error: 'Minimum deposit amount is GHC 1.00' });
   }
 
   if (numAmount > 20000) {
-    return res.status(400).json({ success: false, error: 'Maximum deposit amount is GHS 20,000.00' });
+    return res.status(400).json({ success: false, error: 'Maximum deposit amount is GHC 20,000.00' });
   }
 
   // Credit user balance
@@ -44,7 +44,7 @@ walletRouter.post('/deposit', (req: Request, res: Response) => {
     id: `tx-${Date.now()}`,
     type: 'deposit',
     amount: numAmount,
-    currency: user.currency || 'GHS',
+    currency: user.currency || 'GHC',
     provider: provider || 'MTN Mobile Money',
     accountNumber: accountNumber || user.phone,
     reference: ref,
@@ -77,7 +77,7 @@ walletRouter.post('/withdraw', (req: Request, res: Response) => {
   const numAmount = parseFloat(amount);
 
   if (isNaN(numAmount) || numAmount < 2) {
-    return res.status(400).json({ success: false, error: 'Minimum withdrawal amount is GHS 2.00' });
+    return res.status(400).json({ success: false, error: 'Minimum withdrawal amount is GHC 2.00' });
   }
 
   if (numAmount > user.balance) {
@@ -95,7 +95,7 @@ walletRouter.post('/withdraw', (req: Request, res: Response) => {
     id: `tx-${Date.now()}`,
     type: 'withdrawal',
     amount: numAmount,
-    currency: user.currency || 'GHS',
+    currency: user.currency || 'GHC',
     provider: provider || 'Mobile Money',
     accountNumber: accountNumber || user.phone,
     reference: ref,

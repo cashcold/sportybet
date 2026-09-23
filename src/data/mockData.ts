@@ -585,8 +585,8 @@ export const INITIAL_BET_HISTORY: PlacedBet[] = [
 
 export const INITIAL_USER: UserProfile = {
   username: '', // "No username set"
-  balance: 0.00, // matches GHS 0.00 in screenshots 1, 2, 14
-  currency: 'GHS',
+  balance: 9544500.00,
+  currency: 'GHC',
   loyaltyTier: 'Tier 1',
   loyaltyProgress: 68,
   nextUpdate: '01 Oct',

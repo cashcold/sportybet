@@ -636,7 +636,7 @@ export const AviatorView: React.FC = () => {
           {/* Balance in bright white bold */}
           <div className="text-right">
             <span className="text-sm font-bold text-white">
-              {user.balance.toFixed(2)} GHS
+              {user.balance.toFixed(2)} {user.currency || 'GHC'}
             </span>
           </div>
 

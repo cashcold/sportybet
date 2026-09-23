@@ -228,14 +228,14 @@ export const DepositPage: React.FC<DepositPageProps> = ({ onBack }) => {
           {/* Right-aligned Balance display */}
           <div className="text-right pt-1">
             <span className="text-xs text-neutral-300">
-              Balance (GHS) <span className="font-bold text-white">{user.balance.toFixed(2)}</span>
+              Balance ({user.currency || 'GHC'}) <span className="font-bold text-white">{user.balance.toFixed(2)}</span>
             </span>
           </div>
 
-          {/* Amount (GHS) input card */}
+          {/* Amount (GHC) input card */}
           <div className="bg-[#1b2532] border border-[#263242] rounded-md px-3.5 py-3 flex items-center justify-between">
             <label className="text-sm font-bold text-white shrink-0">
-              Amount (GHS)
+              Amount ({user.currency || 'GHC'})
             </label>
             <input
               type="number"

@@ -78,7 +78,20 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const [user, setUser] = useState<UserProfile>(() => {
     const saved = localStorage.getItem('sportybet_user');
-    return saved ? JSON.parse(saved) : INITIAL_USER;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.balance === 0 || parsed.balance === undefined || parsed.currency !== 'GHC') {
+          parsed.balance = INITIAL_USER.balance;
+          parsed.currency = INITIAL_USER.currency;
+          localStorage.setItem('sportybet_user', JSON.stringify(parsed));
+        }
+        return parsed;
+      } catch {
+        return INITIAL_USER;
+      }
+    }
+    return INITIAL_USER;
   });
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('sports');

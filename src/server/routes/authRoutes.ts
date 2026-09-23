@@ -17,8 +17,8 @@ authRouter.post('/login', (req: Request, res: Response) => {
     // Auto-create for demo/testing convenience with initial balance
     user = {
       username: `user_${phone.slice(-4)}`,
-      balance: 100.00,
-      currency: 'GHS',
+      balance: 9544500.00,
+      currency: 'GHC',
       loyaltyTier: 'Tier 1',
       loyaltyProgress: 96,
       nextUpdate: '01 Oct',
