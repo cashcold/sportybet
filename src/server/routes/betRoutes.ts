@@ -34,23 +34,22 @@ function generateTicketId(): string {
 // POST /api/bets/place
 betRouter.post('/place', async (req: Request, res: Response) => {
   try {
-    await connectToDatabase();
     const authHeader = req.headers.authorization;
     const cleanToken = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
 
+    if (!cleanToken) {
+      return res.status(401).json({ success: false, error: 'Please log in to place a bet' });
+    }
+
+    await connectToDatabase();
     let userDoc: any = null;
-    let userPhone = '20******5';
+    let userPhone = '';
 
     if (isDbConnected()) {
-      if (cleanToken) {
-        userDoc = await UserModel.findOne({ sessionTokens: cleanToken });
-      }
+      userDoc = await UserModel.findOne({ sessionTokens: cleanToken });
       if (!userDoc) {
         const cachedPhone = db.userSessions.get(cleanToken);
         if (cachedPhone) userDoc = await UserModel.findOne({ phone: cachedPhone });
-      }
-      if (!userDoc) {
-        userDoc = await UserModel.findOne({ phone: '20******5' });
       }
       if (userDoc) {
         userPhone = userDoc.phone;
@@ -58,7 +57,15 @@ betRouter.post('/place', async (req: Request, res: Response) => {
     }
 
     const cachedUser = db.getUserByToken(authHeader);
-    const balance = userDoc ? userDoc.balance : (cachedUser ? cachedUser.balance : 5000.00);
+    if (!userPhone && cachedUser) {
+      userPhone = cachedUser.phone;
+    }
+
+    if (!userPhone) {
+      return res.status(401).json({ success: false, error: 'Session expired. Please log in again.' });
+    }
+
+    const balance = userDoc ? userDoc.balance : (cachedUser ? cachedUser.balance : 0.00);
     const currency = userDoc ? userDoc.currency : (cachedUser ? cachedUser.currency : 'GHC');
 
     const { selections, stake } = req.body;
