@@ -261,6 +261,82 @@ export const api = {
     }
   },
 
+  // --- SPORTS API-SPORTS CENTRAL SERVICE ---
+  sports: {
+    async getUsage(): Promise<{ success: boolean; stats: any[]; provider?: string; error?: string }> {
+      try {
+        const res = await fetch(`${getBaseUrl()}/sports/usage`);
+        return await res.json();
+      } catch (err: any) {
+        return { success: false, stats: [], error: err.message };
+      }
+    },
+
+    async getStatus(sport: string = 'football'): Promise<any> {
+      try {
+        const res = await fetch(`${getBaseUrl()}/sports/${encodeURIComponent(sport)}/status`);
+        return await res.json();
+      } catch (err: any) {
+        return { success: false, error: err.message };
+      }
+    },
+
+    async getLive(sport: string = 'football'): Promise<{
+      success: boolean;
+      data?: Match[];
+      count?: number;
+      cached?: boolean;
+      stale?: boolean;
+      lastUpdated?: string;
+      source?: string;
+      error?: string;
+    }> {
+      try {
+        const res = await fetch(`${getBaseUrl()}/sports/${encodeURIComponent(sport)}/live`);
+        return await res.json();
+      } catch (err: any) {
+        return { success: false, data: [], error: err.message };
+      }
+    },
+
+    async getFixtures(
+      sport: string = 'football',
+      params?: { date?: string; league?: string; season?: string }
+    ): Promise<{
+      success: boolean;
+      data?: Match[];
+      count?: number;
+      cached?: boolean;
+      stale?: boolean;
+      lastUpdated?: string;
+      source?: string;
+      error?: string;
+    }> {
+      try {
+        const query = new URLSearchParams();
+        if (params?.date) query.append('date', params.date);
+        if (params?.league) query.append('league', params.league);
+        if (params?.season) query.append('season', params.season);
+
+        const res = await fetch(`${getBaseUrl()}/sports/${encodeURIComponent(sport)}/fixtures?${query.toString()}`);
+        return await res.json();
+      } catch (err: any) {
+        return { success: false, data: [], error: err.message };
+      }
+    },
+
+    async clearCache(): Promise<{ success: boolean; message?: string }> {
+      try {
+        const res = await fetch(`${getBaseUrl()}/sports/clear-cache`, {
+          method: 'POST'
+        });
+        return await res.json();
+      } catch (err: any) {
+        return { success: false };
+      }
+    }
+  },
+
   // --- SYSTEM INFO ---
   system: {
     async getStatus(): Promise<any> {

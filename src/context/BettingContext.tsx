@@ -52,7 +52,12 @@ interface BettingContextType {
   loadBookingCode: (code: string) => Promise<boolean>;
   generateBookingCode: () => Promise<string | null>;
   apiFootballConfigured: boolean;
-  refreshLiveOdds: () => Promise<void>;
+  refreshLiveOdds: (force?: boolean) => Promise<void>;
+  lastUpdatedTime: string;
+  isLiveCached: boolean;
+  isLiveStale: boolean;
+  sportsUsage: any[];
+  refreshSportsUsage: () => Promise<void>;
 }
 
 const BettingContext = createContext<BettingContextType | undefined>(undefined);
@@ -108,42 +113,76 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [selectedLeagueFilter, setSelectedLeagueFilter] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [apiFootballConfigured, setApiFootballConfigured] = useState(false);
+  const [lastManualRefresh, setLastManualRefresh] = useState<number>(0);
+  const [lastUpdatedTime, setLastUpdatedTime] = useState<string>(() => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  const [isLiveCached, setIsLiveCached] = useState<boolean>(true);
+  const [isLiveStale, setIsLiveStale] = useState<boolean>(false);
+  const [sportsUsage, setSportsUsage] = useState<any[]>([]);
 
-  // Check API-Football backend status and fetch live fixtures
-  const refreshLiveOdds = async () => {
+  // Query API-Sports usage metadata
+  const refreshSportsUsage = async () => {
     try {
-      const statusRes = await fetch(resolveApiUrl('/football/status'));
-      if (statusRes.ok) {
-        const statusData = await statusRes.json();
-        setApiFootballConfigured(Boolean(statusData.configured));
-        if (statusData.configured) {
-          const liveRes = await fetch(resolveApiUrl('/football/live'));
-          if (liveRes.ok) {
-            const liveData = await liveRes.json();
-            if (liveData.success && liveData.data && liveData.data.length > 0) {
-              setMatches(prev => {
-                // Merge API matches ahead of scheduled matches
-                const scheduled = prev.filter(m => !m.isLive);
-                return [...liveData.data, ...scheduled];
-              });
-              showToast('⚡ Live matches synced from API-Football');
-            }
+      const res = await api.sports.getUsage();
+      if (res && res.success && res.stats) {
+        setSportsUsage(res.stats);
+      }
+    } catch {
+      // Backend offline or error
+    }
+  };
+
+  // Check centralized API-Sports backend and fetch live fixtures with cooldown protection
+  const refreshLiveOdds = async (force: boolean = false) => {
+    const now = Date.now();
+    if (force) {
+      if (now - lastManualRefresh < 15000) {
+        const remaining = Math.ceil((15000 - (now - lastManualRefresh)) / 1000);
+        showToast(`Cooldown active: please wait ${remaining}s before refreshing`);
+        return;
+      }
+      setLastManualRefresh(now);
+    }
+
+    try {
+      const activeSport = selectedSport || 'football';
+      const liveRes = await api.sports.getLive(activeSport);
+
+      if (liveRes && liveRes.success) {
+        setApiFootballConfigured(true);
+        setIsLiveCached(Boolean(liveRes.cached));
+        setIsLiveStale(Boolean(liveRes.stale));
+        if (liveRes.lastUpdated) {
+          setLastUpdatedTime(liveRes.lastUpdated);
+        }
+
+        if (liveRes.data && liveRes.data.length > 0) {
+          setMatches(prev => {
+            const scheduled = prev.filter(m => !m.isLive);
+            return [...liveRes.data!, ...scheduled];
+          });
+          if (force) {
+            showToast(liveRes.stale ? '⚠️ Live feed served from stale cache' : '⚡ Matches synced (Cache protected)');
           }
         }
       }
+      // Also update usage table
+      refreshSportsUsage();
     } catch {
-      // Backend not reached or running in preview client mode
+      // Backend not reached
     }
   };
 
   useEffect(() => {
-    refreshLiveOdds();
-    // Poll every 30 seconds if key is configured
+    // Initial fetch on mount or when sport changes
+    refreshLiveOdds(false);
+    refreshSportsUsage();
+
+    // Gentle 60-second polling while viewing sports tab (the backend cache handles deduplication & TTLs)
     const pollInterval = setInterval(() => {
-      if (apiFootballConfigured) {
-        refreshLiveOdds();
+      if (activeTab === 'sports') {
+        refreshLiveOdds(false);
       }
-    }, 30000);
+    }, 60000);
 
     // Initial sync from MongoDB backend
     const syncMongoData = async () => {
@@ -169,7 +208,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     syncMongoData();
 
     return () => clearInterval(pollInterval);
-  }, [apiFootballConfigured]);
+  }, [selectedSport, activeTab]);
 
   // Sync state to localStorage
   useEffect(() => {
@@ -818,7 +857,12 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         loadBookingCode,
         generateBookingCode,
         apiFootballConfigured,
-        refreshLiveOdds
+        refreshLiveOdds,
+        lastUpdatedTime,
+        isLiveCached,
+        isLiveStale,
+        sportsUsage,
+        refreshSportsUsage
       }}
     >
       {children}

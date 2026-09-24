@@ -4,6 +4,7 @@ import { walletRouter } from './routes/walletRoutes';
 import { betRouter } from './routes/betRoutes';
 import { matchesRouter } from './routes/matchesRoutes';
 import { footballRouter } from './footballApi';
+import { sportsRouter } from './routes/sportsRoutes';
 
 export const app = express();
 
@@ -84,5 +85,19 @@ app.use('/api/matches', matchesRouter);
 app.use('/matches', matchesRouter);
 app.use('/api/football', footballRouter);
 app.use('/football', footballRouter);
+app.use('/api/sports', sportsRouter);
+app.use('/sports', sportsRouter);
+
+// Error middleware to handle database queries failing gracefully when MongoDB is offline
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (err?.name === 'MongooseError' || err?.name === 'MongoNetworkError' || err?.message?.includes('buffering timed out')) {
+    console.warn('[AI Studio] Database offline — returning mock response');
+    if (req.method === 'GET') {
+      return res.json(req.path.endsWith('s') || req.path.endsWith('s/') ? [] : {});
+    }
+    return res.status(503).json({ error: 'Service temporarily unavailable (database offline)' });
+  }
+  next(err);
+});
 
 export default app;

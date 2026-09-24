@@ -1,14 +1,31 @@
 import { Router, Request, Response } from 'express';
 import { db } from '../db';
 import { Match } from '../../types';
+import { sportsService, getSportsApiKey } from '../sports/sportsService';
 
 export const matchesRouter = Router();
 
 // GET /api/matches
-matchesRouter.get('/', (req: Request, res: Response) => {
+matchesRouter.get('/', async (req: Request, res: Response) => {
   const { sport, live, league, search } = req.query;
 
   let result = [...db.matches];
+
+  // If external API-Sports key is active, augment with cached live matches
+  if (getSportsApiKey()) {
+    try {
+      const activeSport = (typeof sport === 'string' && sport) ? sport : 'football';
+      const liveData = await sportsService.getLiveMatches(activeSport);
+      if (liveData.matches && liveData.matches.length > 0) {
+        // Merge without duplicating IDs
+        const existingIds = new Set(result.map(m => m.id));
+        const newLiveMatches = liveData.matches.filter(m => !existingIds.has(m.id));
+        result = [...newLiveMatches, ...result];
+      }
+    } catch {
+      // Non-blocking fallback to existing matches in db
+    }
+  }
 
   if (sport && typeof sport === 'string') {
     result = result.filter(m => m.sport.toLowerCase() === sport.toLowerCase());

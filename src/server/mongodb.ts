@@ -1,14 +1,20 @@
 import mongoose from 'mongoose';
 import { UserModel } from './models/UserModel';
 
-export const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  'mongodb+srv://capital:mangement12345@capgainco.o3hgd.mongodb.net/SportyBet?retryWrites=true&w=majority&appName=Capgainco';
+export const MONGODB_URI = process.env.MONGODB_URI || '';
 
 let isConnected = false;
 let connectionPromise: Promise<typeof mongoose | null> | null = null;
 
+// Ensure mongoose never buffers commands when offline
+mongoose.set('bufferCommands', false);
+
 export async function connectToDatabase(): Promise<typeof mongoose | null> {
+  if (!MONGODB_URI) {
+    // In-memory mode active (db.ts)
+    return null;
+  }
+
   if (isConnected && mongoose.connection.readyState === 1) {
     return mongoose;
   }

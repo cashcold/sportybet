@@ -16,6 +16,9 @@ export const SportsView: React.FC = () => {
     setSelectedLeagueFilter,
     apiFootballConfigured,
     refreshLiveOdds,
+    lastUpdatedTime,
+    isLiveCached,
+    isLiveStale,
     showToast,
     setActiveTab,
     loadBookingCode
@@ -27,11 +30,8 @@ export const SportsView: React.FC = () => {
 
   const handleManualSync = async () => {
     setIsRefreshing(true);
-    await refreshLiveOdds();
+    await refreshLiveOdds(true);
     setIsRefreshing(false);
-    if (!apiFootballConfigured) {
-      showToast('API-Football: Add API_FOOTBALL_KEY in AI Studio Settings to load real in-play odds');
-    }
   };
   
   // Market tab state
@@ -41,7 +41,7 @@ export const SportsView: React.FC = () => {
   const [upToggle, setUpToggle] = useState<'1UP' | '2UP'>('1UP');
   const [detailMatch, setDetailMatch] = useState<Match | null>(null);
 
-  const sportsList = ['Football', 'vFootball', 'Basketball', 'Tennis', 'eFootball'];
+  const sportsList = ['Football', 'Basketball', 'NBA', 'NFL', 'Baseball', 'Hockey', 'Rugby', 'Tennis', 'MMA'];
   const marketTypes = ['1X2', 'O/U', 'DC', '1st Half O/U', 'Handicap'];
 
   const liveMatches = matches.filter(m => m.isLive);
@@ -88,21 +88,29 @@ export const SportsView: React.FC = () => {
             })}
           </div>
 
-          <button
-            onClick={handleManualSync}
-            title={apiFootballConfigured ? 'API-Football Live Synced' : 'Sync live odds / check API'}
-            className="shrink-0 ml-2 px-2 py-0.5 rounded text-[10px] font-bold flex items-center space-x-1 bg-[#1a2330] border border-neutral-700/60 text-neutral-300 hover:text-white"
-          >
-            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[#00df59]' : 'text-neutral-400'}`} />
-            {apiFootballConfigured ? (
-              <span className="text-[#00df59] flex items-center space-x-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00df59] animate-pulse" />
-                <span>API-Football</span>
+          <div className="shrink-0 ml-2 flex items-center space-x-1.5">
+            <span className="hidden sm:inline-block text-[9px] text-neutral-400 font-mono">
+              Updated {lastUpdatedTime}
+            </span>
+            {isLiveStale ? (
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                Stale Cache
               </span>
-            ) : (
-              <span>Live Sync</span>
-            )}
-          </button>
+            ) : isLiveCached ? (
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#00df59]/10 text-[#00df59] border border-[#00df59]/30">
+                Cached
+              </span>
+            ) : null}
+            <button
+              onClick={handleManualSync}
+              disabled={isRefreshing}
+              title={`Sync live odds (Backend Cache Protected). Last updated ${lastUpdatedTime}`}
+              className="px-2 py-0.5 rounded text-[10px] font-bold flex items-center space-x-1 bg-[#1a2330] border border-neutral-700/60 text-neutral-300 hover:text-white transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[#00df59]' : 'text-neutral-400'}`} />
+              <span>Sync</span>
+            </button>
+          </div>
         </div>
 
         {/* Live Markets Selector (1X2, O/U, DC, 1st Half O/U, Handicap) + 1UP/2UP Toggle */}
