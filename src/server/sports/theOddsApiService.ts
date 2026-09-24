@@ -1,6 +1,7 @@
 import { Match } from '../../types';
 import { db } from '../db';
 import { MatchModel } from '../models/MatchModel';
+import { isDbConnected, connectToDatabase } from '../mongodb';
 
 export interface TheOddsQuotaStatus {
   provider: string;
@@ -82,6 +83,12 @@ class TheOddsApiService {
    */
   public async hydrateFromMongo(): Promise<number> {
     try {
+      if (!isDbConnected()) {
+        await connectToDatabase();
+      }
+      if (!isDbConnected()) {
+        return 0;
+      }
       const docs = await MatchModel.find({ source: 'the_odds_api' }).lean();
       if (docs && docs.length > 0) {
         let loadedCount = 0;
@@ -100,6 +107,9 @@ class TheOddsApiService {
             minute: doc.minute,
             isLive: doc.isLive,
             startTime: doc.startTime,
+            date: doc.date,
+            dateLabel: doc.dateLabel,
+            commenceTime: doc.commenceTime ? doc.commenceTime.toISOString() : undefined,
             isHot: doc.isHot,
             hasLiveStream: doc.hasLiveStream,
             marketsCount: doc.marketsCount,
@@ -204,8 +214,15 @@ class TheOddsApiService {
     const isLive = isPastCommence && (now.getTime() - commenceDate.getTime()) < (115 * 60 * 1000);
 
     let startTime = '19:00';
+    let dateStr: string | undefined;
+    let dateLabel: string | undefined;
+
     if (!isNaN(commenceDate.getTime())) {
       startTime = commenceDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      dateStr = commenceDate.toISOString().split('T')[0];
+      const weekday = commenceDate.toLocaleDateString('en-GB', { weekday: 'long' });
+      const dayMonth = commenceDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+      dateLabel = `${weekday} ${dayMonth}`;
     }
 
     // Default realistic odds
@@ -272,6 +289,9 @@ class TheOddsApiService {
       minute: isLive ? "25' 1H" : undefined,
       isLive,
       startTime: isLive ? 'Live' : startTime,
+      date: dateStr,
+      dateLabel,
+      commenceTime: item.commence_time,
       isHot: true,
       hasLiveStream: true,
       marketsCount,
@@ -325,39 +345,48 @@ class TheOddsApiService {
 
     const transformedMatches: Match[] = [];
 
+    // Ensure database connection is initialized if configured
+    if (!isDbConnected()) {
+      await connectToDatabase();
+    }
+
     for (const item of events) {
       const match = this.transformOddsApiEvent(item, leagueDef);
       transformedMatches.push(match);
       this.localMatches.set(match.id, match);
 
-      // Asynchronously upsert to MongoDB Atlas
-      MatchModel.findOneAndUpdate(
-        { id: match.id },
-        {
-          id: match.id,
-          gameId: match.gameId,
-          sport: match.sport,
-          sportKey: leagueDef.key,
-          league: match.league,
-          countryOrCategory: match.countryOrCategory,
-          homeTeam: match.homeTeam,
-          awayTeam: match.awayTeam,
-          homeScore: match.homeScore,
-          awayScore: match.awayScore,
-          period: match.period,
-          minute: match.minute,
-          isLive: match.isLive,
-          startTime: match.startTime,
-          commenceTime: item.commence_time ? new Date(item.commence_time) : new Date(),
-          isHot: match.isHot,
-          hasLiveStream: match.hasLiveStream,
-          marketsCount: match.marketsCount,
-          markets: match.markets,
-          source: 'the_odds_api',
-          lastSyncedAt: new Date()
-        },
-        { upsert: true, new: true }
-      ).catch(e => console.warn('[TheOddsAPI] Mongo upsert error:', e.message));
+      // Asynchronously upsert to MongoDB Atlas if connected
+      if (isDbConnected()) {
+        MatchModel.findOneAndUpdate(
+          { id: match.id },
+          {
+            id: match.id,
+            gameId: match.gameId,
+            sport: match.sport,
+            sportKey: leagueDef.key,
+            league: match.league,
+            countryOrCategory: match.countryOrCategory,
+            homeTeam: match.homeTeam,
+            awayTeam: match.awayTeam,
+            homeScore: match.homeScore,
+            awayScore: match.awayScore,
+            period: match.period,
+            minute: match.minute,
+            isLive: match.isLive,
+            startTime: match.startTime,
+            date: match.date,
+            dateLabel: match.dateLabel,
+            commenceTime: item.commence_time ? new Date(item.commence_time) : new Date(),
+            isHot: match.isHot,
+            hasLiveStream: match.hasLiveStream,
+            marketsCount: match.marketsCount,
+            markets: match.markets,
+            source: 'the_odds_api',
+            lastSyncedAt: new Date()
+          },
+          { upsert: true, new: true }
+        ).catch(e => console.warn('[TheOddsAPI] Mongo upsert error:', e.message));
+      }
     }
 
     this.syncToGlobalDb();

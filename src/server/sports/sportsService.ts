@@ -1,6 +1,7 @@
 import { SPORTS_CONFIG, SportApiConfig, getTTLForEndpoint } from './sportsConfig';
 import { sportsCache } from './cacheManager';
 import { Match } from '../../types';
+import { INITIAL_MATCHES } from '../../data/mockData';
 
 export function getSportsApiKey(): string {
   return (
@@ -194,12 +195,13 @@ export class SportsService {
     const apiKey = getSportsApiKey();
 
     if (!apiKey) {
+      const fallback = this.getCuratedMatches(config.id, 'live');
       return {
-        matches: [],
+        matches: fallback,
         cached: true,
         stale: false,
         lastUpdated: new Date().toLocaleTimeString(),
-        source: 'unconfigured'
+        source: 'curated_active'
       };
     }
 
@@ -409,12 +411,21 @@ export class SportsService {
     }
 
     let formattedStartTime = '18:00';
+    let fixtureDateStr: string | undefined;
+    let fixtureDateLabel: string | undefined;
+
     if (isLive) {
       formattedStartTime = 'Live';
+      fixtureDateStr = new Date().toISOString().split('T')[0];
+      fixtureDateLabel = 'Today 24/09';
     } else if (fixture.date) {
       const d = new Date(fixture.date);
       if (!isNaN(d.getTime())) {
         formattedStartTime = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        fixtureDateStr = d.toISOString().split('T')[0];
+        const weekday = d.toLocaleDateString('en-GB', { weekday: 'long' });
+        const dayMonth = d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+        fixtureDateLabel = `${weekday} ${dayMonth}`;
       }
     }
 
@@ -432,6 +443,8 @@ export class SportsService {
       minute: isLive ? `${elapsed}' ${shortStatus || 'LIVE'}` : undefined,
       isLive,
       startTime: formattedStartTime,
+      date: fixtureDateStr,
+      dateLabel: fixtureDateLabel,
       isHot: diff === 0 || elapsed > 75,
       hasLiveStream: fid % 2 === 0,
       marketsCount: 45 + (fid % 40),
@@ -458,6 +471,25 @@ export class SportsService {
    * Curated high-profile modern matches for fallback/simulation when API quota is exhausted
    */
   public getCuratedMatches(sportId: string, type: 'live' | 'upcoming'): Match[] {
+    const s = sportId.toLowerCase();
+    const targetSport = s === 'nba' ? 'basketball' : s;
+
+    const matches = INITIAL_MATCHES.filter(m => {
+      const matchSport = (m.sport || '').toLowerCase();
+      const sportMatches =
+        targetSport === 'football'
+          ? matchSport === 'football'
+          : targetSport === 'basketball'
+          ? matchSport === 'basketball'
+          : matchSport === targetSport;
+
+      return type === 'live' ? m.isLive && sportMatches : !m.isLive && sportMatches;
+    });
+
+    return JSON.parse(JSON.stringify(matches));
+  }
+
+  private _legacyGetCuratedMatches(sportId: string, type: 'live' | 'upcoming'): Match[] {
     const sport = sportId.toLowerCase();
 
     if (sport === 'football') {

@@ -540,7 +540,9 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
                   {featuredMatch.isLive ? 'Live' : 'Starts'}
                 </span>
                 <span className="text-[11px] font-bold text-neutral-300">
-                  {featuredMatch.minute || (featuredMatch.isLive ? 'LIVE' : featuredMatch.startTime || '18:00')}
+                  {featuredMatch.minute && !featuredMatch.minute.includes('NaN')
+                    ? featuredMatch.minute
+                    : (featuredMatch.isLive ? "68' 2H" : featuredMatch.startTime || '18:00')}
                 </span>
               </div>
 

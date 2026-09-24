@@ -75,7 +75,7 @@ class Database {
         reference: 'TKT-GH-99120',
         status: 'completed',
         date: new Date(Date.now() - 3600000 * 5).toISOString(),
-        description: 'Single Bet - Bayern Munich W'
+        description: 'Single Bet - Arsenal FC'
       }
     ]);
 

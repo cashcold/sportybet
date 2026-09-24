@@ -8,10 +8,12 @@ import { connectToDatabase } from './src/server/mongodb';
 const PORT = 3000;
 
 async function startServer() {
-  // Connect to MongoDB
-  connectToDatabase().catch((err) => {
-    console.error('[MongoDB Startup Error]', err);
-  });
+  // Connect to MongoDB if configured
+  try {
+    await connectToDatabase();
+  } catch (err: any) {
+    console.warn('[MongoDB Startup Notice]', err?.message || err);
+  }
   // Mount Vite middleware in development
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({

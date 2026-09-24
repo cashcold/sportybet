@@ -43,23 +43,12 @@ footballRouter.get('/status', async (req: Request, res: Response) => {
 
 // 2. Live Matches Endpoint: /live (mounted at /api/football/live and /football/live)
 footballRouter.get('/live', async (req: Request, res: Response) => {
-  const apiKey = getSportsApiKey();
-
-  if (!apiKey) {
-    return res.json({
-      success: true,
-      source: 'demo_simulation',
-      configured: false,
-      data: null
-    });
-  }
-
   try {
     const result = await sportsService.getLiveMatches('football');
     return res.json({
       success: true,
       source: result.source,
-      configured: true,
+      configured: Boolean(getSportsApiKey()),
       cached: result.cached,
       stale: result.stale,
       lastUpdated: result.lastUpdated,

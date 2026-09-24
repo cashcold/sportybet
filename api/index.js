@@ -707,10 +707,18 @@ var UserModel = mongoose.models.User || mongoose.model("User", UserSchema);
 
 // src/server/mongodb.ts
 import mongoose2 from "mongoose";
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://capital:mangement12345@capgainco.o3hgd.mongodb.net/SportyBet?retryWrites=true&w=majority&appName=Capgainco";
+function getMongoUri() {
+  return process.env.MONGODB_URI || "";
+}
+var MONGODB_URI = process.env.MONGODB_URI || "";
 var isConnected = false;
 var connectionPromise = null;
+mongoose2.set("bufferCommands", false);
 async function connectToDatabase() {
+  const uri = getMongoUri();
+  if (!uri) {
+    return null;
+  }
   if (isConnected && mongoose2.connection.readyState === 1) {
     return mongoose2;
   }
@@ -720,9 +728,9 @@ async function connectToDatabase() {
   connectionPromise = (async () => {
     try {
       console.log("[MongoDB] Connecting to SportyBet database...");
-      const conn = await mongoose2.connect(MONGODB_URI, {
-        serverSelectionTimeoutMS: 2500,
-        connectTimeoutMS: 3e3,
+      const conn = await mongoose2.connect(uri, {
+        serverSelectionTimeoutMS: 8e3,
+        connectTimeoutMS: 8e3,
         bufferCommands: false
       });
       isConnected = true;
@@ -1478,28 +1486,32 @@ function generateTicketId() {
 }
 betRouter.post("/place", async (req, res) => {
   try {
-    await connectToDatabase();
     const authHeader = req.headers.authorization;
     const cleanToken = authHeader ? authHeader.replace("Bearer ", "").trim() : "";
+    if (!cleanToken) {
+      return res.status(401).json({ success: false, error: "Please log in to place a bet" });
+    }
+    await connectToDatabase();
     let userDoc = null;
-    let userPhone = "20******5";
+    let userPhone = "";
     if (isDbConnected()) {
-      if (cleanToken) {
-        userDoc = await UserModel.findOne({ sessionTokens: cleanToken });
-      }
+      userDoc = await UserModel.findOne({ sessionTokens: cleanToken });
       if (!userDoc) {
         const cachedPhone = db.userSessions.get(cleanToken);
         if (cachedPhone) userDoc = await UserModel.findOne({ phone: cachedPhone });
-      }
-      if (!userDoc) {
-        userDoc = await UserModel.findOne({ phone: "20******5" });
       }
       if (userDoc) {
         userPhone = userDoc.phone;
       }
     }
     const cachedUser = db.getUserByToken(authHeader);
-    const balance = userDoc ? userDoc.balance : cachedUser ? cachedUser.balance : 5e3;
+    if (!userPhone && cachedUser) {
+      userPhone = cachedUser.phone;
+    }
+    if (!userPhone) {
+      return res.status(401).json({ success: false, error: "Session expired. Please log in again." });
+    }
+    const balance = userDoc ? userDoc.balance : cachedUser ? cachedUser.balance : 0;
     const currency = userDoc ? userDoc.currency : cachedUser ? cachedUser.currency : "GHC";
     const { selections, stake } = req.body;
     const numStake = parseFloat(stake);
@@ -1636,22 +1648,30 @@ betRouter.post("/place", async (req, res) => {
 });
 betRouter.get("/open", async (req, res) => {
   try {
-    await connectToDatabase();
     const authHeader = req.headers.authorization;
     const cleanToken = authHeader ? authHeader.replace("Bearer ", "").trim() : "";
-    let userPhone = "20******5";
+    if (!cleanToken) {
+      return res.json({ success: true, count: 0, bets: [] });
+    }
+    await connectToDatabase();
+    let userPhone = "";
     if (isDbConnected()) {
-      if (cleanToken) {
-        const u = await UserModel.findOne({ sessionTokens: cleanToken });
-        if (u) userPhone = u.phone;
-      }
-    } else {
+      const u = await UserModel.findOne({ sessionTokens: cleanToken });
+      if (u) userPhone = u.phone;
+    }
+    if (!userPhone) {
       const cached = db.getUserByToken(authHeader);
       if (cached && cached.phone) userPhone = cached.phone;
     }
+    if (!userPhone) {
+      return res.json({ success: true, count: 0, bets: [] });
+    }
     let bets = [];
     if (isDbConnected()) {
-      const mongoBets = await BetModel.find({ userPhone, status: "open" }).sort({ createdAt: -1 });
+      const phoneQueries = [userPhone];
+      if (userPhone.startsWith("0")) phoneQueries.push(userPhone.slice(1));
+      if (!userPhone.startsWith("0")) phoneQueries.push("0" + userPhone);
+      const mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: "open" }).sort({ createdAt: -1 });
       if (mongoBets.length > 0) {
         bets = mongoBets.map((doc) => ({
           id: doc.id,
@@ -1682,28 +1702,35 @@ betRouter.get("/open", async (req, res) => {
     });
   } catch (err) {
     console.error("[Get Open Bets Error]", err);
-    const cached = db.openBets.get("20******5") || [];
-    return res.json({ success: true, count: cached.length, bets: cached });
+    return res.json({ success: true, count: 0, bets: [] });
   }
 });
 betRouter.get("/history", async (req, res) => {
   try {
-    await connectToDatabase();
     const authHeader = req.headers.authorization;
     const cleanToken = authHeader ? authHeader.replace("Bearer ", "").trim() : "";
-    let userPhone = "20******5";
+    if (!cleanToken) {
+      return res.json({ success: true, count: 0, bets: [] });
+    }
+    await connectToDatabase();
+    let userPhone = "";
     if (isDbConnected()) {
-      if (cleanToken) {
-        const u = await UserModel.findOne({ sessionTokens: cleanToken });
-        if (u) userPhone = u.phone;
-      }
-    } else {
+      const u = await UserModel.findOne({ sessionTokens: cleanToken });
+      if (u) userPhone = u.phone;
+    }
+    if (!userPhone) {
       const cached = db.getUserByToken(authHeader);
       if (cached && cached.phone) userPhone = cached.phone;
     }
+    if (!userPhone) {
+      return res.json({ success: true, count: 0, bets: [] });
+    }
     let bets = [];
     if (isDbConnected()) {
-      const mongoBets = await BetModel.find({ userPhone, status: { $ne: "open" } }).sort({ createdAt: -1 });
+      const phoneQueries = [userPhone];
+      if (userPhone.startsWith("0")) phoneQueries.push(userPhone.slice(1));
+      if (!userPhone.startsWith("0")) phoneQueries.push("0" + userPhone);
+      const mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: { $ne: "open" } }).sort({ createdAt: -1 });
       if (mongoBets.length > 0) {
         bets = mongoBets.map((doc) => ({
           id: doc.id,
@@ -1734,8 +1761,7 @@ betRouter.get("/history", async (req, res) => {
     });
   } catch (err) {
     console.error("[Get Bet History Error]", err);
-    const cached = db.betHistory.get("20******5") || [];
-    return res.json({ success: true, count: cached.length, bets: cached });
+    return res.json({ success: true, count: 0, bets: [] });
   }
 });
 betRouter.post("/cashout", async (req, res) => {
@@ -1900,10 +1926,1680 @@ betRouter.get("/booking-code/:code", async (req, res) => {
 
 // src/server/routes/matchesRoutes.ts
 import { Router as Router4 } from "express";
+
+// src/server/sports/sportsConfig.ts
+var DEFAULT_FIXTURE_TTL = parseInt(process.env.API_CACHE_FIXTURES_TTL || "900", 10);
+var DEFAULT_LIVE_TTL = parseInt(process.env.API_CACHE_LIVE_TTL || "60", 10);
+var DEFAULT_RESULTS_TTL = parseInt(process.env.API_CACHE_RESULTS_TTL || "2700", 10);
+var DEFAULT_STANDINGS_TTL = parseInt(process.env.API_CACHE_STANDINGS_TTL || "2700", 10);
+var DEFAULT_STATIC_TTL = parseInt(process.env.API_CACHE_STATIC_TTL || "86400", 10);
+var SPORTS_CONFIG = {
+  football: {
+    id: "football",
+    name: "Football",
+    host: "v3.football.api-sports.io",
+    plan: "Free",
+    dailyLimit: parseInt(process.env.API_FOOTBALL_DAILY_LIMIT || "100", 10),
+    safetyLimit: parseInt(process.env.API_FOOTBALL_SAFETY_LIMIT || "80", 10),
+    defaultFixtureTTL: DEFAULT_FIXTURE_TTL,
+    defaultLiveTTL: DEFAULT_LIVE_TTL
+  },
+  afl: {
+    id: "afl",
+    name: "AFL",
+    host: "v1.afl.api-sports.io",
+    plan: "Free",
+    dailyLimit: parseInt(process.env.API_AFL_DAILY_LIMIT || "100", 10),
+    safetyLimit: parseInt(process.env.API_AFL_SAFETY_LIMIT || "80", 10),
+    defaultFixtureTTL: DEFAULT_FIXTURE_TTL,
+    defaultLiveTTL: DEFAULT_LIVE_TTL
+  },
+  baseball: {
+    id: "baseball",
+    name: "Baseball",
+    host: "v1.baseball.api-sports.io",
+    plan: "Free",
+    dailyLimit: parseInt(process.env.API_BASEBALL_DAILY_LIMIT || "100", 10),
+    safetyLimit: parseInt(process.env.API_BASEBALL_SAFETY_LIMIT || "80", 10),
+    defaultFixtureTTL: DEFAULT_FIXTURE_TTL,
+    defaultLiveTTL: DEFAULT_LIVE_TTL
+  },
+  basketball: {
+    id: "basketball",
+    name: "Basketball",
+    host: "v1.basketball.api-sports.io",
+    plan: "Free",
+    dailyLimit: parseInt(process.env.API_BASKETBALL_DAILY_LIMIT || "100", 10),
+    safetyLimit: parseInt(process.env.API_BASKETBALL_SAFETY_LIMIT || "80", 10),
+    defaultFixtureTTL: DEFAULT_FIXTURE_TTL,
+    defaultLiveTTL: DEFAULT_LIVE_TTL
+  },
+  "formula-1": {
+    id: "formula-1",
+    name: "Formula 1",
+    host: "v1.formula-1.api-sports.io",
+    plan: "Free",
+    dailyLimit: parseInt(process.env.API_F1_DAILY_LIMIT || "100", 10),
+    safetyLimit: parseInt(process.env.API_F1_SAFETY_LIMIT || "80", 10),
+    defaultFixtureTTL: DEFAULT_FIXTURE_TTL,
+    defaultLiveTTL: DEFAULT_LIVE_TTL
+  },
+  handball: {
+    id: "handball",
+    name: "Handball",
+    host: "v1.handball.api-sports.io",
+    plan: "Free",
+    dailyLimit: parseInt(process.env.API_HANDBALL_DAILY_LIMIT || "100", 10),
+    safetyLimit: parseInt(process.env.API_HANDBALL_SAFETY_LIMIT || "80", 10),
+    defaultFixtureTTL: DEFAULT_FIXTURE_TTL,
+    defaultLiveTTL: DEFAULT_LIVE_TTL
+  },
+  hockey: {
+    id: "hockey",
+    name: "Hockey",
+    host: "v1.hockey.api-sports.io",
+    plan: "Free",
+    dailyLimit: parseInt(process.env.API_HOCKEY_DAILY_LIMIT || "100", 10),
+    safetyLimit: parseInt(process.env.API_HOCKEY_SAFETY_LIMIT || "80", 10),
+    defaultFixtureTTL: DEFAULT_FIXTURE_TTL,
+    defaultLiveTTL: DEFAULT_LIVE_TTL
+  },
+  mma: {
+    id: "mma",
+    name: "MMA",
+    host: "v1.mma.api-sports.io",
+    plan: "Free",
+    dailyLimit: parseInt(process.env.API_MMA_DAILY_LIMIT || "100", 10),
+    safetyLimit: parseInt(process.env.API_MMA_SAFETY_LIMIT || "80", 10),
+    defaultFixtureTTL: DEFAULT_FIXTURE_TTL,
+    defaultLiveTTL: DEFAULT_LIVE_TTL
+  },
+  nba: {
+    id: "nba",
+    name: "NBA",
+    host: "v2.nba.api-sports.io",
+    plan: "Free",
+    dailyLimit: parseInt(process.env.API_NBA_DAILY_LIMIT || "100", 10),
+    safetyLimit: parseInt(process.env.API_NBA_SAFETY_LIMIT || "80", 10),
+    defaultFixtureTTL: DEFAULT_FIXTURE_TTL,
+    defaultLiveTTL: DEFAULT_LIVE_TTL
+  },
+  nfl: {
+    id: "nfl",
+    name: "NFL (American Football)",
+    host: "v1.american-football.api-sports.io",
+    plan: "Free",
+    dailyLimit: parseInt(process.env.API_NFL_DAILY_LIMIT || "100", 10),
+    safetyLimit: parseInt(process.env.API_NFL_SAFETY_LIMIT || "80", 10),
+    defaultFixtureTTL: DEFAULT_FIXTURE_TTL,
+    defaultLiveTTL: DEFAULT_LIVE_TTL
+  },
+  rugby: {
+    id: "rugby",
+    name: "Rugby",
+    host: "v1.rugby.api-sports.io",
+    plan: "Free",
+    dailyLimit: parseInt(process.env.API_RUGBY_DAILY_LIMIT || "100", 10),
+    safetyLimit: parseInt(process.env.API_RUGBY_SAFETY_LIMIT || "80", 10),
+    defaultFixtureTTL: DEFAULT_FIXTURE_TTL,
+    defaultLiveTTL: DEFAULT_LIVE_TTL
+  },
+  volleyball: {
+    id: "volleyball",
+    name: "Volleyball",
+    host: "v1.volleyball.api-sports.io",
+    plan: "Free",
+    dailyLimit: parseInt(process.env.API_VOLLEYBALL_DAILY_LIMIT || "100", 10),
+    safetyLimit: parseInt(process.env.API_VOLLEYBALL_SAFETY_LIMIT || "80", 10),
+    defaultFixtureTTL: DEFAULT_FIXTURE_TTL,
+    defaultLiveTTL: DEFAULT_LIVE_TTL
+  }
+};
+function getTTLForEndpoint(endpoint) {
+  const lower = endpoint.toLowerCase();
+  if (lower.includes("live") || lower.includes("inplay") || lower.includes("status")) {
+    return DEFAULT_LIVE_TTL;
+  }
+  if (lower.includes("standings")) {
+    return DEFAULT_STANDINGS_TTL;
+  }
+  if (lower.includes("results") || lower.includes("h2h")) {
+    return DEFAULT_RESULTS_TTL;
+  }
+  if (lower.includes("teams") || lower.includes("leagues") || lower.includes("players") || lower.includes("venues") || lower.includes("seasons") || lower.includes("countries") || lower.includes("timezone")) {
+    return DEFAULT_STATIC_TTL;
+  }
+  return DEFAULT_FIXTURE_TTL;
+}
+
+// src/server/sports/cacheManager.ts
+var SportsCacheManager = class {
+  constructor() {
+    this.cache = /* @__PURE__ */ new Map();
+    // Request deduplication (single-flight locking)
+    this.inFlightRequests = /* @__PURE__ */ new Map();
+    // Sport usage tracking
+    this.usageStats = /* @__PURE__ */ new Map();
+    this.initUsageStats();
+  }
+  initUsageStats() {
+    Object.values(SPORTS_CONFIG).forEach((sport) => {
+      this.usageStats.set(sport.id, {
+        sport: sport.id,
+        sportName: sport.name,
+        dailyLimit: sport.dailyLimit,
+        safetyLimit: sport.safetyLimit,
+        requestsMade: 0,
+        remainingRequests: sport.dailyLimit,
+        cacheHits: 0,
+        cacheMisses: 0,
+        lastApiRequest: null,
+        lastSuccessfulRequest: null,
+        lastError: null,
+        rateLimitHits: 0,
+        status: "Healthy"
+      });
+    });
+  }
+  /**
+   * Generates a deterministic canonical cache key
+   * e.g., sports:football:fixtures:league:39:season:2026
+   */
+  generateKey(sport, endpoint, params = {}) {
+    const cleanSport = sport.toLowerCase().trim();
+    const cleanEndpoint = endpoint.toLowerCase().trim().replace(/^\/+/, "");
+    const sortedKeys = Object.keys(params).filter((k) => params[k] !== void 0 && params[k] !== null && params[k] !== "").sort();
+    const paramParts = sortedKeys.map((k) => `${k}:${String(params[k]).trim()}`);
+    if (paramParts.length === 0) {
+      return `sports:${cleanSport}:${cleanEndpoint}`;
+    }
+    return `sports:${cleanSport}:${cleanEndpoint}:${paramParts.join(":")}`;
+  }
+  /**
+   * Retrieve cached data if valid and unexpired
+   */
+  get(cacheKey) {
+    const entry = this.cache.get(cacheKey);
+    if (!entry) {
+      return { hit: false, entry: null, isStale: false };
+    }
+    const now = Date.now();
+    const isExpired = now >= entry.expiresAt;
+    if (!isExpired) {
+      return { hit: true, entry, isStale: false };
+    }
+    return { hit: false, entry, isStale: true };
+  }
+  /**
+   * Save response to cache with TTL
+   */
+  set(cacheKey, sport, endpoint, data, customTTLSeconds) {
+    const ttlSeconds = customTTLSeconds || getTTLForEndpoint(endpoint);
+    const now = Date.now();
+    const entry = {
+      data,
+      createdAt: now,
+      expiresAt: now + ttlSeconds * 1e3,
+      sport,
+      endpoint,
+      cacheKey,
+      lastApiRequestTime: now,
+      status: "valid"
+    };
+    this.cache.set(cacheKey, entry);
+    console.log(`[CACHE SAVED] ${cacheKey} (TTL: ${ttlSeconds}s, Expires in: ${ttlSeconds / 60}m)`);
+    return entry;
+  }
+  /**
+   * Get an existing stale cache entry if available
+   */
+  getStale(cacheKey) {
+    const entry = this.cache.get(cacheKey);
+    return entry || null;
+  }
+  /**
+   * Check if external request is allowed based on rate-limit & safety thresholds
+   */
+  canMakeRequest(sportId) {
+    const stats = this.getOrCreateStats(sportId);
+    if (stats.requestsMade >= stats.dailyLimit) {
+      stats.status = "Exhausted";
+      return {
+        allowed: false,
+        reason: `Daily quota of ${stats.dailyLimit} requests exhausted for ${stats.sportName}. Using cached/stale data.`
+      };
+    }
+    if (stats.rateLimitHits > 0 && stats.requestsMade >= stats.safetyLimit) {
+      stats.status = "Rate Limited";
+      return {
+        allowed: false,
+        reason: `Upstream rate-limit reached for ${stats.sportName}. Preserving remaining quota.`
+      };
+    }
+    if (stats.requestsMade >= stats.safetyLimit) {
+      stats.status = "Conservative";
+    } else {
+      stats.status = "Healthy";
+    }
+    return { allowed: true };
+  }
+  /**
+   * Central single-flight request executor with deduplication & stale fallback
+   */
+  async executeWithCache(sport, endpoint, params, fetcher, customTTLSeconds) {
+    const cacheKey = this.generateKey(sport, endpoint, params);
+    const stats = this.getOrCreateStats(sport);
+    const cacheResult = this.get(cacheKey);
+    if (cacheResult.hit && cacheResult.entry) {
+      stats.cacheHits++;
+      console.log(`[CACHE HIT] ${cacheKey} (${stats.cacheHits} total hits)`);
+      return {
+        data: cacheResult.entry.data,
+        cached: true,
+        stale: false,
+        lastUpdated: new Date(cacheResult.entry.createdAt).toLocaleTimeString(),
+        cacheKey
+      };
+    }
+    stats.cacheMisses++;
+    console.log(`[CACHE MISS] ${cacheKey}`);
+    const safetyCheck = this.canMakeRequest(sport);
+    if (!safetyCheck.allowed) {
+      console.warn(`[RATE LIMIT PROTECTION] ${safetyCheck.reason}`);
+      if (cacheResult.entry) {
+        console.log(`[STALE CACHE FALLBACK] Returning expired data for ${cacheKey}`);
+        return {
+          data: cacheResult.entry.data,
+          cached: true,
+          stale: true,
+          lastUpdated: new Date(cacheResult.entry.createdAt).toLocaleTimeString(),
+          cacheKey
+        };
+      }
+    }
+    if (this.inFlightRequests.has(cacheKey)) {
+      console.log(`[DEDUPLICATION] Joining in-flight request for: ${cacheKey}`);
+      try {
+        const inFlightData = await this.inFlightRequests.get(cacheKey);
+        stats.cacheHits++;
+        return {
+          data: inFlightData,
+          cached: true,
+          stale: false,
+          lastUpdated: (/* @__PURE__ */ new Date()).toLocaleTimeString(),
+          cacheKey
+        };
+      } catch (inFlightErr) {
+        if (cacheResult.entry) {
+          return {
+            data: cacheResult.entry.data,
+            cached: true,
+            stale: true,
+            lastUpdated: new Date(cacheResult.entry.createdAt).toLocaleTimeString(),
+            cacheKey
+          };
+        }
+        throw inFlightErr;
+      }
+    }
+    const requestPromise = (async () => {
+      try {
+        stats.requestsMade++;
+        stats.remainingRequests = Math.max(0, stats.dailyLimit - stats.requestsMade);
+        stats.lastApiRequest = (/* @__PURE__ */ new Date()).toISOString();
+        console.log(`[API REQUEST] ${cacheKey} (Request #${stats.requestsMade}/${stats.dailyLimit})`);
+        const freshData = await fetcher();
+        stats.lastSuccessfulRequest = (/* @__PURE__ */ new Date()).toISOString();
+        stats.lastError = null;
+        this.set(cacheKey, sport, endpoint, freshData, customTTLSeconds);
+        return freshData;
+      } catch (err) {
+        stats.lastError = err?.message || String(err);
+        console.error(`[API ERROR] ${cacheKey}:`, stats.lastError);
+        if (err?.message?.includes("429") || err?.message?.toLowerCase().includes("rate limit") || err?.message?.toLowerCase().includes("quota")) {
+          stats.rateLimitHits++;
+          stats.status = "Rate Limited";
+          console.warn(`[RATE LIMIT] Rate limit recorded for sport: ${sport}`);
+        }
+        if (cacheResult.entry) {
+          console.log(`[STALE CACHE FALLBACK] Request failed, returning stale cache for ${cacheKey}`);
+          return cacheResult.entry.data;
+        }
+        throw err;
+      } finally {
+        this.inFlightRequests.delete(cacheKey);
+      }
+    })();
+    this.inFlightRequests.set(cacheKey, requestPromise);
+    try {
+      const data = await requestPromise;
+      const isStaleFallback = Boolean(stats.lastError && cacheResult.entry);
+      return {
+        data,
+        cached: isStaleFallback,
+        stale: isStaleFallback,
+        lastUpdated: (/* @__PURE__ */ new Date()).toLocaleTimeString(),
+        cacheKey
+      };
+    } catch (err) {
+      if (cacheResult.entry) {
+        return {
+          data: cacheResult.entry.data,
+          cached: true,
+          stale: true,
+          lastUpdated: new Date(cacheResult.entry.createdAt).toLocaleTimeString(),
+          cacheKey
+        };
+      }
+      throw err;
+    }
+  }
+  /**
+   * Record external API response quota headers if provided by API-Sports
+   */
+  recordApiSportsHeaders(sportId, headers) {
+    const stats = this.getOrCreateStats(sportId);
+    const remaining = headers.get("x-ratelimit-requests-remaining");
+    const limit = headers.get("x-ratelimit-requests-limit");
+    if (remaining !== null) {
+      const remNum = parseInt(remaining, 10);
+      if (!isNaN(remNum)) {
+        stats.remainingRequests = remNum;
+        if (limit !== null) {
+          const limitNum = parseInt(limit, 10);
+          if (!isNaN(limitNum)) {
+            stats.dailyLimit = limitNum;
+            stats.requestsMade = Math.max(0, limitNum - remNum);
+          }
+        }
+      }
+    }
+  }
+  getOrCreateStats(sportId) {
+    let stats = this.usageStats.get(sportId);
+    if (!stats) {
+      const config = SPORTS_CONFIG[sportId] || {
+        id: sportId,
+        name: sportId.toUpperCase(),
+        dailyLimit: 100,
+        safetyLimit: 80
+      };
+      stats = {
+        sport: sportId,
+        sportName: config.name,
+        dailyLimit: config.dailyLimit,
+        safetyLimit: config.safetyLimit,
+        requestsMade: 0,
+        remainingRequests: config.dailyLimit,
+        cacheHits: 0,
+        cacheMisses: 0,
+        lastApiRequest: null,
+        lastSuccessfulRequest: null,
+        lastError: null,
+        rateLimitHits: 0,
+        status: "Healthy"
+      };
+      this.usageStats.set(sportId, stats);
+    }
+    return stats;
+  }
+  getAllUsageStats() {
+    return Array.from(this.usageStats.values());
+  }
+  clearCache() {
+    this.cache.clear();
+    console.log("[CACHE] Sports cache cleared");
+  }
+  resetStats() {
+    this.usageStats.clear();
+    console.log("[USAGE STATS] Usage stats cleared");
+  }
+};
+var sportsCache = new SportsCacheManager();
+
+// src/server/sports/sportsService.ts
+function getSportsApiKey() {
+  return (process.env.API_SPORTS_KEY || process.env.API_FOOTBALL_KEY || process.env.RAPIDAPI_KEY || "").trim();
+}
+var SportsService = class {
+  /**
+   * Generic call to external API-Sports with timeout, rate-limit header parsing,
+   * error checking, and single-flight cached execution.
+   */
+  async fetchSportEndpoint(sportId, endpoint, params = {}, customTTLSeconds) {
+    const config = SPORTS_CONFIG[sportId.toLowerCase()] || SPORTS_CONFIG.football;
+    const apiKey = getSportsApiKey();
+    const fetcher = async () => {
+      if (!apiKey) {
+        throw new Error(`API-Sports key not configured on backend. Set API_SPORTS_KEY or API_FOOTBALL_KEY in .env.`);
+      }
+      const check = sportsCache.canMakeRequest(config.id);
+      if (!check.allowed) {
+        throw new Error(check.reason || `Rate limit protection active for ${config.name}`);
+      }
+      const isRapidApi = apiKey.length > 40 && !apiKey.startsWith("v3.");
+      const queryString = new URLSearchParams();
+      Object.entries(params).forEach(([k, v]) => {
+        if (v !== void 0 && v !== null && v !== "") {
+          queryString.append(k, String(v));
+        }
+      });
+      const cleanEndpoint = endpoint.replace(/^\/+/, "");
+      const qs = queryString.toString();
+      const pathWithQuery = qs ? `${cleanEndpoint}?${qs}` : cleanEndpoint;
+      const url = isRapidApi ? `https://${config.host}/${pathWithQuery}` : `https://${config.host}/${pathWithQuery}`;
+      const headers = isRapidApi ? {
+        "x-rapidapi-key": apiKey,
+        "x-rapidapi-host": config.host
+      } : {
+        "x-apisports-key": apiKey
+      };
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5500);
+      try {
+        const response = await fetch(url, {
+          headers,
+          signal: controller.signal
+        });
+        sportsCache.recordApiSportsHeaders(config.id, response.headers);
+        if (!response.ok) {
+          if (response.status === 429) {
+            throw new Error(`API-Sports 429 Rate Limit exceeded on ${config.name}`);
+          }
+          throw new Error(`API-Sports HTTP error: ${response.status} ${response.statusText}`);
+        }
+        const json = await response.json();
+        if (json.errors) {
+          if (Array.isArray(json.errors) && json.errors.length > 0) {
+            throw new Error(`API-Sports Error: ${json.errors.join(", ")}`);
+          } else if (typeof json.errors === "object" && Object.keys(json.errors).length > 0) {
+            const errStr = JSON.stringify(json.errors);
+            if (errStr.includes("rate") || errStr.includes("Requests") || errStr.includes("limit")) {
+              throw new Error(`API-Sports Quota Error: ${errStr}`);
+            }
+          }
+        }
+        return json;
+      } catch (err) {
+        if (err.name === "AbortError") {
+          throw new Error(`API-Sports request timed out for ${config.name} (${cleanEndpoint})`);
+        }
+        throw err;
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    };
+    return await sportsCache.executeWithCache(
+      config.id,
+      endpoint,
+      params,
+      fetcher,
+      customTTLSeconds
+    );
+  }
+  /**
+   * Status check for a sport or provider
+   */
+  async getSportStatus(sportId = "football") {
+    const config = SPORTS_CONFIG[sportId.toLowerCase()] || SPORTS_CONFIG.football;
+    const apiKey = getSportsApiKey();
+    const stats = sportsCache.getOrCreateStats(config.id);
+    if (!apiKey) {
+      return {
+        configured: false,
+        sport: config.name,
+        host: config.host,
+        status: "Unconfigured (Missing API_SPORTS_KEY)",
+        requestsUsed: stats.requestsMade,
+        dailyLimit: config.dailyLimit,
+        remainingRequests: stats.remainingRequests,
+        cacheHits: stats.cacheHits,
+        cacheMisses: stats.cacheMisses,
+        mode: "demo_simulation"
+      };
+    }
+    try {
+      const result = await this.fetchSportEndpoint(config.id, "status", {}, 60);
+      const apiResp = result.data?.response || {};
+      const requests = apiResp.requests || { current: stats.requestsMade, limit_day: config.dailyLimit };
+      const account = apiResp.account || {};
+      return {
+        configured: true,
+        sport: config.name,
+        host: config.host,
+        status: stats.status,
+        provider: `API-Sports (${config.host})`,
+        accountName: account.firstname ? `${account.firstname} ${account.lastname || ""}`.trim() : "Active Subscriber",
+        requestsUsed: requests.current ?? stats.requestsMade,
+        dailyLimit: requests.limit_day ?? config.dailyLimit,
+        remainingRequests: (requests.limit_day ?? config.dailyLimit) - (requests.current ?? stats.requestsMade),
+        cacheHits: stats.cacheHits,
+        cacheMisses: stats.cacheMisses,
+        cached: result.cached,
+        stale: result.stale,
+        lastUpdated: result.lastUpdated,
+        mode: "live_real_data"
+      };
+    } catch (err) {
+      return {
+        configured: true,
+        sport: config.name,
+        host: config.host,
+        status: stats.status,
+        provider: `API-Sports (${config.host})`,
+        requestsUsed: stats.requestsMade,
+        dailyLimit: config.dailyLimit,
+        remainingRequests: stats.remainingRequests,
+        cacheHits: stats.cacheHits,
+        cacheMisses: stats.cacheMisses,
+        mode: "cached_fallback",
+        error: err.message
+      };
+    }
+  }
+  /**
+   * Get Live Matches for a specific sport (Live cache: 30–60s)
+   */
+  async getLiveMatches(sportId = "football") {
+    const config = SPORTS_CONFIG[sportId.toLowerCase()] || SPORTS_CONFIG.football;
+    const apiKey = getSportsApiKey();
+    if (!apiKey) {
+      return {
+        matches: [],
+        cached: true,
+        stale: false,
+        lastUpdated: (/* @__PURE__ */ new Date()).toLocaleTimeString(),
+        source: "unconfigured"
+      };
+    }
+    try {
+      const liveResult = await this.fetchSportEndpoint(
+        config.id,
+        config.id === "football" ? "fixtures" : "games",
+        { live: "all" },
+        60
+        // 60s live TTL
+      );
+      const responseList = liveResult.data?.response || [];
+      if (Array.isArray(responseList) && responseList.length > 0) {
+        const matches = responseList.slice(0, 30).map(
+          (item) => this.transformToMatch(item, config.id)
+        );
+        return {
+          matches,
+          cached: liveResult.cached,
+          stale: liveResult.stale,
+          lastUpdated: liveResult.lastUpdated,
+          source: liveResult.stale ? "api_sports_stale" : liveResult.cached ? "api_sports_cache" : "api_sports_live"
+        };
+      }
+      const fallback = this.getCuratedMatches(config.id, "live");
+      return {
+        matches: fallback,
+        cached: true,
+        stale: false,
+        lastUpdated: (/* @__PURE__ */ new Date()).toLocaleTimeString(),
+        source: "curated_active"
+      };
+    } catch (err) {
+      console.warn(`[SportsService Live Error] ${config.name}:`, err.message);
+      const isQuota = err.message?.toLowerCase().includes("quota") || err.message?.toLowerCase().includes("request limit");
+      const fallback = this.getCuratedMatches(config.id, "live");
+      return {
+        matches: fallback,
+        cached: true,
+        stale: true,
+        lastUpdated: (/* @__PURE__ */ new Date()).toLocaleTimeString(),
+        source: isQuota ? "quota_protection_simulation" : "error_fallback"
+      };
+    }
+  }
+  /**
+   * Get upcoming fixtures with 15-minute (900s) cache
+   */
+  async getUpcomingFixtures(sportId = "football", params = {}) {
+    const config = SPORTS_CONFIG[sportId.toLowerCase()] || SPORTS_CONFIG.football;
+    const apiKey = getSportsApiKey();
+    if (!apiKey) {
+      const fallback = this.getCuratedMatches(config.id, "upcoming");
+      return {
+        matches: fallback,
+        cached: true,
+        stale: false,
+        lastUpdated: (/* @__PURE__ */ new Date()).toLocaleTimeString(),
+        source: "curated_active"
+      };
+    }
+    const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+    const queryParams = {
+      date: params.date || today,
+      ...params.league ? { league: params.league } : {},
+      ...params.season ? { season: params.season } : {}
+    };
+    try {
+      const fixturesResult = await this.fetchSportEndpoint(
+        config.id,
+        config.id === "football" ? "fixtures" : "games",
+        queryParams,
+        config.defaultFixtureTTL
+        // 900 seconds
+      );
+      const responseList = fixturesResult.data?.response || [];
+      if (Array.isArray(responseList) && responseList.length > 0) {
+        const matches = responseList.slice(0, 35).map(
+          (item) => this.transformToMatch(item, config.id)
+        );
+        return {
+          matches,
+          cached: fixturesResult.cached,
+          stale: fixturesResult.stale,
+          lastUpdated: fixturesResult.lastUpdated,
+          source: fixturesResult.stale ? "api_sports_stale" : fixturesResult.cached ? "api_sports_cache" : "api_sports_fresh"
+        };
+      }
+      const fallback = this.getCuratedMatches(config.id, "upcoming");
+      return {
+        matches: fallback,
+        cached: true,
+        stale: false,
+        lastUpdated: (/* @__PURE__ */ new Date()).toLocaleTimeString(),
+        source: "curated_active"
+      };
+    } catch (err) {
+      console.warn(`[SportsService Fixtures Error] ${config.name}:`, err.message);
+      const isQuota = err.message?.toLowerCase().includes("quota") || err.message?.toLowerCase().includes("request limit");
+      const fallback = this.getCuratedMatches(config.id, "upcoming");
+      return {
+        matches: fallback,
+        cached: true,
+        stale: true,
+        lastUpdated: (/* @__PURE__ */ new Date()).toLocaleTimeString(),
+        source: isQuota ? "quota_protection_simulation" : "error_fallback"
+      };
+    }
+  }
+  /**
+   * Helper to normalize various API-Sports entities (football, basketball, etc.) into Match interface
+   */
+  transformToMatch(item, sportId) {
+    const fixture = item.fixture || item.game || item || {};
+    const league = item.league || {};
+    const teams = item.teams || {};
+    const goals = item.goals || item.scores || {};
+    const status = fixture.status || {};
+    const homeName = teams.home?.name || "Home Team";
+    const awayName = teams.away?.name || "Away Team";
+    const parseScore = (val) => {
+      if (val === null || val === void 0) return 0;
+      if (typeof val === "number") return isNaN(val) ? 0 : val;
+      if (typeof val === "string") {
+        const num = parseInt(val, 10);
+        return isNaN(num) ? 0 : num;
+      }
+      if (typeof val === "object") {
+        if (typeof val.total === "number") return val.total;
+        if (typeof val.score === "number") return val.score;
+        if (typeof val.current === "number") return val.current;
+        if (typeof val.total === "string") {
+          const num = parseInt(val.total, 10);
+          return isNaN(num) ? 0 : num;
+        }
+      }
+      return 0;
+    };
+    const homeScore = parseScore(goals.home);
+    const awayScore = parseScore(goals.away);
+    const elapsed = status.elapsed || 1;
+    const diff = homeScore - awayScore;
+    const shortStatus = (status.short || "").toUpperCase();
+    const isLive = ["1H", "2H", "HT", "ET", "P", "LIVE", "Q1", "Q2", "Q3", "Q4", "OT"].includes(shortStatus);
+    let homeOdd = 2.15;
+    let drawOdd = 3.2;
+    let awayOdd = 3.1;
+    if (diff > 0) {
+      homeOdd = Math.max(1.05, parseFloat((1.35 - elapsed / 200 * 0.25).toFixed(2)));
+      drawOdd = parseFloat((3.8 + diff * 1.4).toFixed(2));
+      awayOdd = parseFloat((6.5 + diff * 2.8).toFixed(2));
+    } else if (diff < 0) {
+      awayOdd = Math.max(1.05, parseFloat((1.35 - elapsed / 200 * 0.25).toFixed(2)));
+      drawOdd = parseFloat((3.8 + Math.abs(diff) * 1.4).toFixed(2));
+      homeOdd = parseFloat((6.5 + Math.abs(diff) * 2.8).toFixed(2));
+    }
+    const fid = fixture.id || Math.floor(Math.random() * 9e5 + 1e5);
+    const totalGoals = homeScore + awayScore;
+    let ouLine;
+    if (sportId === "basketball" || sportId === "nba") {
+      ouLine = totalGoals > 0 ? totalGoals + 0.5 : 218.5;
+    } else if (sportId === "baseball") {
+      ouLine = totalGoals > 0 ? totalGoals + 0.5 : 8.5;
+    } else if (sportId === "hockey") {
+      ouLine = totalGoals > 0 ? totalGoals + 0.5 : 5.5;
+    } else if (sportId === "american-football" || sportId === "nfl") {
+      ouLine = totalGoals > 0 ? totalGoals + 0.5 : 44.5;
+    } else {
+      ouLine = totalGoals > 0 ? totalGoals + 0.5 : 2.5;
+    }
+    let formattedStartTime = "18:00";
+    if (isLive) {
+      formattedStartTime = "Live";
+    } else if (fixture.date) {
+      const d = new Date(fixture.date);
+      if (!isNaN(d.getTime())) {
+        formattedStartTime = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      }
+    }
+    return {
+      id: `${sportId}-${fid}`,
+      gameId: String(fid).slice(-5),
+      sport: sportId,
+      league: league.name || (sportId === "nba" ? "NBA" : "Major League"),
+      countryOrCategory: league.country || "International",
+      homeTeam: homeName,
+      awayTeam: awayName,
+      homeScore: isLive ? homeScore : void 0,
+      awayScore: isLive ? awayScore : void 0,
+      period: shortStatus || (isLive ? "1H" : "FT"),
+      minute: isLive ? `${elapsed}' ${shortStatus || "LIVE"}` : void 0,
+      isLive,
+      startTime: formattedStartTime,
+      isHot: diff === 0 || elapsed > 75,
+      hasLiveStream: fid % 2 === 0,
+      marketsCount: 45 + fid % 40,
+      markets: {
+        "1X2": [
+          { id: `o-${fid}-1`, name: "1", value: homeOdd, trend: "same" },
+          { id: `o-${fid}-X`, name: "X", value: drawOdd, trend: "same" },
+          { id: `o-${fid}-2`, name: "2", value: awayOdd, trend: "same" }
+        ],
+        "O/U": [
+          { id: `o-${fid}-over`, name: `Over ${ouLine}`, value: 1.85, trend: "same" },
+          { id: `o-${fid}-under`, name: `Under ${ouLine}`, value: 1.95, trend: "same" }
+        ],
+        "DC": [
+          { id: `o-${fid}-1x`, name: "1X", value: parseFloat((homeOdd / 1.65).toFixed(2)) || 1.18, trend: "same" },
+          { id: `o-${fid}-12`, name: "12", value: 1.28, trend: "same" },
+          { id: `o-${fid}-x2`, name: "X2", value: parseFloat((awayOdd / 1.65).toFixed(2)) || 1.55, trend: "same" }
+        ]
+      }
+    };
+  }
+  /**
+   * Curated high-profile modern matches for fallback/simulation when API quota is exhausted
+   */
+  getCuratedMatches(sportId, type) {
+    const sport = sportId.toLowerCase();
+    if (sport === "football") {
+      if (type === "live") {
+        return [
+          {
+            id: "football-cur-1",
+            gameId: "84920",
+            sport: "football",
+            league: "Premier League",
+            countryOrCategory: "England",
+            homeTeam: "Arsenal FC",
+            awayTeam: "Manchester City",
+            homeScore: 1,
+            awayScore: 1,
+            minute: "68' 2H",
+            period: "2H",
+            isLive: true,
+            isHot: true,
+            hasLiveStream: true,
+            marketsCount: 142,
+            markets: {
+              "1X2": [
+                { id: "f1-1", name: "1", value: 2.85, trend: "same" },
+                { id: "f1-X", name: "X", value: 2.3, trend: "same" },
+                { id: "f1-2", name: "2", value: 3.1, trend: "up" }
+              ],
+              "O/U": [
+                { id: "f1-o2.5", name: "Over 2.5", value: 1.88, trend: "same" },
+                { id: "f1-u2.5", name: "Under 2.5", value: 1.92, trend: "same" }
+              ],
+              "DC": [
+                { id: "f1-1x", name: "1X", value: 1.35, trend: "same" },
+                { id: "f1-12", name: "12", value: 1.45, trend: "same" },
+                { id: "f1-x2", name: "X2", value: 1.4, trend: "same" }
+              ]
+            }
+          },
+          {
+            id: "football-cur-2",
+            gameId: "91832",
+            sport: "football",
+            league: "UEFA Champions League",
+            countryOrCategory: "Europe",
+            homeTeam: "Real Madrid",
+            awayTeam: "Bayern Munich",
+            homeScore: 2,
+            awayScore: 1,
+            minute: "74' 2H",
+            period: "2H",
+            isLive: true,
+            isHot: true,
+            hasLiveStream: true,
+            marketsCount: 156,
+            markets: {
+              "1X2": [
+                { id: "f2-1", name: "1", value: 1.25, trend: "same" },
+                { id: "f2-X", name: "X", value: 4.8, trend: "same" },
+                { id: "f2-2", name: "2", value: 11.5, trend: "down" }
+              ],
+              "O/U": [
+                { id: "f2-o3.5", name: "Over 3.5", value: 1.95, trend: "same" },
+                { id: "f2-u3.5", name: "Under 3.5", value: 1.8, trend: "same" }
+              ],
+              "DC": [
+                { id: "f2-1x", name: "1X", value: 1.05, trend: "same" },
+                { id: "f2-12", name: "12", value: 1.15, trend: "same" },
+                { id: "f2-x2", name: "X2", value: 3.6, trend: "down" }
+              ]
+            }
+          },
+          {
+            id: "football-cur-3",
+            gameId: "73910",
+            sport: "football",
+            league: "La Liga",
+            countryOrCategory: "Spain",
+            homeTeam: "Barcelona",
+            awayTeam: "Atletico Madrid",
+            homeScore: 0,
+            awayScore: 0,
+            minute: "32' 1H",
+            period: "1H",
+            isLive: true,
+            isHot: true,
+            hasLiveStream: false,
+            marketsCount: 118,
+            markets: {
+              "1X2": [
+                { id: "f3-1", name: "1", value: 2.1, trend: "same" },
+                { id: "f3-X", name: "X", value: 3.1, trend: "same" },
+                { id: "f3-2", name: "2", value: 3.6, trend: "same" }
+              ],
+              "O/U": [
+                { id: "f3-o2.5", name: "Over 2.5", value: 1.9, trend: "same" },
+                { id: "f3-u2.5", name: "Under 2.5", value: 1.85, trend: "same" }
+              ],
+              "DC": [
+                { id: "f3-1x", name: "1X", value: 1.28, trend: "same" },
+                { id: "f3-12", name: "12", value: 1.34, trend: "same" },
+                { id: "f3-x2", name: "X2", value: 1.68, trend: "same" }
+              ]
+            }
+          },
+          {
+            id: "football-cur-4",
+            gameId: "62841",
+            sport: "football",
+            league: "Serie A",
+            countryOrCategory: "Italy",
+            homeTeam: "Inter Milan",
+            awayTeam: "Juventus",
+            homeScore: 1,
+            awayScore: 0,
+            minute: "54' 2H",
+            period: "2H",
+            isLive: true,
+            isHot: false,
+            hasLiveStream: true,
+            marketsCount: 124,
+            markets: {
+              "1X2": [
+                { id: "f4-1", name: "1", value: 1.45, trend: "same" },
+                { id: "f4-X", name: "X", value: 3.8, trend: "same" },
+                { id: "f4-2", name: "2", value: 7.2, trend: "same" }
+              ],
+              "O/U": [
+                { id: "f4-o1.5", name: "Over 1.5", value: 1.4, trend: "same" },
+                { id: "f4-u1.5", name: "Under 1.5", value: 2.7, trend: "same" }
+              ],
+              "DC": [
+                { id: "f4-1x", name: "1X", value: 1.1, trend: "same" },
+                { id: "f4-12", name: "12", value: 1.22, trend: "same" },
+                { id: "f4-x2", name: "X2", value: 2.6, trend: "same" }
+              ]
+            }
+          }
+        ];
+      } else {
+        return [
+          {
+            id: "football-up-1",
+            gameId: "10928",
+            sport: "football",
+            league: "Premier League",
+            countryOrCategory: "England",
+            homeTeam: "Liverpool FC",
+            awayTeam: "Chelsea FC",
+            startTime: "18:30",
+            isLive: false,
+            isHot: true,
+            marketsCount: 220,
+            markets: {
+              "1X2": [
+                { id: "fu1-1", name: "1", value: 1.72 },
+                { id: "fu1-X", name: "X", value: 3.9 },
+                { id: "fu1-2", name: "2", value: 4.6 }
+              ],
+              "O/U": [
+                { id: "fu1-o2.5", name: "Over 2.5", value: 1.65 },
+                { id: "fu1-u2.5", name: "Under 2.5", value: 2.2 }
+              ],
+              "DC": [
+                { id: "fu1-1x", name: "1X", value: 1.2 },
+                { id: "fu1-12", name: "12", value: 1.25 },
+                { id: "fu1-x2", name: "X2", value: 2.05 }
+              ]
+            }
+          },
+          {
+            id: "football-up-2",
+            gameId: "21938",
+            sport: "football",
+            league: "Premier League",
+            countryOrCategory: "England",
+            homeTeam: "Manchester United",
+            awayTeam: "Tottenham Hotspur",
+            startTime: "20:00",
+            isLive: false,
+            isHot: true,
+            marketsCount: 210,
+            markets: {
+              "1X2": [
+                { id: "fu2-1", name: "1", value: 2.15 },
+                { id: "fu2-X", name: "X", value: 3.6 },
+                { id: "fu2-2", name: "2", value: 3.2 }
+              ],
+              "O/U": [
+                { id: "fu2-o2.5", name: "Over 2.5", value: 1.6 },
+                { id: "fu2-u2.5", name: "Under 2.5", value: 2.3 }
+              ],
+              "DC": [
+                { id: "fu2-1x", name: "1X", value: 1.33 },
+                { id: "fu2-12", name: "12", value: 1.28 },
+                { id: "fu2-x2", name: "X2", value: 1.68 }
+              ]
+            }
+          },
+          {
+            id: "football-up-3",
+            gameId: "32948",
+            sport: "football",
+            league: "Premier League",
+            countryOrCategory: "England",
+            homeTeam: "Aston Villa",
+            awayTeam: "Newcastle United",
+            startTime: "20:45",
+            isLive: false,
+            isHot: true,
+            marketsCount: 198,
+            markets: {
+              "1X2": [
+                { id: "fu3-1", name: "1", value: 2.05 },
+                { id: "fu3-X", name: "X", value: 3.5 },
+                { id: "fu3-2", name: "2", value: 3.5 }
+              ],
+              "O/U": [
+                { id: "fu3-o2.5", name: "Over 2.5", value: 1.7 },
+                { id: "fu3-u2.5", name: "Under 2.5", value: 2.1 }
+              ],
+              "DC": [
+                { id: "fu3-1x", name: "1X", value: 1.29 },
+                { id: "fu3-12", name: "12", value: 1.3 },
+                { id: "fu3-x2", name: "X2", value: 1.74 }
+              ]
+            }
+          },
+          {
+            id: "football-up-4",
+            gameId: "43958",
+            sport: "football",
+            league: "UEFA Champions League",
+            countryOrCategory: "Europe",
+            homeTeam: "Paris Saint-Germain",
+            awayTeam: "AC Milan",
+            startTime: "20:00",
+            isLive: false,
+            isHot: true,
+            marketsCount: 240,
+            markets: {
+              "1X2": [
+                { id: "fu4-1", name: "1", value: 1.65 },
+                { id: "fu4-X", name: "X", value: 4.1 },
+                { id: "fu4-2", name: "2", value: 4.8 }
+              ],
+              "O/U": [
+                { id: "fu4-o2.5", name: "Over 2.5", value: 1.62 },
+                { id: "fu4-u2.5", name: "Under 2.5", value: 2.25 }
+              ],
+              "DC": [
+                { id: "fu4-1x", name: "1X", value: 1.18 },
+                { id: "fu4-12", name: "12", value: 1.23 },
+                { id: "fu4-x2", name: "X2", value: 2.18 }
+              ]
+            }
+          },
+          {
+            id: "football-up-5",
+            gameId: "54968",
+            sport: "football",
+            league: "La Liga",
+            countryOrCategory: "Spain",
+            homeTeam: "Sevilla FC",
+            awayTeam: "Athletic Bilbao",
+            startTime: "19:00",
+            isLive: false,
+            isHot: false,
+            marketsCount: 185,
+            markets: {
+              "1X2": [
+                { id: "fu5-1", name: "1", value: 2.45 },
+                { id: "fu5-X", name: "X", value: 3.2 },
+                { id: "fu5-2", name: "2", value: 3 }
+              ],
+              "O/U": [
+                { id: "fu5-o2.5", name: "Over 2.5", value: 2.1 },
+                { id: "fu5-u2.5", name: "Under 2.5", value: 1.7 }
+              ],
+              "DC": [
+                { id: "fu5-1x", name: "1X", value: 1.38 },
+                { id: "fu5-12", name: "12", value: 1.34 },
+                { id: "fu5-x2", name: "X2", value: 1.54 }
+              ]
+            }
+          },
+          {
+            id: "football-up-6",
+            gameId: "65978",
+            sport: "football",
+            league: "Serie A",
+            countryOrCategory: "Italy",
+            homeTeam: "Napoli",
+            awayTeam: "AS Roma",
+            startTime: "19:45",
+            isLive: false,
+            isHot: true,
+            marketsCount: 195,
+            markets: {
+              "1X2": [
+                { id: "fu6-1", name: "1", value: 1.95 },
+                { id: "fu6-X", name: "X", value: 3.4 },
+                { id: "fu6-2", name: "2", value: 3.9 }
+              ],
+              "O/U": [
+                { id: "fu6-o2.5", name: "Over 2.5", value: 1.85 },
+                { id: "fu6-u2.5", name: "Under 2.5", value: 1.95 }
+              ],
+              "DC": [
+                { id: "fu6-1x", name: "1X", value: 1.25 },
+                { id: "fu6-12", name: "12", value: 1.3 },
+                { id: "fu6-x2", name: "X2", value: 1.82 }
+              ]
+            }
+          }
+        ];
+      }
+    }
+    if (sport === "basketball" || sport === "nba") {
+      if (type === "live") {
+        return [
+          {
+            id: "nba-cur-1",
+            gameId: "77218",
+            sport: "basketball",
+            league: "NBA",
+            countryOrCategory: "USA",
+            homeTeam: "Boston Celtics",
+            awayTeam: "LA Lakers",
+            homeScore: 84,
+            awayScore: 81,
+            minute: "7:42 Q3",
+            period: "Q3",
+            isLive: true,
+            isHot: true,
+            hasLiveStream: true,
+            marketsCount: 78,
+            markets: {
+              "1X2": [
+                { id: "b1-1", name: "1", value: 1.55, trend: "same" },
+                { id: "b1-x", name: "X", value: 14, trend: "same" },
+                { id: "b1-2", name: "2", value: 2.45, trend: "up" }
+              ],
+              "O/U": [
+                { id: "b1-o", name: "Over 216.5", value: 1.85, trend: "same" },
+                { id: "b1-u", name: "Under 216.5", value: 1.95, trend: "same" }
+              ],
+              "DC": [
+                { id: "b1-1x", name: "1X", value: 1.35, trend: "same" },
+                { id: "b1-12", name: "12", value: 1.05, trend: "same" },
+                { id: "b1-x2", name: "X2", value: 1.95, trend: "same" }
+              ]
+            }
+          }
+        ];
+      } else {
+        return [
+          {
+            id: "nba-up-1",
+            gameId: "77219",
+            sport: "basketball",
+            league: "NBA",
+            countryOrCategory: "USA",
+            homeTeam: "Golden State Warriors",
+            awayTeam: "Milwaukee Bucks",
+            startTime: "23:30",
+            isLive: false,
+            isHot: true,
+            marketsCount: 85,
+            markets: {
+              "1X2": [
+                { id: "bu1-1", name: "1", value: 1.8 },
+                { id: "bu1-X", name: "X", value: 15 },
+                { id: "bu1-2", name: "2", value: 2.05 }
+              ],
+              "O/U": [
+                { id: "bu1-o", name: "Over 224.5", value: 1.88 },
+                { id: "bu1-u", name: "Under 224.5", value: 1.92 }
+              ],
+              "DC": [
+                { id: "bu1-1x", name: "1X", value: 1.5 },
+                { id: "bu1-12", name: "12", value: 1.05 },
+                { id: "bu1-x2", name: "X2", value: 1.7 }
+              ]
+            }
+          }
+        ];
+      }
+    }
+    return [];
+  }
+};
+var sportsService = new SportsService();
+
+// src/server/models/MatchModel.ts
+import mongoose6, { Schema as Schema5 } from "mongoose";
+var MatchSchema = new Schema5(
+  {
+    id: { type: String, required: true, unique: true, index: true },
+    gameId: { type: String, required: true, index: true },
+    sport: { type: String, required: true, index: true },
+    sportKey: { type: String, index: true },
+    league: { type: String, required: true, index: true },
+    countryOrCategory: { type: String, default: "International" },
+    homeTeam: { type: String, required: true, index: true },
+    awayTeam: { type: String, required: true, index: true },
+    homeScore: { type: Number },
+    awayScore: { type: Number },
+    period: { type: String },
+    minute: { type: String },
+    isLive: { type: Boolean, default: false, index: true },
+    startTime: { type: String, required: true },
+    commenceTime: { type: Date, index: true },
+    isHot: { type: Boolean, default: false },
+    hasLiveStream: { type: Boolean, default: false },
+    marketsCount: { type: Number, default: 45 },
+    markets: { type: Schema5.Types.Mixed, required: true },
+    source: { type: String, default: "the_odds_api", index: true },
+    lastSyncedAt: { type: Date, default: Date.now, index: true }
+  },
+  {
+    timestamps: true
+  }
+);
+MatchSchema.index({ sport: 1, isLive: 1, commenceTime: 1 });
+var MatchModel = mongoose6.models.Match || mongoose6.model("Match", MatchSchema);
+
+// src/server/sports/theOddsApiService.ts
+var SUPPORTED_LEAGUES = [
+  { key: "soccer_epl", sport: "football", league: "Premier League", country: "England" },
+  { key: "soccer_spain_la_liga", sport: "football", league: "La Liga", country: "Spain" },
+  { key: "soccer_italy_serie_a", sport: "football", league: "Serie A", country: "Italy" },
+  { key: "soccer_germany_bundesliga", sport: "football", league: "Bundesliga", country: "Germany" },
+  { key: "soccer_france_ligue_one", sport: "football", league: "Ligue 1", country: "France" },
+  { key: "soccer_uefa_champs_league", sport: "football", league: "UEFA Champions League", country: "Europe" },
+  { key: "soccer_uefa_europa_league", sport: "football", league: "UEFA Europa League", country: "Europe" },
+  { key: "basketball_nba", sport: "basketball", league: "NBA", country: "USA" }
+];
+function getTheOddsApiKey() {
+  return (process.env.THE_ODDS_API_KEY || "cae042eb472e9a12bf139e8dc5369281").trim();
+}
+var TheOddsApiService = class {
+  constructor() {
+    this.localMatches = /* @__PURE__ */ new Map();
+    this.totalMonthlyCredits = 500;
+    this.remainingCredits = 496;
+    this.usedCredits = 4;
+    this.requestsToday = 0;
+    this.dailyBudget = 14;
+    // 14 requests/day * 30 days = ~420 requests (safe under 500)
+    this.currentUtcDay = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+    this.lastSyncedAt = null;
+    this.lastManualSyncTime = 0;
+    this.manualSyncCooldownMs = 15 * 60 * 1e3;
+    // 15-minute cooldown to prevent user abuse
+    this.isSyncing = false;
+    this.backgroundIntervalId = null;
+    this.init();
+  }
+  async init() {
+    await this.hydrateFromMongo();
+    this.startBackgroundSync();
+  }
+  /**
+   * Reset daily counter at midnight UTC
+   */
+  checkDayRollover() {
+    const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+    if (today !== this.currentUtcDay) {
+      this.currentUtcDay = today;
+      this.requestsToday = 0;
+    }
+  }
+  /**
+   * Hydrates local memory cache with matches already stored in MongoDB Atlas
+   */
+  async hydrateFromMongo() {
+    try {
+      const docs = await MatchModel.find({ source: "the_odds_api" }).lean();
+      if (docs && docs.length > 0) {
+        let loadedCount = 0;
+        for (const doc of docs) {
+          const match = {
+            id: doc.id,
+            gameId: doc.gameId,
+            sport: doc.sport,
+            league: doc.league,
+            countryOrCategory: doc.countryOrCategory,
+            homeTeam: doc.homeTeam,
+            awayTeam: doc.awayTeam,
+            homeScore: doc.homeScore,
+            awayScore: doc.awayScore,
+            period: doc.period,
+            minute: doc.minute,
+            isLive: doc.isLive,
+            startTime: doc.startTime,
+            isHot: doc.isHot,
+            hasLiveStream: doc.hasLiveStream,
+            marketsCount: doc.marketsCount,
+            markets: doc.markets
+          };
+          this.localMatches.set(match.id, match);
+          loadedCount++;
+        }
+        this.syncToGlobalDb();
+        console.log(`[TheOddsAPI] Hydrated ${loadedCount} matches from MongoDB Atlas`);
+        return loadedCount;
+      }
+    } catch (err) {
+      console.warn("[TheOddsAPI] Mongo hydration notice:", err.message);
+    }
+    return 0;
+  }
+  /**
+   * Synchronizes local matches into global db.matches for app-wide availability
+   */
+  syncToGlobalDb() {
+    const freshOddsMatches = Array.from(this.localMatches.values());
+    if (freshOddsMatches.length === 0) return;
+    const freshOddsIds = new Set(freshOddsMatches.map((m) => m.id));
+    const nonOddsMatches = db.matches.filter((m) => !freshOddsIds.has(m.id));
+    db.matches = [...freshOddsMatches, ...nonOddsMatches];
+  }
+  /**
+   * Quota and Abuse Protection Check
+   */
+  canMakeRequest() {
+    this.checkDayRollover();
+    const apiKey = getTheOddsApiKey();
+    if (!apiKey) {
+      return { allowed: false, reason: "The Odds API key is not configured" };
+    }
+    if (this.remainingCredits <= 5) {
+      return {
+        allowed: false,
+        reason: `Monthly credit buffer reached (${this.remainingCredits} credits remaining of 500)`
+      };
+    }
+    if (this.requestsToday >= this.dailyBudget) {
+      return {
+        allowed: false,
+        reason: `Daily quota protection active (${this.requestsToday}/${this.dailyBudget} daily requests used)`
+      };
+    }
+    return { allowed: true };
+  }
+  /**
+   * Updates internal quota counters from The Odds API HTTP response headers
+   */
+  recordQuotaHeaders(headers) {
+    const remaining = headers.get("x-requests-remaining");
+    const used = headers.get("x-requests-used");
+    if (remaining !== null) {
+      const parsed = parseInt(remaining, 10);
+      if (!isNaN(parsed)) {
+        this.remainingCredits = parsed;
+      }
+    }
+    if (used !== null) {
+      const parsed = parseInt(used, 10);
+      if (!isNaN(parsed)) {
+        this.usedCredits = parsed;
+      }
+    }
+    this.requestsToday++;
+  }
+  /**
+   * Converts a single event from The Odds API into a SportyBet Match model
+   */
+  transformOddsApiEvent(item, leagueDef) {
+    const rawId = item.id || Math.random().toString(36).substring(2, 10);
+    const id = `theodds-${rawId}`;
+    const gameId = rawId.replace(/[^0-9]/g, "").slice(0, 5) || String(Math.floor(Math.random() * 9e4 + 1e4));
+    const homeTeam = item.home_team || "Home Team";
+    const awayTeam = item.away_team || "Away Team";
+    const commenceDate = new Date(item.commence_time);
+    const now = /* @__PURE__ */ new Date();
+    const isPastCommence = commenceDate.getTime() <= now.getTime();
+    const isLive = isPastCommence && now.getTime() - commenceDate.getTime() < 115 * 60 * 1e3;
+    let startTime = "19:00";
+    if (!isNaN(commenceDate.getTime())) {
+      startTime = commenceDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+    let odd1 = 2.1;
+    let oddX = 3.3;
+    let odd2 = 3.4;
+    let over25 = 1.85;
+    let under25 = 1.95;
+    const bookmakers = item.bookmakers || [];
+    const preferredBookmakers = ["1xBet", "pinnacle", "marathonbet", "williamhill", "betfair_ex_eu", "betsson", "nordicbet", "tipico_de", "winamax_fr"];
+    let chosenBookmaker = bookmakers.find(
+      (b) => preferredBookmakers.some((pref) => (b.title || b.key || "").toLowerCase().includes(pref.toLowerCase()))
+    ) || bookmakers[0];
+    if (chosenBookmaker && Array.isArray(chosenBookmaker.markets)) {
+      const h2hMarket = chosenBookmaker.markets.find((m) => m.key === "h2h");
+      if (h2hMarket && Array.isArray(h2hMarket.outcomes)) {
+        for (const outcome of h2hMarket.outcomes) {
+          if (outcome.name === homeTeam) {
+            odd1 = parseFloat(outcome.price.toFixed(2));
+          } else if (outcome.name === awayTeam) {
+            odd2 = parseFloat(outcome.price.toFixed(2));
+          } else if (outcome.name.toLowerCase().includes("draw")) {
+            oddX = parseFloat(outcome.price.toFixed(2));
+          }
+        }
+      }
+      const totalsMarket = chosenBookmaker.markets.find((m) => m.key === "totals");
+      if (totalsMarket && Array.isArray(totalsMarket.outcomes)) {
+        for (const outcome of totalsMarket.outcomes) {
+          if (outcome.name.toLowerCase().includes("over")) {
+            over25 = parseFloat(outcome.price.toFixed(2));
+          } else if (outcome.name.toLowerCase().includes("under")) {
+            under25 = parseFloat(outcome.price.toFixed(2));
+          }
+        }
+      }
+    }
+    const dc1X = parseFloat((1 / (1 / odd1 + 1 / oddX) * 0.95).toFixed(2)) || 1.25;
+    const dc12 = parseFloat((1 / (1 / odd1 + 1 / odd2) * 0.95).toFixed(2)) || 1.3;
+    const dcX2 = parseFloat((1 / (1 / oddX + 1 / odd2) * 0.95).toFixed(2)) || 1.65;
+    const marketsCount = 50 + bookmakers.length * 8;
+    const match = {
+      id,
+      gameId,
+      sport: leagueDef.sport,
+      league: leagueDef.league,
+      countryOrCategory: leagueDef.country,
+      homeTeam,
+      awayTeam,
+      homeScore: isLive ? 0 : void 0,
+      awayScore: isLive ? 0 : void 0,
+      period: isLive ? "1H" : void 0,
+      minute: isLive ? "25' 1H" : void 0,
+      isLive,
+      startTime: isLive ? "Live" : startTime,
+      isHot: true,
+      hasLiveStream: true,
+      marketsCount,
+      markets: {
+        "1X2": [
+          { id: `o-${rawId}-1`, name: "1", value: odd1, trend: "same" },
+          { id: `o-${rawId}-X`, name: "X", value: oddX, trend: "same" },
+          { id: `o-${rawId}-2`, name: "2", value: odd2, trend: "same" }
+        ],
+        "O/U": [
+          { id: `o-${rawId}-over`, name: "Over 2.5", value: over25, trend: "same" },
+          { id: `o-${rawId}-under`, name: "Under 2.5", value: under25, trend: "same" }
+        ],
+        "DC": [
+          { id: `o-${rawId}-1x`, name: "1X", value: dc1X, trend: "same" },
+          { id: `o-${rawId}-12`, name: "12", value: dc12, trend: "same" },
+          { id: `o-${rawId}-x2`, name: "X2", value: dcX2, trend: "same" }
+        ]
+      }
+    };
+    return match;
+  }
+  /**
+   * Sync a specific league from The Odds API, persist locally and in MongoDB
+   */
+  async syncLeague(leagueDef) {
+    const quotaCheck = this.canMakeRequest();
+    if (!quotaCheck.allowed) {
+      throw new Error(quotaCheck.reason || "Quota limit reached");
+    }
+    const apiKey = getTheOddsApiKey();
+    const url = `https://api.the-odds-api.com/v4/sports/${leagueDef.key}/odds/?apiKey=${apiKey}&regions=eu&markets=h2h,totals`;
+    console.log(`[TheOddsAPI] Fetching upcoming odds for ${leagueDef.league} (${leagueDef.key})...`);
+    const response = await fetch(url);
+    this.recordQuotaHeaders(response.headers);
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`The Odds API error (${response.status}): ${errText}`);
+    }
+    const events = await response.json();
+    if (!Array.isArray(events)) {
+      return [];
+    }
+    const transformedMatches = [];
+    for (const item of events) {
+      const match = this.transformOddsApiEvent(item, leagueDef);
+      transformedMatches.push(match);
+      this.localMatches.set(match.id, match);
+      MatchModel.findOneAndUpdate(
+        { id: match.id },
+        {
+          id: match.id,
+          gameId: match.gameId,
+          sport: match.sport,
+          sportKey: leagueDef.key,
+          league: match.league,
+          countryOrCategory: match.countryOrCategory,
+          homeTeam: match.homeTeam,
+          awayTeam: match.awayTeam,
+          homeScore: match.homeScore,
+          awayScore: match.awayScore,
+          period: match.period,
+          minute: match.minute,
+          isLive: match.isLive,
+          startTime: match.startTime,
+          commenceTime: item.commence_time ? new Date(item.commence_time) : /* @__PURE__ */ new Date(),
+          isHot: match.isHot,
+          hasLiveStream: match.hasLiveStream,
+          marketsCount: match.marketsCount,
+          markets: match.markets,
+          source: "the_odds_api",
+          lastSyncedAt: /* @__PURE__ */ new Date()
+        },
+        { upsert: true, new: true }
+      ).catch((e) => console.warn("[TheOddsAPI] Mongo upsert error:", e.message));
+    }
+    this.syncToGlobalDb();
+    this.lastSyncedAt = /* @__PURE__ */ new Date();
+    console.log(`[TheOddsAPI] Successfully fetched and stored ${transformedMatches.length} matches for ${leagueDef.league}`);
+    return transformedMatches;
+  }
+  /**
+   * Syncs top popular leagues in a single batch (EPL, La Liga, Serie A, Champions League)
+   * Consumes only 3-4 API requests per sync cycle!
+   */
+  async syncPopularLeagues() {
+    if (this.isSyncing) {
+      throw new Error("A sync operation is already in progress");
+    }
+    this.isSyncing = true;
+    const syncedLeagues = [];
+    let totalMatches = 0;
+    try {
+      const targetLeagues = SUPPORTED_LEAGUES.slice(0, 3);
+      for (const league of targetLeagues) {
+        try {
+          const matches = await this.syncLeague(league);
+          totalMatches += matches.length;
+          syncedLeagues.push(league.league);
+          await new Promise((r) => setTimeout(r, 800));
+        } catch (err) {
+          console.warn(`[TheOddsAPI] Failed to sync ${league.league}:`, err.message);
+        }
+      }
+      this.lastManualSyncTime = Date.now();
+      return { syncedCount: totalMatches, leaguesSynced: syncedLeagues };
+    } finally {
+      this.isSyncing = false;
+    }
+  }
+  /**
+   * Manual Sync with 15-Minute Cooldown Guard (prevents any abuse by users)
+   */
+  async triggerManualSync() {
+    const now = Date.now();
+    const elapsed = now - this.lastManualSyncTime;
+    if (elapsed < this.manualSyncCooldownMs) {
+      const remainingSeconds = Math.ceil((this.manualSyncCooldownMs - elapsed) / 1e3);
+      const remainingMins = Math.ceil(remainingSeconds / 60);
+      return {
+        success: false,
+        message: `Manual sync is in cooldown to protect your 500 credits. Please wait ${remainingMins} minute(s) before syncing again. (Data is already cached locally for all users).`,
+        syncedCount: 0,
+        remainingCredits: this.remainingCredits
+      };
+    }
+    const result = await this.syncPopularLeagues();
+    return {
+      success: true,
+      message: `Successfully synchronized ${result.syncedCount} real matches across ${result.leaguesSynced.join(", ")} from The Odds API and stored them in local MongoDB Atlas!`,
+      syncedCount: result.syncedCount,
+      remainingCredits: this.remainingCredits
+    };
+  }
+  /**
+   * Background Cron Scheduler: Syncs every 3 hours (8 requests/day = 240/month)
+   */
+  startBackgroundSync() {
+    if (this.backgroundIntervalId) {
+      clearInterval(this.backgroundIntervalId);
+    }
+    setTimeout(() => {
+      this.syncPopularLeagues().catch(
+        (e) => console.warn("[TheOddsAPI] Initial background sync note:", e.message)
+      );
+    }, 1e4);
+    const THREE_HOURS_MS = 3 * 60 * 60 * 1e3;
+    this.backgroundIntervalId = setInterval(() => {
+      console.log("[TheOddsAPI] Running scheduled 3-hour background sync...");
+      this.syncPopularLeagues().catch(
+        (e) => console.warn("[TheOddsAPI] Scheduled sync note:", e.message)
+      );
+    }, THREE_HOURS_MS);
+  }
+  /**
+   * Retrieves matches strictly from local storage (MongoDB or Memory)
+   * 0 external requests consumed!
+   */
+  getLocalMatches(filters = {}) {
+    let matches = Array.from(this.localMatches.values());
+    if (filters.sport) {
+      const s = filters.sport.toLowerCase();
+      matches = matches.filter((m) => m.sport.toLowerCase() === s);
+    }
+    if (filters.isLive !== void 0) {
+      matches = matches.filter((m) => m.isLive === filters.isLive);
+    }
+    if (filters.league) {
+      const l = filters.league.toLowerCase();
+      matches = matches.filter((m) => m.league.toLowerCase().includes(l));
+    }
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      matches = matches.filter(
+        (m) => m.homeTeam.toLowerCase().includes(q) || m.awayTeam.toLowerCase().includes(q) || m.league.toLowerCase().includes(q) || m.gameId.includes(q)
+      );
+    }
+    return matches;
+  }
+  /**
+   * Detailed quota and status monitor
+   */
+  getQuotaStatus() {
+    const now = Date.now();
+    const elapsed = now - this.lastManualSyncTime;
+    const cooldownRemaining = Math.max(0, Math.ceil((this.manualSyncCooldownMs - elapsed) / 1e3));
+    const nextSync = new Date(now + 3 * 60 * 60 * 1e3).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+    return {
+      provider: "The Odds API",
+      plan: "Starter (Free 500 Credits/Month)",
+      totalMonthlyCredits: this.totalMonthlyCredits,
+      remainingCredits: this.remainingCredits,
+      usedCredits: this.usedCredits,
+      requestsToday: this.requestsToday,
+      dailyBudget: this.dailyBudget,
+      lastSyncedAt: this.lastSyncedAt ? this.lastSyncedAt.toLocaleTimeString() : "Never",
+      nextScheduledSync: nextSync,
+      cooldownRemainingSeconds: cooldownRemaining,
+      isRateLimited: this.remainingCredits <= 5 || this.requestsToday >= this.dailyBudget,
+      totalMatchesInLocalDb: this.localMatches.size,
+      configured: !!getTheOddsApiKey()
+    };
+  }
+};
+var theOddsApiService = new TheOddsApiService();
+
+// src/server/routes/matchesRoutes.ts
 var matchesRouter = Router4();
-matchesRouter.get("/", (req, res) => {
+matchesRouter.get("/", async (req, res) => {
   const { sport, live, league, search } = req.query;
-  let result = [...db.matches];
+  const theOddsMatches = theOddsApiService.getLocalMatches();
+  const seenIds = /* @__PURE__ */ new Set();
+  let result = [];
+  for (const m of theOddsMatches) {
+    if (!seenIds.has(m.id)) {
+      seenIds.add(m.id);
+      result.push(m);
+    }
+  }
+  for (const m of db.matches) {
+    if (!seenIds.has(m.id)) {
+      seenIds.add(m.id);
+      result.push(m);
+    }
+  }
+  if (getSportsApiKey()) {
+    try {
+      const activeSport = typeof sport === "string" && sport ? sport : "football";
+      const liveData = await sportsService.getLiveMatches(activeSport);
+      if (liveData.matches && liveData.matches.length > 0) {
+        const existingIds = new Set(result.map((m) => m.id));
+        const newLiveMatches = liveData.matches.filter((m) => !existingIds.has(m.id));
+        result = [...newLiveMatches, ...result];
+      }
+    } catch {
+    }
+  }
   if (sport && typeof sport === "string") {
     result = result.filter((m) => m.sport.toLowerCase() === sport.toLowerCase());
   }
@@ -1928,7 +3624,7 @@ matchesRouter.get("/", (req, res) => {
 });
 matchesRouter.get("/:id", (req, res) => {
   const { id } = req.params;
-  const match = db.matches.find((m) => m.id === id || m.gameId === id);
+  const match = theOddsApiService.getLocalMatches().find((m) => m.id === id || m.gameId === id) || db.matches.find((m) => m.id === id || m.gameId === id);
   if (!match) {
     return res.status(404).json({ success: false, error: "Match not found" });
   }
@@ -1983,55 +3679,39 @@ matchesRouter.post("/simulate-live", (req, res) => {
 // src/server/footballApi.ts
 import { Router as Router5 } from "express";
 var footballRouter = Router5();
-var liveCache = { timestamp: 0, data: [] };
-var CACHE_TTL_MS = 45e3;
-var DEFAULT_KEY = "4995ee7869ce07d01b61d0a7d0b24307";
-function getApiKey() {
-  return process.env.API_FOOTBALL_KEY || process.env.RAPIDAPI_KEY || DEFAULT_KEY;
-}
-async function fetchFromApiFootball(endpoint) {
-  const apiKey = getApiKey();
-  if (!apiKey) return null;
-  const isRapidApi = apiKey.length > 40 && !apiKey.startsWith("v3.");
-  const url = isRapidApi ? `https://api-football-v1.p.rapidapi.com/v3/${endpoint}` : `https://v3.football.api-sports.io/${endpoint}`;
-  const headers = isRapidApi ? {
-    "x-rapidapi-key": apiKey,
-    "x-rapidapi-host": "api-football-v1.p.rapidapi.com"
-  } : {
-    "x-apisports-key": apiKey
-  };
-  const response = await fetch(url, { headers });
-  if (!response.ok) {
-    throw new Error(`API-Football error: ${response.status} ${response.statusText}`);
-  }
-  return await response.json();
-}
 footballRouter.get("/status", async (req, res) => {
-  const apiKey = getApiKey();
   try {
-    const statusData = await fetchFromApiFootball("status");
-    const requests = statusData?.response?.requests || { current: 0, limit_day: 100 };
-    const account = statusData?.response?.account || {};
+    const statusData = await sportsService.getSportStatus("football");
     res.json({
-      configured: true,
-      provider: "API-Football (api-sports.io)",
-      mode: "live_real_data",
-      accountName: account.firstname ? `${account.firstname} ${account.lastname || ""}`.trim() : "Active",
-      requestsUsed: requests.current,
-      dailyLimit: requests.limit_day,
-      message: `Connected to API-Football (${requests.current}/${requests.limit_day} requests used today)`
+      configured: statusData.configured,
+      provider: statusData.provider,
+      mode: statusData.mode,
+      accountName: statusData.accountName || "Active",
+      requestsUsed: statusData.requestsUsed,
+      dailyLimit: statusData.dailyLimit,
+      remainingRequests: statusData.remainingRequests,
+      cacheHits: statusData.cacheHits,
+      cacheMisses: statusData.cacheMisses,
+      cached: statusData.cached,
+      stale: statusData.stale,
+      lastUpdated: statusData.lastUpdated,
+      message: `Connected to API-Football (${statusData.requestsUsed}/${statusData.dailyLimit} requests used today)`
     });
-  } catch {
+  } catch (err) {
+    const stats = sportsCache.getOrCreateStats("football");
     res.json({
-      configured: Boolean(apiKey),
+      configured: Boolean(getSportsApiKey()),
       provider: "API-Football (api-sports.io)",
-      mode: apiKey ? "live_real_data" : "demo_simulation",
+      mode: getSportsApiKey() ? "live_real_data" : "demo_simulation",
+      requestsUsed: stats.requestsMade,
+      dailyLimit: stats.dailyLimit,
+      remainingRequests: stats.remainingRequests,
       message: "Active"
     });
   }
 });
 footballRouter.get("/live", async (req, res) => {
-  const apiKey = getApiKey();
+  const apiKey = getSportsApiKey();
   if (!apiKey) {
     return res.json({
       success: true,
@@ -2040,120 +3720,216 @@ footballRouter.get("/live", async (req, res) => {
       data: null
     });
   }
-  const now = Date.now();
-  if (liveCache.data.length > 0 && now - liveCache.timestamp < CACHE_TTL_MS) {
-    return res.json({
-      success: true,
-      source: "api_football_cache",
-      configured: true,
-      data: liveCache.data
-    });
-  }
   try {
-    const fixturesData = await fetchFromApiFootball("fixtures?live=all");
-    if (!fixturesData || !fixturesData.response || fixturesData.response.length === 0) {
-      return res.json({ success: true, source: "api_football", data: [] });
-    }
-    let liveOddsMap = {};
-    try {
-      const oddsData = await fetchFromApiFootball("odds/live");
-      if (oddsData && oddsData.response) {
-        for (const item of oddsData.response) {
-          liveOddsMap[item.fixture.id] = item.odds;
-        }
-      }
-    } catch {
-    }
-    const transformed = fixturesData.response.slice(0, 30).map((item) => {
-      const fixture = item.fixture;
-      const league = item.league;
-      const teams = item.teams;
-      const goals = item.goals;
-      const fixtureOdds = liveOddsMap[fixture.id] || [];
-      const ftMarket = fixtureOdds.find(
-        (m) => m.name === "Fulltime Result" || m.name === "Match Winner" || m.name === "1X2"
-      );
-      let homeOdd = 0;
-      let drawOdd = 0;
-      let awayOdd = 0;
-      if (ftMarket && ftMarket.values && ftMarket.values.length >= 3) {
-        const h = ftMarket.values.find((v) => v.value === "Home" || v.value === "1");
-        const d = ftMarket.values.find((v) => v.value === "Draw" || v.value === "X");
-        const a = ftMarket.values.find((v) => v.value === "Away" || v.value === "2");
-        if (h && d && a) {
-          homeOdd = parseFloat(parseFloat(h.odd).toFixed(2));
-          drawOdd = parseFloat(parseFloat(d.odd).toFixed(2));
-          awayOdd = parseFloat(parseFloat(a.odd).toFixed(2));
-        }
-      }
-      const elapsed = fixture.status.elapsed || 1;
-      const homeScore = goals.home ?? 0;
-      const awayScore = goals.away ?? 0;
-      const diff = homeScore - awayScore;
-      if (!homeOdd || !drawOdd || !awayOdd) {
-        if (diff > 0) {
-          homeOdd = Math.max(1.05, parseFloat((1.3 - elapsed / 200 * 0.25).toFixed(2)));
-          drawOdd = parseFloat((4 + diff * 1.5).toFixed(2));
-          awayOdd = parseFloat((7 + diff * 3).toFixed(2));
-        } else if (diff < 0) {
-          awayOdd = Math.max(1.05, parseFloat((1.3 - elapsed / 200 * 0.25).toFixed(2)));
-          drawOdd = parseFloat((4 + Math.abs(diff) * 1.5).toFixed(2));
-          homeOdd = parseFloat((7 + Math.abs(diff) * 3).toFixed(2));
-        } else {
-          homeOdd = parseFloat((2.3 + Math.random() * 0.3).toFixed(2));
-          drawOdd = parseFloat((2.8 + Math.random() * 0.4).toFixed(2));
-          awayOdd = parseFloat((2.9 + Math.random() * 0.5).toFixed(2));
-        }
-      }
-      const totalGoals = homeScore + awayScore;
-      const ouLine = totalGoals + 0.5;
-      return {
-        id: `live-api-${fixture.id}`,
-        gameId: String(fixture.id).slice(-5),
-        sport: "football",
-        league: league.name,
-        countryOrCategory: league.country,
-        homeTeam: teams.home.name,
-        awayTeam: teams.away.name,
-        homeScore,
-        awayScore,
-        period: fixture.status.short || "1H",
-        minute: `${elapsed}' ${fixture.status.short || ""}`,
-        isLive: true,
-        startTime: "Live",
-        isHot: diff === 0 || elapsed > 75,
-        hasLiveStream: Boolean(fixture.id % 2 === 0),
-        marketsCount: 65 + fixture.id % 90,
-        markets: {
-          "1X2": [
-            { id: `o-${fixture.id}-1`, name: "1", value: homeOdd, trend: "same" },
-            { id: `o-${fixture.id}-X`, name: "X", value: drawOdd, trend: "same" },
-            { id: `o-${fixture.id}-2`, name: "2", value: awayOdd, trend: "same" }
-          ],
-          "O/U": [
-            { id: `o-${fixture.id}-over`, name: `Over ${ouLine}`, value: 1.82, trend: "same" },
-            { id: `o-${fixture.id}-under`, name: `Under ${ouLine}`, value: 1.98, trend: "same" }
-          ],
-          "DC": [
-            { id: `o-${fixture.id}-1x`, name: "1X", value: parseFloat((homeOdd / 1.7).toFixed(2)) || 1.18, trend: "same" },
-            { id: `o-${fixture.id}-12`, name: "12", value: 1.28, trend: "same" },
-            { id: `o-${fixture.id}-x2`, name: "X2", value: parseFloat((awayOdd / 1.7).toFixed(2)) || 1.55, trend: "same" }
-          ]
-        }
-      };
-    });
-    liveCache = { timestamp: now, data: transformed };
+    const result = await sportsService.getLiveMatches("football");
     return res.json({
       success: true,
-      source: "api_football",
+      source: result.source,
       configured: true,
-      count: transformed.length,
-      data: transformed
+      cached: result.cached,
+      stale: result.stale,
+      lastUpdated: result.lastUpdated,
+      count: result.matches.length,
+      data: result.matches
     });
   } catch (err) {
-    console.error("Error fetching API-Football live:", err);
+    console.error("[API-Football Live Route Error]", err);
     return res.status(500).json({ success: false, error: err.message });
   }
+});
+footballRouter.get("/fixtures", async (req, res) => {
+  const { date, league, season } = req.query;
+  try {
+    const result = await sportsService.getUpcomingFixtures("football", {
+      date: typeof date === "string" ? date : void 0,
+      league: typeof league === "string" ? league : void 0,
+      season: typeof season === "string" ? season : void 0
+    });
+    return res.json({
+      success: true,
+      source: result.source,
+      cached: result.cached,
+      stale: result.stale,
+      lastUpdated: result.lastUpdated,
+      count: result.matches.length,
+      data: result.matches
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// src/server/routes/sportsRoutes.ts
+import { Router as Router6 } from "express";
+var sportsRouter = Router6();
+sportsRouter.get("/the-odds/status", (req, res) => {
+  const status = theOddsApiService.getQuotaStatus();
+  res.json({
+    success: true,
+    data: status
+  });
+});
+sportsRouter.post("/the-odds/sync", async (req, res) => {
+  try {
+    const result = await theOddsApiService.triggerManualSync();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message || "Sync failed"
+    });
+  }
+});
+sportsRouter.get("/the-odds/matches", (req, res) => {
+  const { sport, isLive, league, search } = req.query;
+  const matches = theOddsApiService.getLocalMatches({
+    sport: typeof sport === "string" ? sport : void 0,
+    isLive: isLive !== void 0 ? isLive === "true" || isLive === "1" : void 0,
+    league: typeof league === "string" ? league : void 0,
+    search: typeof search === "string" ? search : void 0
+  });
+  res.json({
+    success: true,
+    count: matches.length,
+    source: "local_mongodb_cache",
+    matches
+  });
+});
+sportsRouter.get("/usage", (req, res) => {
+  const allStats = sportsCache.getAllUsageStats();
+  res.json({
+    success: true,
+    provider: "API-Sports Multi-Sport Centralized Hub",
+    timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+    totalSportsSubscribed: Object.keys(SPORTS_CONFIG).length,
+    stats: allStats
+  });
+});
+sportsRouter.get("/:sport/status", async (req, res) => {
+  const { sport } = req.params;
+  try {
+    const statusData = await sportsService.getSportStatus(sport);
+    res.json({
+      success: true,
+      ...statusData
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+sportsRouter.get("/:sport/live", async (req, res) => {
+  const { sport } = req.params;
+  try {
+    const result = await sportsService.getLiveMatches(sport);
+    res.json({
+      success: true,
+      sport,
+      count: result.matches.length,
+      cached: result.cached,
+      stale: result.stale,
+      lastUpdated: result.lastUpdated,
+      source: result.source,
+      data: result.matches
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+sportsRouter.get("/:sport/fixtures", async (req, res) => {
+  const { sport } = req.params;
+  const { date, league, season } = req.query;
+  try {
+    const result = await sportsService.getUpcomingFixtures(sport, {
+      date: typeof date === "string" ? date : void 0,
+      league: typeof league === "string" ? league : void 0,
+      season: typeof season === "string" ? season : void 0
+    });
+    res.json({
+      success: true,
+      sport,
+      count: result.matches.length,
+      cached: result.cached,
+      stale: result.stale,
+      lastUpdated: result.lastUpdated,
+      source: result.source,
+      data: result.matches
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+sportsRouter.get("/:sport/standings", async (req, res) => {
+  const { sport } = req.params;
+  const { league, season } = req.query;
+  try {
+    const result = await sportsService.fetchSportEndpoint(
+      sport,
+      "standings",
+      { league, season: season || (/* @__PURE__ */ new Date()).getFullYear() },
+      2700
+      // 45 mins
+    );
+    res.json({
+      success: true,
+      sport,
+      cached: result.cached,
+      stale: result.stale,
+      lastUpdated: result.lastUpdated,
+      data: result.data
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+sportsRouter.get("/:sport/query", async (req, res) => {
+  const { sport } = req.params;
+  const { endpoint, ttl, ...params } = req.query;
+  if (!endpoint || typeof endpoint !== "string") {
+    return res.status(400).json({ success: false, error: 'Query parameter "endpoint" is required' });
+  }
+  const customTTL = ttl ? parseInt(String(ttl), 10) : void 0;
+  try {
+    const result = await sportsService.fetchSportEndpoint(
+      sport,
+      endpoint,
+      params,
+      customTTL
+    );
+    res.json({
+      success: true,
+      sport,
+      endpoint,
+      cached: result.cached,
+      stale: result.stale,
+      lastUpdated: result.lastUpdated,
+      data: result.data
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+sportsRouter.post("/clear-cache", (req, res) => {
+  sportsCache.clearCache();
+  sportsCache.resetStats();
+  res.json({
+    success: true,
+    message: "Central sports cache and usage counters successfully reset"
+  });
 });
 
 // src/server/app.ts
@@ -2226,6 +4002,18 @@ app.use("/api/matches", matchesRouter);
 app.use("/matches", matchesRouter);
 app.use("/api/football", footballRouter);
 app.use("/football", footballRouter);
+app.use("/api/sports", sportsRouter);
+app.use("/sports", sportsRouter);
+app.use((err, req, res, next) => {
+  if (err?.name === "MongooseError" || err?.name === "MongoNetworkError" || err?.message?.includes("buffering timed out")) {
+    console.warn("[AI Studio] Database offline \u2014 returning mock response");
+    if (req.method === "GET") {
+      return res.json(req.path.endsWith("s") || req.path.endsWith("s/") ? [] : {});
+    }
+    return res.status(503).json({ error: "Service temporarily unavailable (database offline)" });
+  }
+  next(err);
+});
 
 // src/server/vercel.ts
 dotenv.config();

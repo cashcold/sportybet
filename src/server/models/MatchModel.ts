@@ -16,6 +16,8 @@ export interface IMatchDoc extends Document {
   minute?: string;
   isLive: boolean;
   startTime: string;
+  date?: string;
+  dateLabel?: string;
   commenceTime?: Date;
   isHot?: boolean;
   hasLiveStream?: boolean;
@@ -43,6 +45,8 @@ const MatchSchema = new Schema<IMatchDoc>(
     minute: { type: String },
     isLive: { type: Boolean, default: false, index: true },
     startTime: { type: String, required: true },
+    date: { type: String },
+    dateLabel: { type: String },
     commenceTime: { type: Date, index: true },
     isHot: { type: Boolean, default: false },
     hasLiveStream: { type: Boolean, default: false },

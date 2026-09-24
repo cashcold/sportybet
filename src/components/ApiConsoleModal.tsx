@@ -142,12 +142,12 @@ const ENDPOINTS: ApiEndpoint[] = [
     defaultBody: {
       selections: [
         {
-          matchId: 'live-alloa-hib',
-          gameId: '19482',
-          matchTitle: 'Alloa Athletic vs Hibernian B',
+          matchId: 'live-ars-mci',
+          gameId: '84920',
+          matchTitle: 'Arsenal FC vs Manchester City',
           marketName: '1X2',
           selectionName: '1',
-          odd: 1.03,
+          odd: 2.85,
           isLive: true
         }
       ]

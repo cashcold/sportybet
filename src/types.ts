@@ -27,6 +27,9 @@ export interface Match {
   isLive: boolean;
   isHot?: boolean;
   startTime?: string;
+  date?: string; // YYYY-MM-DD
+  dateLabel?: string; // e.g. 'Today 24/09', 'Friday 25/09'
+  commenceTime?: string;
   hasLiveStream?: boolean;
   marketsCount: number; // e.g. +145
   markets: Record<string, OddItem[]>; // market type -> odds

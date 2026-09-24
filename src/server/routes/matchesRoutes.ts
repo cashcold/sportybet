@@ -9,21 +9,27 @@ export const matchesRouter = Router();
 // GET /api/matches
 matchesRouter.get('/', async (req: Request, res: Response) => {
   const { sport, live, league, search } = req.query;
+  const activeSport = (typeof sport === 'string' && sport) ? sport : 'football';
 
-  // 1. Get real matches stored locally from The Odds API (0 external credits consumed!)
-  const theOddsMatches = theOddsApiService.getLocalMatches();
-
-  // Combine with db.matches, ensuring no duplicate IDs
   const seenIds = new Set<string>();
   let result: Match[] = [];
 
-  for (const m of theOddsMatches) {
-    if (!seenIds.has(m.id)) {
-      seenIds.add(m.id);
-      result.push(m);
+  // 1. Live matches first (active real games with live score & clock)
+  try {
+    const liveData = await sportsService.getLiveMatches(activeSport);
+    if (liveData.matches && liveData.matches.length > 0) {
+      for (const m of liveData.matches) {
+        if (!seenIds.has(m.id)) {
+          seenIds.add(m.id);
+          result.push(m);
+        }
+      }
     }
+  } catch {
+    // Non-blocking
   }
 
+  // 2. Upcoming matches scheduled for Today and following days (curated / db)
   for (const m of db.matches) {
     if (!seenIds.has(m.id)) {
       seenIds.add(m.id);
@@ -31,18 +37,12 @@ matchesRouter.get('/', async (req: Request, res: Response) => {
     }
   }
 
-  // If external API-Sports key is active and healthy, augment with cached live matches
-  if (getSportsApiKey()) {
-    try {
-      const activeSport = (typeof sport === 'string' && sport) ? sport : 'football';
-      const liveData = await sportsService.getLiveMatches(activeSport);
-      if (liveData.matches && liveData.matches.length > 0) {
-        const existingIds = new Set(result.map(m => m.id));
-        const newLiveMatches = liveData.matches.filter(m => !existingIds.has(m.id));
-        result = [...newLiveMatches, ...result];
-      }
-    } catch {
-      // Non-blocking fallback to local matches
+  // 3. Real matches stored locally from The Odds API
+  const theOddsMatches = theOddsApiService.getLocalMatches();
+  for (const m of theOddsMatches) {
+    if (!seenIds.has(m.id)) {
+      seenIds.add(m.id);
+      result.push(m);
     }
   }
 
