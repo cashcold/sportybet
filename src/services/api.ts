@@ -21,7 +21,13 @@ export const api = {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone, password })
         });
-        const data = await res.json();
+        let data: any = null;
+        const text = await res.text();
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = { success: false, error: text || `Server returned error (${res.status})` };
+        }
         if (data.token) {
           localStorage.setItem('sportybet_auth_token', data.token);
         }
@@ -31,14 +37,20 @@ export const api = {
       }
     },
 
-    async register(phone: string, password?: string): Promise<{ success: boolean; user?: UserProfile; token?: string; message?: string; error?: string }> {
+    async register(phone: string, password?: string, firstName?: string, lastName?: string): Promise<{ success: boolean; user?: UserProfile; token?: string; message?: string; error?: string }> {
       try {
         const res = await fetch(`${getBaseUrl()}/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, password })
+          body: JSON.stringify({ phone, password, firstName, lastName })
         });
-        const data = await res.json();
+        let data: any = null;
+        const text = await res.text();
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = { success: false, error: text || `Server returned error (${res.status})` };
+        }
         if (data.token) {
           localStorage.setItem('sportybet_auth_token', data.token);
         }

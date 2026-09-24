@@ -39,36 +39,74 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
     return <ProfileDetailsSubpage onBack={() => setShowSubpage(false)} />;
   }
 
-  // Logged-out view (Screenshot 13)
+  // Logged-out view (SportyBet Guest Account Dashboard)
   if (!user.isLoggedIn) {
     return (
       <div className="pb-24 bg-[#141b24] text-white min-h-screen select-none">
-        {/* Logged-out Top Row */}
-        <div className="bg-[#19222d] px-4 py-4 border-b border-[#232f3f] flex items-center justify-between">
-          <button
-            onClick={() => {
-              setAuthMode('login');
-              setAuthModalOpen(true);
-            }}
-            className="flex items-center space-x-2 text-white font-bold text-sm hover:text-neutral-200"
-          >
-            <div className="w-8 h-8 rounded-full bg-neutral-700 flex items-center justify-center text-sm">
-              👤
+        {/* Logged-out Top Hero Card */}
+        <div className="bg-[#19222d] px-4 pt-5 pb-5 border-b border-[#232f3f]">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 rounded-full bg-[#243142] border border-white/10 flex items-center justify-center text-xl shadow">
+                👤
+              </div>
+              <div>
+                <h2 className="text-base font-black text-white tracking-wide uppercase">
+                  Welcome to SportyBet
+                </h2>
+                <p className="text-xs text-neutral-400">
+                  Join now to enjoy Ghana's best sports betting odds
+                </p>
+              </div>
             </div>
-            <span>Login to View</span>
-            <ChevronRight className="w-4 h-4 text-neutral-400" />
-          </button>
 
-          <div className="flex items-center space-x-1.5 text-xs text-neutral-300">
-            <span>Dark Mode</span>
-            <Moon className="w-4 h-4 text-neutral-400" />
+            <div className="flex items-center space-x-1.5 text-xs text-neutral-300">
+              <span>Dark Mode</span>
+              <Moon className="w-4 h-4 text-neutral-400" />
+            </div>
+          </div>
+
+          {/* Join Now & Log In Action Buttons */}
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            <button
+              onClick={() => {
+                setAuthMode('join');
+                setAuthModalOpen(true);
+              }}
+              className="bg-[#00a826] hover:bg-[#009221] active:scale-[0.98] text-white font-black py-2.5 px-3 rounded-[4px] text-xs flex items-center justify-center space-x-1.5 shadow-lg uppercase tracking-wider"
+            >
+              <span>Join Now</span>
+            </button>
+            <button
+              onClick={() => {
+                setAuthMode('login');
+                setAuthModalOpen(true);
+              }}
+              className="bg-[#243142] hover:bg-[#2e3e52] active:scale-[0.98] border border-[#3b4c63] text-white font-bold py-2.5 px-3 rounded-[4px] text-xs flex items-center justify-center space-x-1.5 shadow"
+            >
+              <span>Log In</span>
+            </button>
+          </div>
+
+          {/* Quick Demo Login Option */}
+          <div className="mt-3 pt-3 border-t border-[#232f3f] flex items-center justify-between text-xs">
+            <span className="text-neutral-400">Quick Demo Account:</span>
+            <button
+              onClick={() => {
+                setAuthMode('login');
+                setAuthModalOpen(true);
+              }}
+              className="text-[#00df59] font-bold hover:underline"
+            >
+              Charles Asumah (0204891235)
+            </button>
           </div>
         </div>
 
         {/* Balance Row */}
         <div className="px-4 py-3 bg-[#19222d] flex items-center justify-between border-b border-[#232f3f]">
           <span className="text-xs text-neutral-400 font-medium">Total Balance</span>
-          <span className="text-base font-black text-white">GHS --</span>
+          <span className="text-base font-black text-white">GHC 0.00</span>
         </div>
 
         {/* Action Buttons */}
@@ -99,14 +137,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
         <div className="px-4 pb-2">
           <div
             onClick={() => {
-              setAuthMode('login');
+              setAuthMode('join');
               setAuthModalOpen(true);
             }}
             className="bg-[#1c2533] border border-[#273445] rounded-lg p-3 flex items-center justify-between cursor-pointer"
           >
             <span className="text-xs font-black italic text-white">Sporty Loyalty</span>
             <span className="text-xs font-bold text-[#00df59] flex items-center space-x-1">
-              <span>Log in to join</span>
+              <span>Register to join</span>
               <ChevronRight className="w-4 h-4" />
             </span>
           </div>
@@ -167,15 +205,22 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
           </div>
 
           <div className="flex-1 min-w-0 pr-8">
-            {/* Phone Number Clickable Row: 20******5 > (Screenshot 14 Arrow/Circle) */}
+            {/* User Name & Phone clickable row */}
             <div 
               onClick={() => setShowSubpage(true)}
-              className="flex items-center space-x-1 cursor-pointer group"
+              className="cursor-pointer group"
             >
-              <span className="font-bold text-[17px] text-white tracking-wide group-hover:text-[#00df59] transition-colors">
-                {user.phone || '20******5'}
-              </span>
-              <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-white stroke-[2.5]" />
+              <div className="flex items-center space-x-1.5">
+                <span className="font-extrabold text-[16px] text-white tracking-wide group-hover:text-[#00df59] transition-colors uppercase truncate">
+                  {user.firstName && user.lastName 
+                    ? `${user.firstName} ${user.lastName}` 
+                    : (user.firstName || user.username || user.phone || 'User')}
+                </span>
+                <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-white stroke-[2.5] shrink-0" />
+              </div>
+              <div className="text-xs text-neutral-400 font-mono tracking-wider mt-0.5">
+                {user.phone ? (user.phone.length > 7 ? `${user.phone.slice(0, 3)}****${user.phone.slice(-3)}` : user.phone) : 'No phone set'}
+              </div>
             </div>
 
             {/* Loyalty Tier Row */}

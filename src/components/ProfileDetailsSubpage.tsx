@@ -112,7 +112,7 @@ export const ProfileDetailsSubpage: React.FC<ProfileDetailsSubpageProps> = ({ on
         <div className="px-4 py-3.5 flex items-center justify-between">
           <span className="text-neutral-400 font-medium">First Name</span>
           <span className="text-neutral-200 font-bold uppercase tracking-wide">
-            {user.firstName || 'CHARLES'}
+            {user.firstName || 'NOT SET'}
           </span>
         </div>
 
@@ -120,7 +120,7 @@ export const ProfileDetailsSubpage: React.FC<ProfileDetailsSubpageProps> = ({ on
         <div className="px-4 py-3.5 flex items-center justify-between">
           <span className="text-neutral-400 font-medium">Last Name</span>
           <span className="text-neutral-200 font-bold uppercase tracking-wide">
-            {user.lastName || 'ASUMAH'}
+            {user.lastName || 'NOT SET'}
           </span>
         </div>
 
@@ -140,7 +140,7 @@ export const ProfileDetailsSubpage: React.FC<ProfileDetailsSubpageProps> = ({ on
           <span className="text-neutral-400 font-medium">Phone Number</span>
           <div className="flex items-center space-x-1">
             <span className="text-[#00df59] font-mono font-bold">
-              {user.phone || '20******5'}
+              {user.phone || 'Not set'}
             </span>
             <ChevronRight className="w-4 h-4 text-neutral-500" />
           </div>

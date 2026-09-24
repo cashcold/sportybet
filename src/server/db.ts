@@ -1,5 +1,5 @@
 import { Match, PlacedBet, UserProfile, BetSelection } from '../types';
-import { INITIAL_MATCHES, INITIAL_OPEN_BETS, INITIAL_BET_HISTORY, INITIAL_USER } from '../data/mockData';
+import { INITIAL_MATCHES, INITIAL_OPEN_BETS, INITIAL_BET_HISTORY, DEMO_USER } from '../data/mockData';
 
 export interface WalletTransaction {
   id: string;
@@ -40,18 +40,21 @@ class Database {
     // 1. Initialize matches
     this.matches = JSON.parse(JSON.stringify(INITIAL_MATCHES));
 
-    // 2. Initialize default user
-    const defaultUser: UserProfile = JSON.parse(JSON.stringify(INITIAL_USER));
-    const phone = defaultUser.phone || '20******5';
-    this.users.set(phone, defaultUser);
-    this.userSessions.set('mock-session-token-sportybet', phone);
+    // 2. Initialize default demo user (Charles Asumah) for demo testing
+    const demoUser: UserProfile = JSON.parse(JSON.stringify(DEMO_USER));
+    const demoPhone = demoUser.phone || '0204891235';
+    this.users.set(demoPhone, demoUser);
+    this.users.set('20******5', demoUser);
+    this.users.set('0204891235', demoUser);
 
-    // 3. Initialize default bets
-    this.openBets.set(phone, JSON.parse(JSON.stringify(INITIAL_OPEN_BETS)));
-    this.betHistory.set(phone, JSON.parse(JSON.stringify(INITIAL_BET_HISTORY)));
+    // 3. Initialize default bets for demo account
+    this.openBets.set(demoPhone, JSON.parse(JSON.stringify(INITIAL_OPEN_BETS)));
+    this.betHistory.set(demoPhone, JSON.parse(JSON.stringify(INITIAL_BET_HISTORY)));
+    this.openBets.set('20******5', JSON.parse(JSON.stringify(INITIAL_OPEN_BETS)));
+    this.betHistory.set('20******5', JSON.parse(JSON.stringify(INITIAL_BET_HISTORY)));
 
     // 4. Initialize default transactions
-    this.transactions.set(phone, [
+    this.transactions.set(demoPhone, [
       {
         id: 'tx-001',
         type: 'deposit',
@@ -87,9 +90,11 @@ class Database {
   }
 
   public getUserByToken(token?: string): UserProfile | null {
-    if (!token) return this.users.get('20******5') || null;
+    if (!token) return null;
     const cleanToken = token.replace('Bearer ', '').trim();
-    const phone = this.userSessions.get(cleanToken) || '20******5';
+    if (!cleanToken) return null;
+    const phone = this.userSessions.get(cleanToken);
+    if (!phone) return null;
     return this.users.get(phone) || null;
   }
 }

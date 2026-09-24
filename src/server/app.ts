@@ -7,8 +7,17 @@ import { footballRouter } from './footballApi';
 
 export const app = express();
 
-// Middleware
+// Serverless-safe body parsing middleware
+// If Vercel has already parsed req.body, mark _body=true so express.json() does not hang waiting on consumed stream
+app.use((req, res, next) => {
+  if (req.body && typeof req.body === 'object' && Object.keys(req.body).length > 0) {
+    (req as any)._body = true;
+  }
+  next();
+});
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Enable CORS for API routes
 app.use((req, res, next) => {

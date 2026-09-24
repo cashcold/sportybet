@@ -12,18 +12,32 @@ interface AuthModalProps {
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'login' }) => {
   const { login, register, showToast } = useBetting();
   const [mode, setMode] = useState<'login' | 'join'>(initialMode);
-  const [phone, setPhone] = useState('0204891235');
-  const [password, setPassword] = useState('password123');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Sync mode if initialMode changes
+  React.useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode);
+      setErrorMessage(null);
+    }
+  }, [isOpen, initialMode]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+
+    if (mode === 'join' && (!firstName.trim() || !lastName.trim())) {
+      showToast('Please enter your First Name and Last Name');
+      setErrorMessage('First Name and Last Name are required for registration');
+      return;
+    }
 
     if (!phone.trim()) {
       showToast('Please enter mobile number');
@@ -68,7 +82,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
     setLoading(true);
     setErrorMessage(null);
     try {
-      await login('20******5', 'demo');
+      await login('0204891235', 'demo');
       onClose();
     } finally {
       setLoading(false);
@@ -236,7 +250,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               onClick={handleDemoLogin}
               className="text-[10px] text-[#00df59] hover:underline font-bold"
             >
-              Quick Login (20******5)
+              Demo: Charles Asumah (0204891235)
             </button>
           </div>
         </form>

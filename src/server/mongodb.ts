@@ -1,11 +1,12 @@
 import mongoose from 'mongoose';
+import { UserModel } from './models/UserModel';
 
 export const MONGODB_URI =
   process.env.MONGODB_URI ||
   'mongodb+srv://capital:mangement12345@capgainco.o3hgd.mongodb.net/SportyBet?retryWrites=true&w=majority&appName=Capgainco';
 
 let isConnected = false;
-let connectionPromise: Promise<typeof mongoose> | null = null;
+let connectionPromise: Promise<typeof mongoose | null> | null = null;
 
 export async function connectToDatabase(): Promise<typeof mongoose | null> {
   if (isConnected && mongoose.connection.readyState === 1) {
@@ -16,39 +17,39 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
     return connectionPromise;
   }
 
-  try {
-    console.log('[MongoDB] Connecting to SportyBet database...');
-    connectionPromise = mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 10000,
-    });
-
-    const conn = await connectionPromise;
-    isConnected = true;
-    console.log('[MongoDB] Successfully connected to SportyBet MongoDB cluster!');
-
-    // Ensure all accounts default to GHC 5000.00 as requested
+  connectionPromise = (async () => {
     try {
-      const { UserModel } = await import('./models/UserModel');
-      await UserModel.updateMany(
+      console.log('[MongoDB] Connecting to SportyBet database...');
+      // Fast timeouts (2.5s) to guarantee serverless function responds quickly
+      const conn = await mongoose.connect(MONGODB_URI, {
+        serverSelectionTimeoutMS: 2500,
+        connectTimeoutMS: 3000,
+        bufferCommands: false,
+      });
+
+      isConnected = true;
+      console.log('[MongoDB] Successfully connected to SportyBet MongoDB cluster!');
+
+      // Background non-blocking sync for default account balances
+      UserModel.updateMany(
         { balance: { $gte: 9000000 } },
         { $set: { balance: 5000.00 } }
-      );
-      await UserModel.updateOne(
-        { phone: '20******5' },
-        { $set: { balance: 5000.00 } }
-      );
-    } catch (syncErr) {
-      console.error('[MongoDB balance sync error]', syncErr);
-    }
+      ).catch(() => {});
 
-    return conn;
-  } catch (error) {
-    console.error('[MongoDB] Connection error:', error);
-    connectionPromise = null;
-    isConnected = false;
-    return null;
-  }
+      return conn;
+    } catch (error: any) {
+      console.warn('[MongoDB Notice] Operating with in-memory cache:', error?.message || error);
+      isConnected = false;
+      return null;
+    } finally {
+      // Allow future reconnection attempts if initial attempt failed
+      if (!isConnected) {
+        connectionPromise = null;
+      }
+    }
+  })();
+
+  return connectionPromise;
 }
 
 export function isDbConnected(): boolean {

@@ -588,25 +588,47 @@ export const INITIAL_BET_HISTORY: PlacedBet[] = [
   }
 ];
 
-export const INITIAL_USER: UserProfile = {
-  username: '', // "No username set"
-  balance: 5000.00,
+export const GUEST_USER: UserProfile = {
+  username: '',
+  balance: 0.00,
   currency: 'GHC',
   loyaltyTier: 'Tier 1',
-  loyaltyProgress: 68,
+  loyaltyProgress: 0,
   nextUpdate: '01 Oct',
-  dailyStreak: 5,
-  unreadNotifications: 1,
-  phone: '20******5',
-  firstName: 'CHARLES',
-  lastName: 'ASUMAH',
-  dateOfBirth: '15/05/1998',
+  dailyStreak: 0,
+  unreadNotifications: 0,
+  phone: '',
+  firstName: '',
+  lastName: '',
+  dateOfBirth: '',
   location: 'Ghana',
   email: '',
   isEmailVerified: false,
   avatarUrl: '/user_beach_avatar.jpg',
+  isLoggedIn: false
+};
+
+export const DEMO_USER: UserProfile = {
+  username: 'charles_asumah',
+  balance: 5000.00,
+  currency: 'GHC',
+  loyaltyTier: 'Tier 1',
+  loyaltyProgress: 96,
+  nextUpdate: '01 Oct',
+  dailyStreak: 5,
+  unreadNotifications: 1,
+  phone: '0204891235',
+  firstName: 'CHARLES',
+  lastName: 'ASUMAH',
+  dateOfBirth: '15/05/1998',
+  location: 'Ghana',
+  email: 'charles.asumah@sportybet.gh',
+  isEmailVerified: true,
+  avatarUrl: '/user_beach_avatar.jpg',
   isLoggedIn: true
 };
+
+export const INITIAL_USER: UserProfile = GUEST_USER;
 
 export const SPORTS_LIST = [
   { id: 'popular', name: 'Popular', icon: 'Flame', count: 420 },
