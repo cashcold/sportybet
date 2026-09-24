@@ -1,11 +1,9 @@
+import 'dotenv/config';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
-import dotenv from 'dotenv';
 import express from 'express';
 import { app } from './src/server/app';
 import { connectToDatabase } from './src/server/mongodb';
-
-dotenv.config();
 
 const PORT = 3000;
 

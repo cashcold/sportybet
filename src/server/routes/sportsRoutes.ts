@@ -2,8 +2,47 @@ import { Router, Request, Response } from 'express';
 import { sportsService } from '../sports/sportsService';
 import { sportsCache } from '../sports/cacheManager';
 import { SPORTS_CONFIG } from '../sports/sportsConfig';
+import { theOddsApiService } from '../sports/theOddsApiService';
 
 export const sportsRouter = Router();
+
+// 0. The Odds API Endpoints (Local Storage & Quota Guard)
+sportsRouter.get('/the-odds/status', (req: Request, res: Response) => {
+  const status = theOddsApiService.getQuotaStatus();
+  res.json({
+    success: true,
+    data: status
+  });
+});
+
+sportsRouter.post('/the-odds/sync', async (req: Request, res: Response) => {
+  try {
+    const result = await theOddsApiService.triggerManualSync();
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || 'Sync failed'
+    });
+  }
+});
+
+sportsRouter.get('/the-odds/matches', (req: Request, res: Response) => {
+  const { sport, isLive, league, search } = req.query;
+  const matches = theOddsApiService.getLocalMatches({
+    sport: typeof sport === 'string' ? sport : undefined,
+    isLive: isLive !== undefined ? isLive === 'true' || isLive === '1' : undefined,
+    league: typeof league === 'string' ? league : undefined,
+    search: typeof search === 'string' ? search : undefined
+  });
+
+  res.json({
+    success: true,
+    count: matches.length,
+    source: 'local_mongodb_cache',
+    matches
+  });
+});
 
 // 1. GET /api/sports/usage - Admin & System Monitoring of API-Sports Quotas
 sportsRouter.get('/usage', (req: Request, res: Response) => {
@@ -152,11 +191,12 @@ sportsRouter.get('/:sport/query', async (req: Request, res: Response) => {
   }
 });
 
-// 7. POST /api/sports/clear-cache - Admin tool to flush cache
+// 7. POST /api/sports/clear-cache - Admin tool to flush cache & reset usage stats
 sportsRouter.post('/clear-cache', (req: Request, res: Response) => {
   sportsCache.clearCache();
+  sportsCache.resetStats();
   res.json({
     success: true,
-    message: 'Central sports cache successfully cleared'
+    message: 'Central sports cache and usage counters successfully reset'
   });
 });

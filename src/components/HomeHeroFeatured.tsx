@@ -35,8 +35,8 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
   onOpenAviator,
   onSelectTournament
 }) => {
-  const { toggleSelection, betslip, showToast, setActiveTab } = useBetting();
-  const [activeTournamentTab, setActiveTournamentTab] = useState("Brasileiro Serie B");
+  const { toggleSelection, betslip, showToast, setActiveTab, matches, selectedSport } = useBetting();
+  const [activeTournamentTab, setActiveTournamentTab] = useState("Premier League");
   const [activeFeaturedTab, setActiveFeaturedTab] = useState<'Matches' | 'Games' | 'Codes' | 'Virtuals'>('Matches');
   const [selectedPromo, setSelectedPromo] = useState<PromoFeatureItem | null>(null);
 
@@ -173,32 +173,39 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
     }
   };
 
-  // Featured live match: Criciuma EC SC vs Operario Ferroviario EC PR (from screenshot 1 & 5)
-  const featuredMatch: Match = {
-    id: 'feat-criciuma-operario',
-    gameId: '38921',
-    sport: 'football',
-    league: 'Brasileiro Serie B',
-    countryOrCategory: 'Brazil',
-    homeTeam: 'Criciuma EC SC',
-    awayTeam: 'Operario Ferroviario EC PR',
-    homeScore: 0,
-    awayScore: 1,
-    minute: "72:16 H2",
-    period: "H2",
-    isLive: true,
-    startTime: 'Live',
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 107,
-    markets: {
-      '1X2': [
-        { id: 'feat-cr-1', name: '1', value: 8.90, trend: 'same' },
-        { id: 'feat-cr-x', name: 'X', value: 3.10, trend: 'same' },
-        { id: 'feat-cr-2', name: '2', value: 1.61, trend: 'same' }
-      ]
-    }
-  };
+  // Dynamic featured live match derived from current sports feed
+  const sportMatches = matches.filter(
+    m => (m.sport || 'football').toLowerCase() === (selectedSport || 'football').toLowerCase()
+  );
+  const featuredMatch: Match =
+    sportMatches.find(m => m.isLive && m.isHot) ||
+    sportMatches.find(m => m.isLive) ||
+    sportMatches[0] ||
+    matches[0] || {
+      id: 'feat-cur-1',
+      gameId: '84920',
+      sport: 'football',
+      league: 'Premier League',
+      countryOrCategory: 'England',
+      homeTeam: 'Arsenal FC',
+      awayTeam: 'Manchester City',
+      homeScore: 1,
+      awayScore: 1,
+      minute: "68' 2H",
+      period: '2H',
+      isLive: true,
+      startTime: 'Live',
+      isHot: true,
+      hasLiveStream: true,
+      marketsCount: 142,
+      markets: {
+        '1X2': [
+          { id: 'f1-1', name: '1', value: 2.85, trend: 'same' },
+          { id: 'f1-X', name: 'X', value: 2.30, trend: 'same' },
+          { id: 'f1-2', name: '2', value: 3.10, trend: 'up' }
+        ]
+      }
+    };
 
   const tournamentFilters = [
     "Brasileiro Serie B",
@@ -455,13 +462,13 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       </div>
 
       {/* =================================================================== */}
-      {/* 5. TOURNAMENT CAPSULE PILL: UEFA Champions League Women */}
+      {/* 5. TOURNAMENT CAPSULE PILL */}
       {/* =================================================================== */}
       <div className="px-3 pb-2">
         <div className="bg-[#1b2532] border border-[#273444] rounded-full px-3 py-1.5 flex items-center justify-between shadow-sm">
           <div className="flex items-center space-x-2 text-xs font-bold text-neutral-200 truncate">
             <span>⚽</span>
-            <span className="truncate">UEFA Champions League Women</span>
+            <span className="truncate">{featuredMatch.league || 'Premier League'}</span>
           </div>
 
           <div className="flex items-center space-x-1.5 shrink-0 ml-2">
@@ -476,7 +483,7 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       </div>
 
       {/* =================================================================== */}
-      {/* 6. BIG FEATURED MATCH CARD: Real Madrid W vs PSG W (Exact match) */}
+      {/* 6. BIG FEATURED MATCH CARD */}
       {/* =================================================================== */}
       <div className="px-3 pb-3">
         <div className="bg-[#16202c] border border-[#232e3d] rounded-md p-3 shadow-md">
@@ -496,12 +503,12 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
 
               {/* Tournament link */}
               <span className="text-[#00df59] underline font-semibold text-[11px] truncate">
-                Football - International Clubs - UEFA Champio...
+                {featuredMatch.sport ? featuredMatch.sport.toUpperCase() : 'FOOTBALL'} - {featuredMatch.countryOrCategory} - {featuredMatch.league}
               </span>
             </div>
 
             <button
-              onClick={() => showToast('Opening UEFA Head-to-Head Statistics')}
+              onClick={() => showToast(`Opening ${featuredMatch.homeTeam} vs ${featuredMatch.awayTeam} Statistics`)}
               className="text-neutral-400 hover:text-white shrink-0 ml-1"
             >
               <BarChart2 className="w-3.5 h-3.5" />
@@ -510,29 +517,30 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
 
           {/* Teams, Score and Live Clock */}
           <div className="grid grid-cols-3 items-center py-3 text-center">
-            {/* Home: Real Madrid W */}
+            {/* Home Team */}
             <div className="flex flex-col items-center space-y-1">
-              {/* Real Madrid crest */}
               <div className="w-10 h-10 rounded-full bg-white/10 border border-amber-400/50 flex items-center justify-center shadow-inner relative">
-                <span className="text-lg">👑</span>
+                <span className="text-sm font-bold text-amber-300">
+                  {featuredMatch.homeTeam.slice(0, 3).toUpperCase()}
+                </span>
               </div>
               <span className="text-xs font-bold text-neutral-200 leading-tight">
-                Real Madrid W
+                {featuredMatch.homeTeam}
               </span>
             </div>
 
             {/* Center: Score + Live badge + 1X2 */}
             <div className="flex flex-col items-center space-y-1">
               <span className="text-xl font-black text-white tracking-wider">
-                1 - 0
+                {featuredMatch.isLive ? `${featuredMatch.homeScore ?? 0} - ${featuredMatch.awayScore ?? 0}` : (featuredMatch.startTime || '18:00')}
               </span>
 
               <div className="flex items-center space-x-1.5">
                 <span className="bg-[#00a826] text-white text-[10px] font-extrabold px-1.5 py-0.2 rounded-sm">
-                  Live
+                  {featuredMatch.isLive ? 'Live' : 'Starts'}
                 </span>
                 <span className="text-[11px] font-bold text-neutral-300">
-                  2:41 H1
+                  {featuredMatch.minute || (featuredMatch.isLive ? 'LIVE' : featuredMatch.startTime || '18:00')}
                 </span>
               </div>
 
@@ -541,21 +549,22 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
               </span>
             </div>
 
-            {/* Away: Paris Saint-Germain W */}
+            {/* Away Team */}
             <div className="flex flex-col items-center space-y-1">
-              {/* PSG crest */}
               <div className="w-10 h-10 rounded-full bg-blue-950 border border-blue-400/50 flex items-center justify-center shadow-inner">
-                <span className="text-xs font-black text-rose-500">PSG</span>
+                <span className="text-sm font-bold text-blue-300">
+                  {featuredMatch.awayTeam.slice(0, 3).toUpperCase()}
+                </span>
               </div>
               <span className="text-xs font-bold text-neutral-200 leading-tight">
-                Paris Saint-Germain W
+                {featuredMatch.awayTeam}
               </span>
             </div>
           </div>
 
           {/* Bottom Odds Row (1, X, 2) in green text matching screenshot */}
           <div className="grid grid-cols-3 gap-2 pt-1">
-            {featuredMatch.markets['1X2'].map(odd => {
+            {(featuredMatch.markets['1X2'] || []).map(odd => {
               const isSelected = betslip.some(
                 s => s.matchId === featuredMatch.id && s.marketName === '1X2' && s.selectionName === odd.name
               );

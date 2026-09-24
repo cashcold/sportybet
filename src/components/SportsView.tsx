@@ -21,7 +21,8 @@ export const SportsView: React.FC = () => {
     isLiveStale,
     showToast,
     setActiveTab,
-    loadBookingCode
+    loadBookingCode,
+    isQuotaProtected
   } = useBetting();
   
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -44,8 +45,9 @@ export const SportsView: React.FC = () => {
   const sportsList = ['Football', 'Basketball', 'NBA', 'NFL', 'Baseball', 'Hockey', 'Rugby', 'Tennis', 'MMA'];
   const marketTypes = ['1X2', 'O/U', 'DC', '1st Half O/U', 'Handicap'];
 
-  const liveMatches = matches.filter(m => m.isLive);
-  const upcomingMatches = matches.filter(m => !m.isLive);
+  const sportLower = (selectedSport || 'football').toLowerCase();
+  const liveMatches = matches.filter(m => m.isLive && ((m.sport || 'football').toLowerCase() === sportLower));
+  const upcomingMatches = matches.filter(m => !m.isLive && ((m.sport || 'football').toLowerCase() === sportLower));
 
   return (
     <div className="pb-24 bg-[#141a22] text-white min-h-screen">
@@ -112,6 +114,22 @@ export const SportsView: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* API Quota Notice when Football 100/100 limit is reached */}
+        {isQuotaProtected && sportLower === 'football' && (
+          <div className="mx-3 my-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded text-[11px] text-amber-300 flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <span>⚠️</span>
+              <span>API-Football daily quota reached (100/100). Active simulation fixtures in play. Basketball & other sports remain live.</span>
+            </span>
+            <button 
+              onClick={() => setActiveTab('az_menu')} 
+              className="text-[10px] text-amber-200 underline hover:text-white shrink-0 ml-2"
+            >
+              API Console
+            </button>
+          </div>
+        )}
 
         {/* Live Markets Selector (1X2, O/U, DC, 1st Half O/U, Handicap) + 1UP/2UP Toggle */}
         <div className="flex items-center justify-between px-3 pt-2.5 pb-1 border-b border-[#1b232e]">
@@ -233,6 +251,11 @@ export const SportsView: React.FC = () => {
               </div>
             );
           })}
+          {liveMatches.length === 0 && (
+            <div className="py-6 px-3 text-center text-xs text-neutral-400">
+              No live {selectedSport} games right now. Check upcoming matches below or tap Sync.
+            </div>
+          )}
         </div>
 
         {/* All Live Events link */}
@@ -341,9 +364,11 @@ export const SportsView: React.FC = () => {
           </div>
         </div>
 
-        {/* Date Row: 22/09 Tuesday + Columns 1  X  2 */}
+        {/* Date Row: Dynamic date + Columns 1  X  2 */}
         <div className="flex items-center justify-between px-3 py-1.5 bg-[#1a222c]/80 text-[11px] text-neutral-300 font-semibold border-b border-[#212b38]">
-          <div className="font-bold text-neutral-200">22/09 Tuesday</div>
+          <div className="font-bold text-neutral-200">
+            {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', weekday: 'long' })}
+          </div>
           <div className="w-1/2 flex items-center justify-around pr-1 text-center font-bold text-neutral-400">
             <span className="w-1/3">1</span>
             <span className="w-1/3">X</span>
@@ -353,68 +378,74 @@ export const SportsView: React.FC = () => {
 
         {/* Upcoming Matches List */}
         <div className="divide-y divide-[#1e2632]">
-          {upcomingMatches.map(match => {
-            const currentOdds = match.markets[sportsMarket] || match.markets['1X2'] || [];
+          {upcomingMatches.length === 0 ? (
+            <div className="py-8 px-3 text-center text-xs text-neutral-400">
+              No upcoming {selectedSport} fixtures scheduled right now. Tap Sync to check for updates.
+            </div>
+          ) : (
+            upcomingMatches.map(match => {
+              const currentOdds = match.markets[sportsMarket] || match.markets['1X2'] || [];
 
-            return (
-              <div key={match.id} className="p-3 hover:bg-[#18212b] transition-colors">
-                {/* Meta header */}
-                <div className="flex items-center justify-between text-[11px] mb-1.5">
-                  <div className="flex items-center space-x-1.5 truncate max-w-[85%]">
-                    {match.isHot && (
-                      <span className="bg-transparent text-amber-400 italic font-black flex items-center text-[11px] shrink-0">
-                        HOT🔥
+              return (
+                <div key={match.id} className="p-3 hover:bg-[#18212b] transition-colors">
+                  {/* Meta header */}
+                  <div className="flex items-center justify-between text-[11px] mb-1.5">
+                    <div className="flex items-center space-x-1.5 truncate max-w-[85%]">
+                      {match.isHot && (
+                        <span className="bg-transparent text-amber-400 italic font-black flex items-center text-[11px] shrink-0">
+                          HOT🔥
+                        </span>
+                      )}
+                      <span className="text-neutral-300 font-semibold shrink-0">
+                        {match.startTime || '18:00'} ID {match.gameId}
                       </span>
-                    )}
-                    <span className="text-neutral-300 font-semibold shrink-0">
-                      {match.startTime || '18:00'} ID {match.gameId}
-                    </span>
-                    <span className="text-neutral-400 truncate">
-                      {match.countryOrCategory} - {match.league}
-                    </span>
+                      <span className="text-neutral-400 truncate">
+                        {match.countryOrCategory} - {match.league}
+                      </span>
+                    </div>
+                    <BarChart2 className="w-3.5 h-3.5 text-neutral-400 hover:text-white shrink-0 cursor-pointer" />
                   </div>
-                  <BarChart2 className="w-3.5 h-3.5 text-neutral-400 hover:text-white shrink-0 cursor-pointer" />
-                </div>
 
-                {/* Match Info & Odds Grid */}
-                <div className="flex items-center justify-between">
-                  {/* Left: Teams */}
-                  <div 
-                    className="w-1/2 pr-2 cursor-pointer"
-                    onClick={() => setDetailMatch(match)}
-                  >
-                    <div className="text-xs font-semibold text-neutral-100 truncate">
-                      {match.homeTeam}
-                    </div>
-                    <div className="text-xs font-semibold text-neutral-100 truncate mt-0.5">
-                      {match.awayTeam}
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDetailMatch(match);
-                      }}
-                      className="text-[11px] text-neutral-400 hover:text-white mt-1 flex items-center font-medium"
+                  {/* Match Info & Odds Grid */}
+                  <div className="flex items-center justify-between">
+                    {/* Left: Teams */}
+                    <div 
+                      className="w-1/2 pr-2 cursor-pointer"
+                      onClick={() => setDetailMatch(match)}
                     >
-                      +{match.marketsCount}&gt;
-                    </button>
-                  </div>
+                      <div className="text-xs font-semibold text-neutral-100 truncate">
+                        {match.homeTeam}
+                      </div>
+                      <div className="text-xs font-semibold text-neutral-100 truncate mt-0.5">
+                        {match.awayTeam}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDetailMatch(match);
+                        }}
+                        className="text-[11px] text-neutral-400 hover:text-white mt-1 flex items-center font-medium"
+                      >
+                        +{match.marketsCount}&gt;
+                      </button>
+                    </div>
 
-                  {/* Right: 3 Odds Buttons */}
-                  <div className="w-1/2 flex items-center space-x-1.5">
-                    {currentOdds.slice(0, 3).map(odd => (
-                      <OddButton
-                        key={odd.id}
-                        match={match}
-                        marketName={sportsMarket}
-                        odd={odd}
-                      />
-                    ))}
+                    {/* Right: 3 Odds Buttons */}
+                    <div className="w-1/2 flex items-center space-x-1.5">
+                      {currentOdds.slice(0, 3).map(odd => (
+                        <OddButton
+                          key={odd.id}
+                          match={match}
+                          marketName={sportsMarket}
+                          odd={odd}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </section>
 

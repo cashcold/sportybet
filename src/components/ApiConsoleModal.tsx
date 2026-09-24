@@ -16,8 +16,32 @@ interface ApiEndpoint {
 
 const ENDPOINTS: ApiEndpoint[] = [
   {
+    id: 'the-odds-status',
+    name: 'The Odds API Status (500 Credits)',
+    method: 'GET',
+    path: '/api/sports/the-odds/status',
+    category: 'Sports API',
+    description: 'Monitor The Odds API 500 credits/month, local MongoDB persistence, and abuse protection'
+  },
+  {
+    id: 'the-odds-sync',
+    name: 'Sync Real Bookmaker Odds',
+    method: 'POST',
+    path: '/api/sports/the-odds/sync',
+    category: 'Sports API',
+    description: 'Sync real Premier League, La Liga, and Champions League odds to MongoDB (15m abuse cooldown)'
+  },
+  {
+    id: 'the-odds-matches',
+    name: 'Local Odds Cache (0 Credits)',
+    method: 'GET',
+    path: '/api/sports/the-odds/matches',
+    category: 'Sports API',
+    description: 'Query matches stored in MongoDB Atlas without consuming any external API credits'
+  },
+  {
     id: 'sports-usage',
-    name: 'Sports Quota & Usage',
+    name: 'API-Sports Quota & Usage',
     method: 'GET',
     path: '/api/sports/usage',
     category: 'Sports API',
@@ -154,9 +178,48 @@ export const ApiConsoleModal: React.FC<{ isOpen: boolean; onClose: () => void }>
   const [isClearingCache, setIsClearingCache] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
 
+  // The Odds API State
+  const [theOddsStatus, setTheOddsStatus] = useState<any>(null);
+  const [isSyncingOdds, setIsSyncingOdds] = useState<boolean>(false);
+
+  const fetchTheOddsStatus = async () => {
+    try {
+      const res = await fetch(resolveApiUrl('/api/sports/the-odds/status'));
+      const json = await res.json();
+      if (json.success) {
+        setTheOddsStatus(json.data);
+      }
+    } catch {
+      // Non-blocking
+    }
+  };
+
+  const handleSyncOddsNow = async () => {
+    setIsSyncingOdds(true);
+    try {
+      const res = await fetch(resolveApiUrl('/api/sports/the-odds/sync'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message || 'Synced real odds to local MongoDB!');
+        await fetchTheOddsStatus();
+        await refreshSportsUsage();
+      } else {
+        showToast(data.message || 'Sync failed');
+      }
+    } catch (err: any) {
+      showToast('Error syncing odds: ' + err.message);
+    } finally {
+      setIsSyncingOdds(false);
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       refreshSportsUsage();
+      fetchTheOddsStatus();
     }
   }, [isOpen]);
 
@@ -306,6 +369,82 @@ export const ApiConsoleModal: React.FC<{ isOpen: boolean; onClose: () => void }>
         {/* TAB 1: Quota & Usage Monitor Table */}
         {activeTab === 'quotas' && (
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#121922]">
+            {/* The Odds API Real Bookmaker Odds Card */}
+            <div className="bg-gradient-to-r from-[#172433] to-[#121c29] p-4 rounded-xl border border-[#00df59]/30 shadow-lg space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-start space-x-3">
+                  <div className="w-9 h-9 rounded-lg bg-[#00df59]/20 border border-[#00df59]/40 flex items-center justify-center text-[#00df59] shrink-0 mt-0.5">
+                    <Zap className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <h4 className="text-sm font-black text-white tracking-wide">
+                        THE ODDS API — STARTER TIER (REAL BOOKMAKER ODDS)
+                      </h4>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#00df59]/20 text-[#00df59] border border-[#00df59]/40">
+                        Protected
+                      </span>
+                    </div>
+                    <p className="text-xs text-neutral-300 mt-0.5">
+                      Fetch once, store locally in MongoDB Atlas. Real odds from 1xBet, Pinnacle, William Hill & Betsson with <strong className="text-white">zero API usage for visiting users</strong>.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2 shrink-0">
+                  <button
+                    onClick={handleSyncOddsNow}
+                    disabled={isSyncingOdds || (theOddsStatus?.cooldownRemainingSeconds > 0)}
+                    className="px-3.5 py-2 bg-[#00df59] hover:bg-[#00c54e] text-black font-black text-xs rounded-lg flex items-center space-x-2 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isSyncingOdds ? 'animate-spin' : ''}`} />
+                    <span>
+                      {isSyncingOdds
+                        ? 'Syncing Odds...'
+                        : theOddsStatus?.cooldownRemainingSeconds > 0
+                        ? `Cooldown (${Math.ceil(theOddsStatus.cooldownRemainingSeconds / 60)}m)`
+                        : 'Sync Real Odds Now'}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Metrics Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 text-xs">
+                <div className="bg-[#0e1620] p-2.5 rounded-lg border border-[#1e2e40]">
+                  <div className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">Remaining Credits</div>
+                  <div className="text-base font-black text-[#00df59] font-mono mt-0.5">
+                    {theOddsStatus ? `${theOddsStatus.remainingCredits} / ${theOddsStatus.totalMonthlyCredits}` : '496 / 500'}
+                  </div>
+                  <div className="text-[10px] text-neutral-400 mt-0.5">Free monthly credits</div>
+                </div>
+
+                <div className="bg-[#0e1620] p-2.5 rounded-lg border border-[#1e2e40]">
+                  <div className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">Daily Ingestion Budget</div>
+                  <div className="text-base font-black text-white font-mono mt-0.5">
+                    {theOddsStatus ? `${theOddsStatus.requestsToday} / ${theOddsStatus.dailyBudget}` : '3 / 14'}
+                  </div>
+                  <div className="text-[10px] text-neutral-400 mt-0.5">Auto-syncs every 3 hours</div>
+                </div>
+
+                <div className="bg-[#0e1620] p-2.5 rounded-lg border border-[#1e2e40]">
+                  <div className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">Matches in Local DB</div>
+                  <div className="text-base font-black text-sky-400 font-mono mt-0.5">
+                    {theOddsStatus ? theOddsStatus.totalMatchesInLocalDb : '10+'}
+                  </div>
+                  <div className="text-[10px] text-neutral-400 mt-0.5">Stored in MongoDB Atlas</div>
+                </div>
+
+                <div className="bg-[#0e1620] p-2.5 rounded-lg border border-[#1e2e40]">
+                  <div className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">End-User Cost</div>
+                  <div className="text-base font-black text-[#00df59] font-mono mt-0.5">
+                    0 Credits
+                  </div>
+                  <div className="text-[10px] text-neutral-400 mt-0.5">100% served locally</div>
+                </div>
+              </div>
+            </div>
+
             {/* Top Toolbar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#19222d] p-3 rounded-lg border border-[#232f3f]">
               <div className="flex items-center space-x-2">

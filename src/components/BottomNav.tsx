@@ -3,7 +3,7 @@ import { useBetting } from '../context/BettingContext';
 import { ActiveTab } from '../types';
 
 export const BottomNav: React.FC = () => {
-  const { activeTab, setActiveTab, openBets } = useBetting();
+  const { activeTab, setActiveTab, openBets, user } = useBetting();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#0e151e] border-t border-[#1c2633] max-w-md mx-auto flex items-center justify-around h-[52px] select-none shadow-2xl">
@@ -144,8 +144,8 @@ export const BottomNav: React.FC = () => {
             </text>
           </svg>
 
-          {/* Badge count if open bets exist */}
-          {openBets.length > 0 && (
+          {/* Badge count if open bets exist and user is logged in */}
+          {user.isLoggedIn && openBets.length > 0 && (
             <span className="absolute -top-1.5 -right-2.5 bg-white text-neutral-950 font-black text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center shadow">
               {openBets.length}
             </span>

@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 import { UserModel } from './models/UserModel';
 
+export function getMongoUri(): string {
+  return process.env.MONGODB_URI || '';
+}
+
 export const MONGODB_URI = process.env.MONGODB_URI || '';
 
 let isConnected = false;
@@ -10,7 +14,8 @@ let connectionPromise: Promise<typeof mongoose | null> | null = null;
 mongoose.set('bufferCommands', false);
 
 export async function connectToDatabase(): Promise<typeof mongoose | null> {
-  if (!MONGODB_URI) {
+  const uri = getMongoUri();
+  if (!uri) {
     // In-memory mode active (db.ts)
     return null;
   }
@@ -26,10 +31,10 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
   connectionPromise = (async () => {
     try {
       console.log('[MongoDB] Connecting to SportyBet database...');
-      // Fast timeouts (2.5s) to guarantee serverless function responds quickly
-      const conn = await mongoose.connect(MONGODB_URI, {
-        serverSelectionTimeoutMS: 2500,
-        connectTimeoutMS: 3000,
+      // 8s timeout to allow MongoDB Atlas DNS SRV and SSL/TLS handshake
+      const conn = await mongoose.connect(uri, {
+        serverSelectionTimeoutMS: 8000,
+        connectTimeoutMS: 8000,
         bufferCommands: false,
       });
 

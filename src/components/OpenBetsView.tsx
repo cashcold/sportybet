@@ -11,11 +11,14 @@ import {
   Calendar,
   Trash2,
   Trophy,
-  ChevronRight
+  ChevronRight,
+  Ticket,
+  ArrowRight
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useBetting } from '../context/BettingContext';
 import { PlacedBet } from '../types';
+import { AuthModal } from './AuthModal';
 
 export const OpenBetsView: React.FC = () => {
   const {
@@ -25,11 +28,14 @@ export const OpenBetsView: React.FC = () => {
     cashoutBet,
     showToast,
     setIsBetslipOpen,
-    addSelection
+    addSelection,
+    setActiveTab: setNavTab
   } = useBetting();
 
   const [activeTab, setActiveTab] = useState<'open' | 'history'>('open');
   const [filter, setFilter] = useState<'all' | 'cashout' | 'live'>('cashout');
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'join'>('login');
 
   // Cashout drawer state (Screenshot 7 & 8)
   const [cashoutDrawerBet, setCashoutDrawerBet] = useState<PlacedBet | null>(null);
@@ -41,7 +47,11 @@ export const OpenBetsView: React.FC = () => {
   } | null>(null);
   const [cashedOutBetIds, setCashedOutBetIds] = useState<Record<string, boolean>>({});
 
-  const filteredOpenBets = openBets.filter((bet) => {
+  // Scoped to logged-in user: guests have 0 open bets
+  const activeOpenBets = user.isLoggedIn ? openBets : [];
+  const activeBetHistory = user.isLoggedIn ? betHistory : [];
+
+  const filteredOpenBets = activeOpenBets.filter((bet) => {
     if (filter === 'cashout') return bet.cashoutAvailable;
     if (filter === 'live') return bet.isLive;
     return true;
@@ -100,26 +110,49 @@ export const OpenBetsView: React.FC = () => {
           <span>How to Cashout?</span>
         </button>
 
-        {/* Profile Avatar + GHS Balance */}
-        <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 rounded-full overflow-hidden border border-white/20 bg-neutral-800">
-            <img
-              src={user.avatarUrl || '/user_beach_avatar.jpg'}
-              alt="User"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLElement).style.display = 'none';
-              }}
-            />
+        {/* Profile Avatar + GHS Balance OR Log In / Join buttons */}
+        {user.isLoggedIn ? (
+          <div className="flex items-center space-x-2">
+            <div className="w-6 h-6 rounded-full overflow-hidden border border-white/20 bg-neutral-800">
+              <img
+                src={user.avatarUrl || '/user_beach_avatar.jpg'}
+                alt="User"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = 'none';
+                }}
+              />
+            </div>
+            <span className="text-xs font-black text-[#ffde00] tracking-wide">
+              {user.currency} {user.balance.toFixed(2)}
+            </span>
           </div>
-          <span className="text-xs font-black text-[#ffde00] tracking-wide">
-            {user.currency} {user.balance.toFixed(2)}
-          </span>
-        </div>
+        ) : (
+          <div className="flex items-center space-x-1.5">
+            <button
+              onClick={() => {
+                setAuthMode('login');
+                setAuthModalOpen(true);
+              }}
+              className="px-2.5 py-1 text-xs font-black bg-[#00a826] hover:bg-[#009221] active:scale-95 text-white rounded-[4px] shadow-sm transition-all uppercase"
+            >
+              Log In
+            </button>
+            <button
+              onClick={() => {
+                setAuthMode('join');
+                setAuthModalOpen(true);
+              }}
+              className="px-2.5 py-1 text-xs font-bold border border-white/30 text-white hover:bg-white/10 active:scale-95 rounded-[4px] transition-all uppercase"
+            >
+              Register
+            </button>
+          </div>
+        )}
       </div>
 
       {/* =================================================================== */}
-      {/* 2. SEGMENTED TABS: Open Bets (2) | Bet History                     */}
+      {/* 2. SEGMENTED TABS: Open Bets (0) | Bet History                     */}
       {/* =================================================================== */}
       <div className="flex bg-[#141d27] text-xs font-bold border-b border-[#212b38]">
         <button
@@ -130,7 +163,7 @@ export const OpenBetsView: React.FC = () => {
               : 'bg-[#4c5768] text-neutral-300 hover:text-white'
           }`}
         >
-          Open Bets ({openBets.length})
+          Open Bets ({activeOpenBets.length})
         </button>
 
         <button
@@ -146,9 +179,61 @@ export const OpenBetsView: React.FC = () => {
       </div>
 
       {/* =================================================================== */}
-      {/* VIEW A: OPEN BETS (Screenshot 6)                                    */}
+      {/* 3. MAIN CONTENT: GUEST PROMPT OR AUTHENTICATED TABS                */}
       {/* =================================================================== */}
-      {activeTab === 'open' && (
+      {!user.isLoggedIn ? (
+        <div className="px-4 py-12 flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 rounded-full bg-[#1b2533] border border-[#2b3a4f] flex items-center justify-center mb-4 text-[#00df59] shadow-lg">
+            <Ticket className="w-8 h-8" />
+          </div>
+          <h3 className="text-base font-black text-white uppercase tracking-wide mb-1.5">
+            {activeTab === 'open' ? 'Log In to View Open Bets' : 'Log In to View Bet History'}
+          </h3>
+          <p className="text-xs text-neutral-400 max-w-xs leading-relaxed mb-6">
+            {activeTab === 'open'
+              ? 'Log in to track your active slips, view live score updates, and use Real-Time Cashout.'
+              : 'Log in to view your settled bets, winning tickets, and account transaction receipts.'}
+          </p>
+
+          <div className="w-full max-w-xs space-y-2.5">
+            <button
+              onClick={() => {
+                setAuthMode('login');
+                setAuthModalOpen(true);
+              }}
+              className="w-full py-3 bg-[#00a826] hover:bg-[#009221] active:scale-[0.99] text-white font-black text-xs rounded-[4px] uppercase tracking-wider shadow-lg transition-all"
+            >
+              Log In
+            </button>
+            <button
+              onClick={() => {
+                setAuthMode('join');
+                setAuthModalOpen(true);
+              }}
+              className="w-full py-3 bg-[#24303f] hover:bg-[#2c3b4e] active:scale-[0.99] text-white font-bold text-xs rounded-[4px] uppercase tracking-wider border border-[#37485e] transition-all"
+            >
+              Join Now / Register
+            </button>
+          </div>
+
+          {/* Value highlights */}
+          <div className="w-full max-w-xs mt-8 pt-6 border-t border-[#1e2a39] grid grid-cols-2 gap-3 text-left">
+            <div className="bg-[#17202c] p-3 rounded border border-[#223042]">
+              <div className="text-[#ffde00] font-black text-xs mb-1">⚡ Cashout</div>
+              <div className="text-[11px] text-neutral-400 leading-snug">Lock in profits anytime before full-time</div>
+            </div>
+            <div className="bg-[#17202c] p-3 rounded border border-[#223042]">
+              <div className="text-[#00df59] font-black text-xs mb-1">🔄 Rebet</div>
+              <div className="text-[11px] text-neutral-400 leading-snug">Reload selections into your betslip with 1 tap</div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* =================================================================== */}
+          {/* VIEW A: OPEN BETS (Screenshot 6)                                    */}
+          {/* =================================================================== */}
+          {activeTab === 'open' && (
         <div>
           {/* Filter Pills Bar: All | Cashout Available | Live Games | Grid Icon */}
           <div className="px-3.5 py-2.5 flex items-center justify-between bg-[#121922] border-b border-[#1f2835]">
@@ -199,9 +284,21 @@ export const OpenBetsView: React.FC = () => {
           {/* Open Bets Cards List (Exact match to Screenshot 6) */}
           <div className="p-3 space-y-3">
             {filteredOpenBets.length === 0 ? (
-              <div className="py-12 text-center text-xs text-neutral-400">
-                <p className="font-bold text-white mb-1">No Open Bets</p>
-                <p>Place bets from matches to see them here.</p>
+              <div className="py-12 text-center text-xs text-neutral-400 space-y-3">
+                <div className="w-12 h-12 rounded-full bg-[#1c2635] flex items-center justify-center mx-auto text-neutral-500">
+                  <Ticket className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="font-bold text-white text-sm mb-1">No Open Bets</p>
+                  <p className="text-neutral-400">Place bets on matches to track them and cashout here.</p>
+                </div>
+                <button
+                  onClick={() => setNavTab('sports')}
+                  className="inline-flex items-center space-x-1.5 px-4 py-2 bg-[#00a826] hover:bg-[#009221] active:scale-95 text-white font-bold text-xs rounded uppercase tracking-wide transition-all shadow"
+                >
+                  <span>Explore Sports</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
             ) : (
               filteredOpenBets.map((bet) => {
@@ -332,67 +429,87 @@ export const OpenBetsView: React.FC = () => {
 
           {/* Settled Cards with Date Column (Exact match to Screenshot 9) */}
           <div className="p-3 space-y-4">
-            {betHistory.map((item) => (
-              <div key={item.id} className="flex items-start space-x-3">
-                {/* Left Date Column: 24 Sep */}
-                <div className="text-center shrink-0 w-10 pt-1">
-                  <div className="text-2xl font-black text-white leading-none">24</div>
-                  <div className="text-[11px] text-neutral-400 mt-0.5">Sep</div>
+            {activeBetHistory.length === 0 ? (
+              <div className="py-12 text-center text-xs text-neutral-400 space-y-3">
+                <div className="w-12 h-12 rounded-full bg-[#1c2635] flex items-center justify-center mx-auto text-neutral-500">
+                  <Trophy className="w-6 h-6" />
                 </div>
-
-                {/* Right Ticket Card */}
-                <div className="flex-1 bg-[#18222f] border border-[#243243] rounded-md overflow-hidden shadow">
-                  {/* Top Dark Green Banner: Multiple | 🏆 Won > */}
-                  <div className="bg-[#153a23] px-3 py-2 flex items-center justify-between border-b border-emerald-900/40 text-xs">
-                    <span className="font-bold text-white">{item.type}</span>
-                    <button
-                      onClick={() => showToast('Viewing Ticket Details')}
-                      className="flex items-center space-x-1 text-[#00df59] font-black hover:underline"
-                    >
-                      <Trophy className="w-3.5 h-3.5" />
-                      <span>Won</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  {/* Stake & Return Row */}
-                  <div className="px-3 py-2 border-b border-[#232f3e] flex items-center justify-between text-xs font-bold">
-                    <div className="text-neutral-300">
-                      <span>Total Stake(GHS): </span>
-                      <strong className="text-white">{item.stake.toFixed(2)}</strong>
-                    </div>
-                    <div className="text-neutral-300">
-                      <span>Total Return: </span>
-                      <strong className="text-[#00df59]">{item.potentialWin.toFixed(2)}</strong>
-                    </div>
-                  </div>
-
-                  {/* Matches Summary */}
-                  <div className="p-3 space-y-1 text-xs text-neutral-300">
-                    <p>Rayo Vallecano v Athletic Bilbao</p>
-                    <p>Alaves v Atletico Madrid</p>
-                    <p>Real Madrid v Villarreal</p>
-                    <p className="text-neutral-500 font-mono text-[11px]">
-                      ...(and 40 other matches)
-                    </p>
-                  </div>
+                <div>
+                  <p className="font-bold text-white text-sm mb-1">No Bet History</p>
+                  <p className="text-neutral-400">Your settled tickets and winning slips will appear here.</p>
                 </div>
+                <button
+                  onClick={() => setNavTab('sports')}
+                  className="inline-flex items-center space-x-1.5 px-4 py-2 bg-[#00a826] hover:bg-[#009221] active:scale-95 text-white font-bold text-xs rounded uppercase tracking-wide transition-all shadow"
+                >
+                  <span>Explore Matches</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
-            ))}
+            ) : (
+              activeBetHistory.map((item) => (
+                <div key={item.id} className="flex items-start space-x-3">
+                  {/* Left Date Column: 24 Sep */}
+                  <div className="text-center shrink-0 w-10 pt-1">
+                    <div className="text-2xl font-black text-white leading-none">24</div>
+                    <div className="text-[11px] text-neutral-400 mt-0.5">Sep</div>
+                  </div>
+
+                  {/* Right Ticket Card */}
+                  <div className="flex-1 bg-[#18222f] border border-[#243243] rounded-md overflow-hidden shadow">
+                    {/* Top Dark Green Banner: Multiple | 🏆 Won > */}
+                    <div className="bg-[#153a23] px-3 py-2 flex items-center justify-between border-b border-emerald-900/40 text-xs">
+                      <span className="font-bold text-white">{item.type}</span>
+                      <button
+                        onClick={() => showToast('Viewing Ticket Details')}
+                        className="flex items-center space-x-1 text-[#00df59] font-black hover:underline"
+                      >
+                        <Trophy className="w-3.5 h-3.5" />
+                        <span>Won</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    {/* Stake & Return Row */}
+                    <div className="px-3 py-2 border-b border-[#232f3e] flex items-center justify-between text-xs font-bold">
+                      <div className="text-neutral-300">
+                        <span>Total Stake(GHS): </span>
+                        <strong className="text-white">{item.stake.toFixed(2)}</strong>
+                      </div>
+                      <div className="text-neutral-300">
+                        <span>Total Return: </span>
+                        <strong className="text-[#00df59]">{item.potentialWin.toFixed(2)}</strong>
+                      </div>
+                    </div>
+
+                    {/* Matches Summary */}
+                    <div className="p-3 space-y-1 text-xs text-neutral-300">
+                      {item.selections.map((s, idx) => (
+                        <p key={idx}>{s.matchTitle}</p>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
 
             {/* Subtext below list */}
-            <div className="text-center pt-4 space-y-1 text-xs">
-              <p className="text-neutral-500">Show only tickets in the last 6 months</p>
-              <button
-                onClick={() => showToast('Loading older tickets from database...')}
-                className="text-[#00df59] font-bold hover:underline"
-              >
-                View Older Tickets
-              </button>
-            </div>
+            {activeBetHistory.length > 0 && (
+              <div className="text-center pt-4 space-y-1 text-xs">
+                <p className="text-neutral-500">Show only tickets in the last 6 months</p>
+                <button
+                  onClick={() => showToast('Loading older tickets from database...')}
+                  className="text-[#00df59] font-bold hover:underline"
+                >
+                  View Older Tickets
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
+    </>
+  )}
 
       {/* =================================================================== */}
       {/* DRAWER 1: CASHOUT SLIDER (Screenshot 7)                             */}
@@ -529,6 +646,13 @@ export const OpenBetsView: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        initialMode={authMode}
+      />
     </div>
   );
 };

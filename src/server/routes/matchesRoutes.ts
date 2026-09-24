@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { db } from '../db';
 import { Match } from '../../types';
 import { sportsService, getSportsApiKey } from '../sports/sportsService';
+import { theOddsApiService } from '../sports/theOddsApiService';
 
 export const matchesRouter = Router();
 
@@ -9,21 +10,39 @@ export const matchesRouter = Router();
 matchesRouter.get('/', async (req: Request, res: Response) => {
   const { sport, live, league, search } = req.query;
 
-  let result = [...db.matches];
+  // 1. Get real matches stored locally from The Odds API (0 external credits consumed!)
+  const theOddsMatches = theOddsApiService.getLocalMatches();
 
-  // If external API-Sports key is active, augment with cached live matches
+  // Combine with db.matches, ensuring no duplicate IDs
+  const seenIds = new Set<string>();
+  let result: Match[] = [];
+
+  for (const m of theOddsMatches) {
+    if (!seenIds.has(m.id)) {
+      seenIds.add(m.id);
+      result.push(m);
+    }
+  }
+
+  for (const m of db.matches) {
+    if (!seenIds.has(m.id)) {
+      seenIds.add(m.id);
+      result.push(m);
+    }
+  }
+
+  // If external API-Sports key is active and healthy, augment with cached live matches
   if (getSportsApiKey()) {
     try {
       const activeSport = (typeof sport === 'string' && sport) ? sport : 'football';
       const liveData = await sportsService.getLiveMatches(activeSport);
       if (liveData.matches && liveData.matches.length > 0) {
-        // Merge without duplicating IDs
         const existingIds = new Set(result.map(m => m.id));
         const newLiveMatches = liveData.matches.filter(m => !existingIds.has(m.id));
         result = [...newLiveMatches, ...result];
       }
     } catch {
-      // Non-blocking fallback to existing matches in db
+      // Non-blocking fallback to local matches
     }
   }
 
@@ -60,7 +79,9 @@ matchesRouter.get('/', async (req: Request, res: Response) => {
 // GET /api/matches/:id
 matchesRouter.get('/:id', (req: Request, res: Response) => {
   const { id } = req.params;
-  const match = db.matches.find(m => m.id === id || m.gameId === id);
+  const match =
+    theOddsApiService.getLocalMatches().find(m => m.id === id || m.gameId === id) ||
+    db.matches.find(m => m.id === id || m.gameId === id);
 
   if (!match) {
     return res.status(404).json({ success: false, error: 'Match not found' });

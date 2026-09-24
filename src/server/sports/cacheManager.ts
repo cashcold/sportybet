@@ -374,6 +374,11 @@ class SportsCacheManager {
     this.cache.clear();
     console.log('[CACHE] Sports cache cleared');
   }
+
+  public resetStats() {
+    this.usageStats.clear();
+    console.log('[USAGE STATS] Usage stats cleared');
+  }
 }
 
 export const sportsCache = new SportsCacheManager();

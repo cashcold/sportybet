@@ -58,6 +58,7 @@ interface BettingContextType {
   isLiveStale: boolean;
   sportsUsage: any[];
   refreshSportsUsage: () => Promise<void>;
+  isQuotaProtected: boolean;
 }
 
 const BettingContext = createContext<BettingContextType | undefined>(undefined);
@@ -74,13 +75,51 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   });
 
   const [openBets, setOpenBets] = useState<PlacedBet[]>(() => {
+    const token = localStorage.getItem('sportybet_auth_token');
+    const savedUser = localStorage.getItem('sportybet_user');
+    // If not logged in, guest users must never see open bets
+    if (!token || !savedUser) return [];
+
+    try {
+      const parsed = JSON.parse(savedUser);
+      if (!parsed || !parsed.isLoggedIn) return [];
+    } catch {
+      return [];
+    }
+
     const saved = localStorage.getItem('sportybet_open_bets');
-    return saved ? JSON.parse(saved) : INITIAL_OPEN_BETS;
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return [];
+      }
+    }
+    return [];
   });
 
   const [betHistory, setBetHistory] = useState<PlacedBet[]>(() => {
+    const token = localStorage.getItem('sportybet_auth_token');
+    const savedUser = localStorage.getItem('sportybet_user');
+    // If not logged in, guest users must never see bet history
+    if (!token || !savedUser) return [];
+
+    try {
+      const parsed = JSON.parse(savedUser);
+      if (!parsed || !parsed.isLoggedIn) return [];
+    } catch {
+      return [];
+    }
+
     const saved = localStorage.getItem('sportybet_bet_history');
-    return saved ? JSON.parse(saved) : INITIAL_BET_HISTORY;
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return [];
+      }
+    }
+    return [];
   });
 
   const [user, setUser] = useState<UserProfile>(() => {
@@ -117,6 +156,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [lastUpdatedTime, setLastUpdatedTime] = useState<string>(() => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
   const [isLiveCached, setIsLiveCached] = useState<boolean>(true);
   const [isLiveStale, setIsLiveStale] = useState<boolean>(false);
+  const [isQuotaProtected, setIsQuotaProtected] = useState<boolean>(false);
   const [sportsUsage, setSportsUsage] = useState<any[]>([]);
 
   // Query API-Sports usage metadata
@@ -131,7 +171,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  // Check centralized API-Sports backend and fetch live fixtures with cooldown protection
+  // Check centralized API-Sports backend and fetch live fixtures & upcoming matches with cooldown protection
   const refreshLiveOdds = async (force: boolean = false) => {
     const now = Date.now();
     if (force) {
@@ -145,23 +185,50 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     try {
       const activeSport = selectedSport || 'football';
-      const liveRes = await api.sports.getLive(activeSport);
+      const [liveRes, fixturesRes] = await Promise.allSettled([
+        api.sports.getLive(activeSport),
+        api.sports.getFixtures(activeSport)
+      ]);
 
-      if (liveRes && liveRes.success) {
+      const live = liveRes.status === 'fulfilled' && liveRes.value?.success ? liveRes.value : null;
+      const fixtures = fixturesRes.status === 'fulfilled' && fixturesRes.value?.success ? fixturesRes.value : null;
+
+      const liveMatches = live?.data || [];
+      const fixturesMatches = fixtures?.data || [];
+
+      const quotaHit = (live?.source === 'quota_protection_simulation') || (fixtures?.source === 'quota_protection_simulation');
+      setIsQuotaProtected(quotaHit);
+
+      if (live || fixtures) {
         setApiFootballConfigured(true);
-        setIsLiveCached(Boolean(liveRes.cached));
-        setIsLiveStale(Boolean(liveRes.stale));
-        if (liveRes.lastUpdated) {
-          setLastUpdatedTime(liveRes.lastUpdated);
+        setIsLiveCached(Boolean(live?.cached ?? fixtures?.cached));
+        setIsLiveStale(Boolean(live?.stale ?? fixtures?.stale));
+        if (live?.lastUpdated || fixtures?.lastUpdated) {
+          setLastUpdatedTime(live?.lastUpdated || fixtures?.lastUpdated!);
         }
 
-        if (liveRes.data && liveRes.data.length > 0) {
+        if (liveMatches.length > 0 || fixturesMatches.length > 0) {
           setMatches(prev => {
-            const scheduled = prev.filter(m => !m.isLive);
-            return [...liveRes.data!, ...scheduled];
+            // Keep matches from other sports
+            const otherSports = prev.filter(m => {
+              const mSport = (m.sport || 'football').toLowerCase();
+              return mSport !== activeSport.toLowerCase();
+            });
+
+            const combinedForSport = [...liveMatches, ...fixturesMatches];
+            const updated = [...combinedForSport, ...otherSports];
+            try {
+              localStorage.setItem('sportybet_matches', JSON.stringify(updated));
+            } catch {}
+            return updated;
           });
+
           if (force) {
-            showToast(liveRes.stale ? '⚠️ Live feed served from stale cache' : '⚡ Matches synced (Cache protected)');
+            if (quotaHit) {
+              showToast('⚠️ API-Football daily quota reached. Curated active matches synced.');
+            } else {
+              showToast(live?.stale ? '⚠️ Matches served from cache' : '⚡ Matches synced (Live from API-Sports)');
+            }
           }
         }
       }
@@ -186,6 +253,12 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // Initial sync from MongoDB backend
     const syncMongoData = async () => {
+      const token = localStorage.getItem('sportybet_auth_token');
+      if (!token) {
+        setOpenBets([]);
+        setBetHistory([]);
+        return;
+      }
       try {
         const [meRes, openRes, historyRes] = await Promise.allSettled([
           api.auth.getMe(),
@@ -194,6 +267,15 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         ]);
         if (meRes.status === 'fulfilled' && meRes.value.success && meRes.value.user) {
           setUser(meRes.value.user);
+        } else if (meRes.status === 'fulfilled' && !meRes.value.success) {
+          localStorage.removeItem('sportybet_auth_token');
+          localStorage.removeItem('sportybet_user');
+          localStorage.removeItem('sportybet_open_bets');
+          localStorage.removeItem('sportybet_bet_history');
+          setUser(INITIAL_USER);
+          setOpenBets([]);
+          setBetHistory([]);
+          return;
         }
         if (openRes.status === 'fulfilled' && openRes.value.success && openRes.value.bets) {
           setOpenBets(openRes.value.bets);
@@ -216,20 +298,32 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [betslip]);
 
   useEffect(() => {
-    localStorage.setItem('sportybet_open_bets', JSON.stringify(openBets));
-  }, [openBets]);
+    if (user.isLoggedIn) {
+      localStorage.setItem('sportybet_open_bets', JSON.stringify(openBets));
+    } else {
+      localStorage.removeItem('sportybet_open_bets');
+    }
+  }, [openBets, user.isLoggedIn]);
 
   useEffect(() => {
-    localStorage.setItem('sportybet_bet_history', JSON.stringify(betHistory));
-  }, [betHistory]);
+    if (user.isLoggedIn) {
+      localStorage.setItem('sportybet_bet_history', JSON.stringify(betHistory));
+    } else {
+      localStorage.removeItem('sportybet_bet_history');
+    }
+  }, [betHistory, user.isLoggedIn]);
 
   useEffect(() => {
     if (user.isLoggedIn) {
       localStorage.setItem('sportybet_user', JSON.stringify(user));
     } else {
       localStorage.removeItem('sportybet_user');
+      setOpenBets([]);
+      setBetHistory([]);
+      localStorage.removeItem('sportybet_open_bets');
+      localStorage.removeItem('sportybet_bet_history');
     }
-  }, [user]);
+  }, [user.isLoggedIn]);
 
   // Live match simulator: updates clock, scores and shifts live odds slightly
   useEffect(() => {
@@ -624,6 +718,8 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
     localStorage.removeItem('sportybet_auth_token');
     localStorage.removeItem('sportybet_user');
+    localStorage.removeItem('sportybet_open_bets');
+    localStorage.removeItem('sportybet_bet_history');
     setUser(INITIAL_USER);
     setOpenBets([]);
     setBetHistory([]);
@@ -862,7 +958,8 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         isLiveCached,
         isLiveStale,
         sportsUsage,
-        refreshSportsUsage
+        refreshSportsUsage,
+        isQuotaProtected
       }}
     >
       {children}
