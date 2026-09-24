@@ -29,17 +29,25 @@ matchesRouter.get('/', async (req: Request, res: Response) => {
     // Non-blocking
   }
 
-  // 2. Upcoming matches scheduled for Today and following days (curated / db)
-  for (const m of db.matches) {
+  // 2. Real matches stored locally from The Odds API (EPL, La Liga, Serie A, Champions League, NBA)
+  let theOddsMatches = theOddsApiService.getLocalMatches({ sport: activeSport });
+  if (theOddsMatches.length === 0) {
+    try {
+      await theOddsApiService.syncPopularLeagues(activeSport);
+      theOddsMatches = theOddsApiService.getLocalMatches({ sport: activeSport });
+    } catch (syncErr: any) {
+      console.warn('[Matches API Sync fallback]', syncErr?.message);
+    }
+  }
+  for (const m of theOddsMatches) {
     if (!seenIds.has(m.id)) {
       seenIds.add(m.id);
       result.push(m);
     }
   }
 
-  // 3. Real matches stored locally from The Odds API
-  const theOddsMatches = theOddsApiService.getLocalMatches();
-  for (const m of theOddsMatches) {
+  // 3. Upcoming matches scheduled for Today and following days (curated / db)
+  for (const m of db.matches) {
     if (!seenIds.has(m.id)) {
       seenIds.add(m.id);
       result.push(m);

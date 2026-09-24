@@ -34,7 +34,9 @@ export const SUPPORTED_LEAGUES: TheOddsSportDef[] = [
   { key: 'soccer_france_ligue_one', sport: 'football', league: 'Ligue 1', country: 'France' },
   { key: 'soccer_uefa_champs_league', sport: 'football', league: 'UEFA Champions League', country: 'Europe' },
   { key: 'soccer_uefa_europa_league', sport: 'football', league: 'UEFA Europa League', country: 'Europe' },
-  { key: 'basketball_nba', sport: 'basketball', league: 'NBA', country: 'USA' }
+  { key: 'soccer_efl_champ', sport: 'football', league: 'Championship', country: 'England' },
+  { key: 'basketball_nba', sport: 'basketball', league: 'NBA', country: 'USA' },
+  { key: 'americanfootball_nfl', sport: 'football', league: 'NFL', country: 'USA' }
 ];
 
 export function getTheOddsApiKey(): string {
@@ -222,7 +224,18 @@ class TheOddsApiService {
       dateStr = commenceDate.toISOString().split('T')[0];
       const weekday = commenceDate.toLocaleDateString('en-GB', { weekday: 'long' });
       const dayMonth = commenceDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
-      dateLabel = `${weekday} ${dayMonth}`;
+      
+      const isToday = commenceDate.toDateString() === now.toDateString();
+      const tomorrow = new Date(now.getTime() + 86400000);
+      const isTomorrow = commenceDate.toDateString() === tomorrow.toDateString();
+
+      if (isToday) {
+        dateLabel = `Today ${dayMonth}`;
+      } else if (isTomorrow) {
+        dateLabel = `Tomorrow ${dayMonth}`;
+      } else {
+        dateLabel = `${weekday} ${dayMonth}`;
+      }
     }
 
     // Default realistic odds
@@ -400,9 +413,9 @@ class TheOddsApiService {
    * Syncs top popular leagues in a single batch (EPL, La Liga, Serie A, Champions League)
    * Consumes only 3-4 API requests per sync cycle!
    */
-  public async syncPopularLeagues(): Promise<{ syncedCount: number; leaguesSynced: string[] }> {
+  public async syncPopularLeagues(sportFilter?: string): Promise<{ syncedCount: number; leaguesSynced: string[] }> {
     if (this.isSyncing) {
-      throw new Error('A sync operation is already in progress');
+      return { syncedCount: this.localMatches.size, leaguesSynced: ['in_progress'] };
     }
 
     this.isSyncing = true;
@@ -410,22 +423,31 @@ class TheOddsApiService {
     let totalMatches = 0;
 
     try {
-      // Top 3 highest traffic leagues (3 requests consumed)
-      const targetLeagues = SUPPORTED_LEAGUES.slice(0, 3);
+      let targetLeagues: TheOddsSportDef[];
+      if (sportFilter && sportFilter.toLowerCase() === 'basketball') {
+        targetLeagues = SUPPORTED_LEAGUES.filter(l => l.sport === 'basketball');
+      } else {
+        // Sync top 3 football + 1 basketball
+        const footballLeagues = SUPPORTED_LEAGUES.filter(l => l.sport === 'football').slice(0, 3);
+        const basketballLeagues = SUPPORTED_LEAGUES.filter(l => l.sport === 'basketball').slice(0, 1);
+        targetLeagues = [...footballLeagues, ...basketballLeagues];
+      }
 
       for (const league of targetLeagues) {
         try {
           const matches = await this.syncLeague(league);
           totalMatches += matches.length;
           syncedLeagues.push(league.league);
-          // 800ms throttle between calls
-          await new Promise(r => setTimeout(r, 800));
+          // 600ms throttle between calls
+          await new Promise(r => setTimeout(r, 600));
         } catch (err: any) {
           console.warn(`[TheOddsAPI] Failed to sync ${league.league}:`, err.message);
         }
       }
 
-      this.lastManualSyncTime = Date.now();
+      if (totalMatches > 0) {
+        this.lastManualSyncTime = Date.now();
+      }
       return { syncedCount: totalMatches, leaguesSynced: syncedLeagues };
     } finally {
       this.isSyncing = false;
@@ -444,7 +466,7 @@ class TheOddsApiService {
     const now = Date.now();
     const elapsed = now - this.lastManualSyncTime;
 
-    if (elapsed < this.manualSyncCooldownMs) {
+    if (this.localMatches.size > 0 && elapsed < this.manualSyncCooldownMs) {
       const remainingSeconds = Math.ceil((this.manualSyncCooldownMs - elapsed) / 1000);
       const remainingMins = Math.ceil(remainingSeconds / 60);
       return {
@@ -472,12 +494,12 @@ class TheOddsApiService {
       clearInterval(this.backgroundIntervalId);
     }
 
-    // Run first sync 10 seconds after server startup
+    // Run first sync immediately on server boot so real data is available right away
     setTimeout(() => {
       this.syncPopularLeagues().catch(e =>
         console.warn('[TheOddsAPI] Initial background sync note:', e.message)
       );
-    }, 10000);
+    }, 500);
 
     // Schedule every 3 hours (3 * 60 * 60 * 1000 ms)
     const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
@@ -499,6 +521,9 @@ class TheOddsApiService {
     league?: string;
     search?: string;
   } = {}): Match[] {
+    if (this.localMatches.size === 0 && !this.isSyncing) {
+      this.syncPopularLeagues().catch(e => console.warn('[TheOddsAPI AutoSync]', e.message));
+    }
     let matches = Array.from(this.localMatches.values());
 
     if (filters.sport) {

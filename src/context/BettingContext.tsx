@@ -70,28 +70,18 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const isStale =
-            parsed.length < 40 ||
-            !parsed.some((m: any) => m.id === 'up-pl-87055') ||
-            parsed.some(
-              (m: any) =>
-                !m.dateLabel ||
-                (m.minute && String(m.minute).includes('NaN')) ||
-                m.id === 'live-1' ||
-                m.id === 'live-alloa-hib' ||
-                m.homeTeam === 'Bayern Munich W' ||
-                m.homeTeam === 'Alloa Athletic FC' ||
-                (m.id === 'up-1' && m.homeTeam === 'Barnsley FC')
-            );
-          if (!isStale) {
-            // Sanitize any remaining minute values
-            return parsed.map((m: any) => {
-              if (m.minute && (String(m.minute).includes('NaN') || String(m.minute).includes(':NaN'))) {
-                return { ...m, minute: m.period === '1H' ? "32' 1H" : "68' 2H" };
-              }
-              return m;
-            });
+          const hasCorruptedMinutes = parsed.some(
+            (m: any) => m.minute && (String(m.minute).includes('NaN') || String(m.minute).includes(':NaN'))
+          );
+          if (!hasCorruptedMinutes) {
+            return parsed;
           }
+          return parsed.map((m: any) => {
+            if (m.minute && (String(m.minute).includes('NaN') || String(m.minute).includes(':NaN'))) {
+              return { ...m, minute: m.period === '1H' ? "32' 1H" : "68' 2H" };
+            }
+            return m;
+          });
         }
       } catch {}
     }
@@ -214,13 +204,25 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     try {
       const activeSport = selectedSport || 'football';
-      const [liveRes, fixturesRes, matchesRes] = await Promise.allSettled([
+
+      // If user manually tapped Sync, trigger backend sync with The Odds API
+      if (force) {
+        try {
+          await api.sports.triggerTheOddsSync();
+        } catch {
+          // ignore cooldown or sync errors
+        }
+      }
+
+      const [liveRes, theOddsRes, fixturesRes, matchesRes] = await Promise.allSettled([
         api.sports.getLive(activeSport),
+        api.sports.getTheOddsMatches({ sport: activeSport }),
         api.sports.getFixtures(activeSport),
         api.matches.getMatches({ sport: activeSport })
       ]);
 
       const live = liveRes.status === 'fulfilled' && liveRes.value?.success ? liveRes.value : null;
+      const theOdds = theOddsRes.status === 'fulfilled' && theOddsRes.value?.success ? (theOddsRes.value.matches || []) : [];
       const fixtures = fixturesRes.status === 'fulfilled' && fixturesRes.value?.success ? fixturesRes.value : null;
       const serverMatches = matchesRes.status === 'fulfilled' && matchesRes.value?.success ? (matchesRes.value.matches || []) : [];
 
@@ -237,10 +239,11 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setLastUpdatedTime(live?.lastUpdated || fixtures?.lastUpdated!);
       }
 
-      // Combine matches: live matches first, then real The Odds API matches, then fixtures
+      // Combine matches: live matches first, then real The Odds API matches, then other upcoming fixtures
       const seen = new Set<string>();
       const combinedForSport: Match[] = [];
 
+      // 1. Live games
       for (const m of liveMatches) {
         if (!seen.has(m.id)) {
           seen.add(m.id);
@@ -248,6 +251,15 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
       }
 
+      // 2. Real The Odds API upcoming fixtures (with verified bookmaker odds and commence times)
+      for (const m of theOdds) {
+        if (!seen.has(m.id)) {
+          seen.add(m.id);
+          combinedForSport.push(m);
+        }
+      }
+
+      // 3. Server matches (/api/matches)
       for (const m of serverMatches) {
         if (!seen.has(m.id)) {
           seen.add(m.id);
@@ -255,6 +267,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
       }
 
+      // 4. Any additional fixtures
       for (const m of fixturesMatches) {
         if (!seen.has(m.id)) {
           seen.add(m.id);

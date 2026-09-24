@@ -68,20 +68,33 @@ export const SportsView: React.FC = () => {
       : mSport === targetSport;
   });
 
-  // Group upcoming matches by date or category based on sportsSubTab
+  // Group upcoming matches by date or category based on sportsSubTab with dynamic real dates
   const groupedMatches = useMemo(() => {
+    const today = new Date();
+    const todayYMD = today.toISOString().split('T')[0];
+    const todayDayMonth = today.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+    const todayWeekday = today.toLocaleDateString('en-GB', { weekday: 'long' });
+
     if (sportsSubTab === 'Today') {
-      const todayList = allUpcomingForSport.filter(m =>
-        (m.dateLabel && (m.dateLabel.toLowerCase().includes('today') || m.dateLabel.includes('24/09'))) ||
-        (m.date && m.date === '2026-09-24') ||
-        (!m.dateLabel && !m.date)
-      );
-      return [
-        {
-          label: 'Thursday 24/09',
-          matches: todayList
+      const todayList = allUpcomingForSport.filter(m => {
+        if (m.commenceTime) {
+          const d = new Date(m.commenceTime);
+          if (!isNaN(d.getTime()) && d.toDateString() === today.toDateString()) return true;
         }
-      ];
+        if (m.date === todayYMD) return true;
+        if (m.dateLabel && (m.dateLabel.toLowerCase().includes('today') || m.dateLabel.includes(todayDayMonth))) return true;
+        return false;
+      });
+
+      if (todayList.length > 0) {
+        return [
+          {
+            label: `Today ${todayDayMonth} (${todayWeekday})`,
+            matches: todayList
+          }
+        ];
+      }
+      return [];
     }
 
     if (sportsSubTab === 'Countries') {
@@ -97,47 +110,54 @@ export const SportsView: React.FC = () => {
       }));
     }
 
-    // Default 'Highlights': Group by date in chronological order
-    const dateOrder = [
-      'Thursday 24/09',
-      'Friday 25/09',
-      'Saturday 26/09',
-      'Sunday 27/09',
-      'Monday 28/09'
-    ];
-
-    const groupsMap = new Map<string, Match[]>();
+    // Default 'Highlights': Group by real chronological date
+    const groupsMap = new Map<string, { label: string; dateVal: number; matches: Match[] }>();
 
     allUpcomingForSport.forEach(m => {
-      let label = m.dateLabel;
-      if (!label || label.toLowerCase().includes('today') || label.includes('24/09')) {
-        label = 'Thursday 24/09';
-      } else if (!label && m.date) {
+      let groupKey = '';
+      let displayLabel = '';
+      let sortTimestamp = 0;
+
+      if (m.commenceTime) {
+        const d = new Date(m.commenceTime);
+        if (!isNaN(d.getTime())) {
+          sortTimestamp = d.getTime();
+          const dayMonth = d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+          const weekday = d.toLocaleDateString('en-GB', { weekday: 'long' });
+          const isToday = d.toDateString() === today.toDateString();
+          const tomorrow = new Date(today.getTime() + 86400000);
+          const isTomorrow = d.toDateString() === tomorrow.toDateString();
+          displayLabel = isToday ? `Today ${dayMonth}` : isTomorrow ? `Tomorrow ${dayMonth}` : `${weekday} ${dayMonth}`;
+          groupKey = d.toISOString().split('T')[0];
+        }
+      } else if (m.date) {
         const d = new Date(m.date);
-        const weekday = d.toLocaleDateString('en-GB', { weekday: 'long' });
-        const dayMonth = d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
-        label = `${weekday} ${dayMonth}`;
+        if (!isNaN(d.getTime())) {
+          sortTimestamp = d.getTime();
+          const dayMonth = d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+          const weekday = d.toLocaleDateString('en-GB', { weekday: 'long' });
+          const isToday = d.toDateString() === today.toDateString();
+          const tomorrow = new Date(today.getTime() + 86400000);
+          const isTomorrow = d.toDateString() === tomorrow.toDateString();
+          displayLabel = isToday ? `Today ${dayMonth}` : isTomorrow ? `Tomorrow ${dayMonth}` : `${weekday} ${dayMonth}`;
+          groupKey = m.date;
+        }
       }
 
-      if (!groupsMap.has(label)) {
-        groupsMap.set(label, []);
+      if (!groupKey) {
+        displayLabel = m.dateLabel || `Today ${todayDayMonth}`;
+        groupKey = displayLabel;
+        sortTimestamp = Date.now() + 86400000;
       }
-      groupsMap.get(label)!.push(m);
+
+      if (!groupsMap.has(groupKey)) {
+        groupsMap.set(groupKey, { label: displayLabel, dateVal: sortTimestamp, matches: [] });
+      }
+      groupsMap.get(groupKey)!.matches.push(m);
     });
 
-    const result: { label: string; matches: Match[] }[] = [];
-    for (const d of dateOrder) {
-      if (groupsMap.has(d)) {
-        result.push({ label: d, matches: groupsMap.get(d)! });
-        groupsMap.delete(d);
-      }
-    }
-
-    for (const [label, groupMatches] of groupsMap.entries()) {
-      result.push({ label, matches: groupMatches });
-    }
-
-    return result;
+    const sortedGroups = Array.from(groupsMap.values()).sort((a, b) => a.dateVal - b.dateVal);
+    return sortedGroups.map(g => ({ label: g.label, matches: g.matches }));
   }, [allUpcomingForSport, sportsSubTab]);
 
   return (
@@ -462,8 +482,25 @@ export const SportsView: React.FC = () => {
         {/* Upcoming Matches Grouped by Date / Highlights / Today */}
         <div>
           {groupedMatches.length === 0 || groupedMatches.every(g => g.matches.length === 0) ? (
-            <div className="py-8 px-3 text-center text-xs text-neutral-400">
-              No upcoming {selectedSport} fixtures scheduled for {sportsSubTab}. Tap Sync to check for updates.
+            <div className="py-8 px-4 text-center text-xs text-neutral-400">
+              <p className="font-semibold text-neutral-200 mb-1">
+                {sportsSubTab === 'Today'
+                  ? `No ${selectedSport} fixtures scheduled for Today (${new Date().toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: '2-digit' })})`
+                  : `No upcoming ${selectedSport} fixtures scheduled`}
+              </p>
+              <p className="text-[11px] text-neutral-400 mb-3">
+                {sportsSubTab === 'Today'
+                  ? 'Switch to Highlights to browse all upcoming match dates and live odds'
+                  : 'Tap Sync above to check for updates from the sports feed'}
+              </p>
+              {sportsSubTab === 'Today' && (
+                <button
+                  onClick={() => setSportsSubTab('Highlights')}
+                  className="px-3.5 py-1.5 bg-[#253243] hover:bg-[#2c3b4e] text-[#00df59] font-bold text-xs rounded transition-colors"
+                >
+                  View Highlights & Upcoming Dates →
+                </button>
+              )}
             </div>
           ) : (
             groupedMatches.map(group => {
@@ -487,6 +524,26 @@ export const SportsView: React.FC = () => {
                   <div className="divide-y divide-[#1e2632]">
                     {group.matches.map(match => {
                       const currentOdds = match.markets[sportsMarket] || match.markets['1X2'] || [];
+                      const displayTime = match.commenceTime 
+                        ? new Date(match.commenceTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        : (match.startTime || '18:00');
+
+                      // Calculate clear date badge for this match
+                      const matchDateObj = match.commenceTime 
+                        ? new Date(match.commenceTime)
+                        : (match.date ? new Date(match.date) : null);
+
+                      let dateBadge = '';
+                      if (matchDateObj && !isNaN(matchDateObj.getTime())) {
+                        const isToday = matchDateObj.toDateString() === new Date().toDateString();
+                        const tomorrow = new Date(Date.now() + 86400000);
+                        const isTomorrow = matchDateObj.toDateString() === tomorrow.toDateString();
+                        const weekdayShort = matchDateObj.toLocaleDateString('en-GB', { weekday: 'short' });
+                        const dayMonth = matchDateObj.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+                        dateBadge = isToday ? 'Today' : isTomorrow ? 'Tomorrow' : `${weekdayShort} ${dayMonth}`;
+                      } else if (match.dateLabel) {
+                        dateBadge = match.dateLabel;
+                      }
 
                       return (
                         <div key={match.id} className="p-3 hover:bg-[#18212b] transition-colors">
@@ -495,11 +552,11 @@ export const SportsView: React.FC = () => {
                             <div className="flex items-center space-x-1.5 truncate max-w-[85%]">
                               {match.isHot && (
                                 <span className="bg-transparent text-amber-400 italic font-black flex items-center text-[11px] shrink-0">
-                                  HOT🔥
+                                   HOT🔥
                                 </span>
                               )}
                               <span className="text-neutral-300 font-semibold shrink-0">
-                                {match.startTime || '18:00'} ID {match.gameId}
+                                {dateBadge ? `${dateBadge} • ` : ''}{displayTime} ID {match.gameId}
                               </span>
                               <span className="text-neutral-400 truncate">
                                 {match.countryOrCategory} - {match.league}

@@ -16,12 +16,14 @@ import {
   ChevronRight,
   ShieldCheck,
   Moon,
-  Sun
+  Sun,
+  Server
 } from 'lucide-react';
 import { useBetting } from '../context/BettingContext';
 import { ProfileDetailsSubpage } from './ProfileDetailsSubpage';
 import { AuthModal } from './AuthModal';
 import { SportyBetLogo } from './SportyBetLogo';
+import { ServerSettingsModal } from './ServerSettingsModal';
 
 interface ProfileViewProps {
   onOpenWithdraw: () => void;
@@ -33,133 +35,259 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
   const [showSubpage, setShowSubpage] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'join'>('login');
+  const [serverSettingsOpen, setServerSettingsOpen] = useState(false);
 
   // If subpage is open, display Image 3
   if (showSubpage) {
     return <ProfileDetailsSubpage onBack={() => setShowSubpage(false)} />;
   }
 
-  // Logged-out view (SportyBet Guest Account Dashboard)
+  // Logged-out view (Exact clone of Screenshot_20260924_213109_Chrome.jpg)
   if (!user.isLoggedIn) {
     return (
       <div className="pb-24 bg-[#141b24] text-white min-h-screen select-none">
-        {/* Logged-out Top Hero Card */}
-        <div className="bg-[#19222d] px-4 pt-5 pb-5 border-b border-[#232f3f]">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-full bg-[#243142] border border-white/10 flex items-center justify-center text-xl shadow">
-                👤
+        {/* Top Header Card (Box 1: Login to View | Dark Mode | Total Balance GHS -- | Deposit | Withdraw) */}
+        <div className="px-4 pt-3 pb-3">
+          {/* Row 1: Login to View > on left, Dark Mode on right */}
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => {
+                setAuthMode('login');
+                setAuthModalOpen(true);
+              }}
+              className="flex items-center space-x-2.5 text-left group"
+            >
+              {/* Circular user avatar icon (white circle with silhouette cutout) */}
+              <div className="w-8 h-8 rounded-full bg-white flex items-end justify-center overflow-hidden shrink-0 shadow-sm">
+                <svg className="w-6 h-6 text-[#141b24]" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="7.5" r="3.8" />
+                  <path d="M4 19.5c0-3.5 3.5-5.8 8-5.8s8 2.3 8 5.8v0.5H4v-0.5z" />
+                </svg>
               </div>
-              <div>
-                <h2 className="text-base font-black text-white tracking-wide uppercase">
-                  Welcome to SportyBet
-                </h2>
-                <p className="text-xs text-neutral-400">
-                  Join now to enjoy Ghana's best sports betting odds
-                </p>
+              <div className="flex items-center space-x-1">
+                <span className="font-bold text-[17px] text-white tracking-tight group-hover:text-[#00df59] transition-colors">
+                  Login to View
+                </span>
+                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-white stroke-[2.5]" />
               </div>
-            </div>
+            </button>
 
-            <div className="flex items-center space-x-1.5 text-xs text-neutral-300">
+            {/* Dark Mode crescent moon */}
+            <div className="flex items-center space-x-1.5 text-xs text-white">
               <span>Dark Mode</span>
-              <Moon className="w-4 h-4 text-neutral-400" />
+              <svg className="w-4 h-4 text-white fill-white" viewBox="0 0 24 24">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
             </div>
           </div>
 
-          {/* Join Now & Log In Action Buttons */}
-          <div className="grid grid-cols-2 gap-3 mt-2">
-            <button
-              onClick={() => {
-                setAuthMode('join');
-                setAuthModalOpen(true);
-              }}
-              className="bg-[#00a826] hover:bg-[#009221] active:scale-[0.98] text-white font-black py-2.5 px-3 rounded-[4px] text-xs flex items-center justify-center space-x-1.5 shadow-lg uppercase tracking-wider"
-            >
-              <span>Join Now</span>
-            </button>
-            <button
-              onClick={() => {
-                setAuthMode('login');
-                setAuthModalOpen(true);
-              }}
-              className="bg-[#243142] hover:bg-[#2e3e52] active:scale-[0.98] border border-[#3b4c63] text-white font-bold py-2.5 px-3 rounded-[4px] text-xs flex items-center justify-center space-x-1.5 shadow"
-            >
-              <span>Log In</span>
-            </button>
-          </div>
-
-          {/* Quick Demo Login Option */}
-          <div className="mt-3 pt-3 border-t border-[#232f3f] flex items-center justify-between text-xs">
-            <span className="text-neutral-400">Quick Demo Account:</span>
-            <button
-              onClick={() => {
-                setAuthMode('login');
-                setAuthModalOpen(true);
-              }}
-              className="text-[#00df59] font-bold hover:underline"
-            >
-              Charles Asumah (0204891235)
-            </button>
-          </div>
-        </div>
-
-        {/* Balance Row */}
-        <div className="px-4 py-3 bg-[#19222d] flex items-center justify-between border-b border-[#232f3f]">
-          <span className="text-xs text-neutral-400 font-medium">Total Balance</span>
-          <span className="text-base font-black text-white">GHC 0.00</span>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-3 p-4 bg-[#141b24]">
-          <button
-            onClick={() => {
-              setAuthMode('login');
-              setAuthModalOpen(true);
-            }}
-            className="bg-[#00a826] hover:bg-[#009221] text-white font-bold py-2.5 rounded-[4px] text-xs flex items-center justify-center space-x-2 shadow"
-          >
-            <Wallet className="w-4 h-4" />
-            <span>Deposit</span>
-          </button>
-          <button
-            onClick={() => {
-              setAuthMode('login');
-              setAuthModalOpen(true);
-            }}
-            className="border border-[#00a826] text-[#00df59] hover:bg-[#00a826]/10 font-bold py-2.5 rounded-[4px] text-xs flex items-center justify-center space-x-2"
-          >
-            <ArrowDownToLine className="w-4 h-4" />
-            <span>Withdraw</span>
-          </button>
-        </div>
-
-        {/* Sporty Loyalty Log in banner */}
-        <div className="px-4 pb-2">
-          <div
-            onClick={() => {
-              setAuthMode('join');
-              setAuthModalOpen(true);
-            }}
-            className="bg-[#1c2533] border border-[#273445] rounded-lg p-3 flex items-center justify-between cursor-pointer"
-          >
-            <span className="text-xs font-black italic text-white">Sporty Loyalty</span>
-            <span className="text-xs font-bold text-[#00df59] flex items-center space-x-1">
-              <span>Register to join</span>
-              <ChevronRight className="w-4 h-4" />
+          {/* Row 2: Total Balance on left, GHS -- on right */}
+          <div className="flex items-baseline justify-between mt-3.5">
+            <span className="text-xs text-neutral-300 font-normal">Total Balance</span>
+            <span className="text-[22px] font-black tracking-tight text-white font-sans">
+              GHS --
             </span>
           </div>
-        </div>
 
-        {/* Common Footer */}
-        {renderFooter(false, () => {}, () => {
-          setAuthMode('login');
-          setAuthModalOpen(true);
-        }, showToast)}
+          {/* Row 3: Action Buttons (Deposit in green, Withdraw in dark with green border) */}
+          <div className="grid grid-cols-2 gap-3 mt-3.5">
+            {/* Deposit button */}
+            <button
+              onClick={() => {
+                setAuthMode('login');
+                setAuthModalOpen(true);
+              }}
+              className="bg-[#00a826] hover:bg-[#009221] active:scale-[0.98] text-white font-bold py-2.5 px-4 rounded-[4px] text-xs flex items-center justify-center space-x-2 shadow-sm transition-all"
+            >
+              {/* Wallet Card Icon */}
+              <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M2 10h20" />
+                <circle cx="16" cy="15" r="1.5" fill="currentColor" stroke="none" />
+              </svg>
+              <span className="text-sm font-bold">Deposit</span>
+            </button>
+
+            {/* Withdraw button */}
+            <button
+              onClick={() => {
+                setAuthMode('login');
+                setAuthModalOpen(true);
+              }}
+              className="border border-[#00a826] bg-[#0c1813] hover:bg-[#00a826]/10 active:scale-[0.98] text-[#00df59] font-bold py-2.5 px-4 rounded-[4px] text-xs flex items-center justify-center space-x-2 transition-all"
+            >
+              {/* Banknote / ATM cash icon */}
+              <svg className="w-4 h-4 text-[#00df59]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="2" />
+                <circle cx="12" cy="12" r="2.5" />
+                <path d="M6 12h.01M18 12h.01" />
+              </svg>
+              <span className="text-sm font-bold">Withdraw</span>
+            </button>
+          </div>
+
+          {/* Row 4: Sporty Loyalty Banner (Screenshot) */}
+          <div
+            onClick={() => {
+              setAuthMode('login');
+              setAuthModalOpen(true);
+            }}
+            className="mt-3.5 relative overflow-hidden rounded-md h-[46px] flex items-center justify-between px-3.5 cursor-pointer bg-gradient-to-r from-[#172738] via-[#1a3044] to-[#12222e] border border-[#223548] shadow-sm hover:border-[#2d445c] transition-all"
+          >
+            {/* Watermark subtle graphic */}
+            <div className="absolute left-0 top-0 bottom-0 w-32 pointer-events-none opacity-20 bg-gradient-to-r from-red-600/30 to-transparent" />
+            <span className="text-sm font-black italic tracking-wide text-white drop-shadow-sm">
+              Sporty Loyalty
+            </span>
+            <div className="flex items-center space-x-0.5 text-xs font-bold text-[#00df59]">
+              <span>Log in to join</span>
+              <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
+            </div>
+          </div>
+
+          {/* Row 5: 3-Column Card (Sports Bet History | Transaction Records | Gifts (0) Lucky Wheel (0)) */}
+          <div className="bg-[#19222d] rounded-md border border-[#212d3d] grid grid-cols-3 divide-x divide-[#212d3d] py-3.5 text-center mt-3.5 shadow-xs">
+            {/* Column 1: Sports Bet History */}
+            <div
+              onClick={() => {
+                setAuthMode('login');
+                setAuthModalOpen(true);
+              }}
+              className="flex flex-col items-center justify-center cursor-pointer group px-1"
+            >
+              <svg className="w-5 h-5 text-neutral-300 group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
+                <path d="M8 7h8M8 11h8M8 15h5" />
+              </svg>
+              <span className="text-[11px] text-neutral-300 group-hover:text-white font-medium leading-tight mt-1.5 transition-colors">
+                Sports Bet<br />History
+              </span>
+            </div>
+
+            {/* Column 2: Transaction Records */}
+            <div
+              onClick={() => {
+                setAuthMode('login');
+                setAuthModalOpen(true);
+              }}
+              className="flex flex-col items-center justify-center cursor-pointer group px-1"
+            >
+              <svg className="w-5 h-5 text-neutral-300 group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <polyline points="3 3 3 8 8 8" />
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                <polyline points="16 21 21 21 21 16" />
+                <text x="12" y="15.2" textAnchor="middle" fontSize="9.5" fontWeight="bold" fill="currentColor" stroke="none">$</text>
+              </svg>
+              <span className="text-[11px] text-neutral-300 group-hover:text-white font-medium leading-tight mt-1.5 transition-colors">
+                Transaction<br />Records
+              </span>
+            </div>
+
+            {/* Column 3: Gifts (0) Lucky Wheel (0) */}
+            <div
+              onClick={() => {
+                setAuthMode('login');
+                setAuthModalOpen(true);
+              }}
+              className="flex flex-col items-center justify-center cursor-pointer group px-1"
+            >
+              <svg className="w-5 h-5 text-neutral-300 group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 12 20 22 4 22 4 12" />
+                <rect x="2" y="7" width="20" height="5" />
+                <line x1="12" y1="22" x2="12" y2="7" />
+                <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+                <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+              </svg>
+              <span className="text-[11px] text-neutral-300 group-hover:text-white font-medium leading-tight mt-1.5 transition-colors">
+                Gifts (0)<br />Lucky Wheel (0)
+              </span>
+            </div>
+          </div>
+
+          {/* Row 6: Customer Service (Screenshot) */}
+          <div className="mt-4 border-t border-[#212d3d]">
+            <button
+              onClick={() => showToast('Connecting to 24/7 Live Agent in Accra...')}
+              className="w-full py-3.5 flex items-center justify-between border-b border-[#212d3d] hover:bg-[#16212e] transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <Headphones className="w-5 h-5 text-neutral-300 stroke-[1.8]" />
+                <span className="text-sm font-normal text-neutral-200">Customer Service</span>
+              </div>
+              <div className="flex items-center space-x-1 text-xs text-neutral-400">
+                <span>Online 24/7</span>
+                <ChevronRight className="w-4 h-4 text-neutral-400 stroke-[2]" />
+              </div>
+            </button>
+
+            {/* Row 7: How to play (Box 2: Circled in red at bottom) */}
+            <button
+              onClick={() => showToast('SportyBet Ghana Rules & Guide')}
+              className="w-full py-3.5 flex items-center justify-between border-b border-[#212d3d] hover:bg-[#16212e] transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-5 h-5 rounded-full border border-neutral-300 flex items-center justify-center text-xs font-serif font-bold text-neutral-200">
+                  i
+                </div>
+                <span className="text-sm font-normal text-neutral-200">How to play</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-neutral-400 stroke-[2]" />
+            </button>
+          </div>
+
+          {/* Row 8: Footer (18+ | LaLiga Partner | Tagline as seen in Screenshot) */}
+          <div className="mt-6 text-center text-xs text-neutral-400 space-y-3.5">
+            {/* 18+ and Copyright */}
+            <div className="flex items-center justify-between text-neutral-400 font-bold text-xs pt-1">
+              <div className="flex items-center space-x-1.5 text-neutral-300">
+                <svg className="w-5 h-5 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <polyline points="9 15 11 17 15 13" />
+                </svg>
+                <span className="text-base font-extrabold text-neutral-300">18+</span>
+              </div>
+              <span
+                onClick={() => setServerSettingsOpen(true)}
+                className="text-[11px] font-normal text-neutral-400 cursor-pointer"
+                title="System Info"
+              >
+                © 2026 SportyBet. All rights reserved.
+              </span>
+            </div>
+
+            {/* Official Sports Betting Partner: LaLiga */}
+            <div className="flex items-center justify-center space-x-3 py-3 border-y border-[#1e2733]/80">
+              <SportyBetLogo size="sm" variant="red" />
+              <div className="h-5 w-px bg-neutral-600/70" />
+              <span className="text-[9px] uppercase font-bold text-neutral-300 leading-tight text-left">
+                Official Sports<br />Betting Partner
+              </span>
+              <div className="h-5 w-px bg-neutral-600/70" />
+              <div className="flex flex-col items-center">
+                <svg className="w-4 h-4 text-[#ff4d4f]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M4 3h5l7 14h-5z M10 17l2 4h5l-2-4z" />
+                </svg>
+                <span className="text-[8px] font-black tracking-wider text-[#ff4d4f]">LALIGA</span>
+              </div>
+            </div>
+
+            {/* The world's most visited betting platform */}
+            <p className="text-xs text-neutral-400 font-normal">
+              The world&apos;s most visited betting platform
+            </p>
+          </div>
+        </div>
 
         <AuthModal
           isOpen={authModalOpen}
           onClose={() => setAuthModalOpen(false)}
           initialMode={authMode}
+        />
+        <ServerSettingsModal
+          isOpen={serverSettingsOpen}
+          onClose={() => setServerSettingsOpen(false)}
         />
       </div>
     );
@@ -183,7 +311,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
 
         {/* Settings Gear icon top-right */}
         <button 
-          onClick={() => showToast('Settings')}
+          onClick={() => setServerSettingsOpen(true)}
           className="absolute top-4 right-4 text-white hover:text-neutral-300 z-10 transition-colors"
           aria-label="Settings"
         >
@@ -463,6 +591,21 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
           <ChevronRight className="w-4 h-4 text-neutral-400 stroke-[2]" />
         </button>
 
+        {/* Server & Network Settings (for Android APK & Web) */}
+        <button
+          onClick={() => setServerSettingsOpen(true)}
+          className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-[#16212e] transition-colors"
+        >
+          <div className="flex items-center space-x-3">
+            <Server className="w-5 h-5 text-[#00df59] stroke-[1.8]" />
+            <div className="text-left">
+              <span className="text-sm font-medium text-neutral-200 block">Server & Network Settings</span>
+              <span className="text-[10px] text-neutral-400 font-mono">Configure API endpoint for APK / Web</span>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-neutral-400 stroke-[2]" />
+        </button>
+
         {/* How to play */}
         <button
           onClick={() => showToast('SportyBet Ghana Rules & Guide')}
@@ -490,6 +633,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
 
       {/* Footer Section (Screenshot 4 & 14) */}
       {renderFooter(true, logout, () => {}, showToast)}
+
+      <ServerSettingsModal
+        isOpen={serverSettingsOpen}
+        onClose={() => setServerSettingsOpen(false)}
+      />
     </div>
   );
 };

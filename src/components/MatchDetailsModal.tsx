@@ -169,14 +169,36 @@ export const MatchDetailsModal: React.FC<MatchDetailsModalProps> = ({ match, onC
                   </div>
                 </>
               ) : (
-                <>
-                  <div className="text-xs text-neutral-400 font-medium">
-                    {match.startTime || '24/09 Thursday'}
-                  </div>
-                  <div className="text-sm font-black text-white mt-0.5">
-                    16:00
-                  </div>
-                </>
+                (() => {
+                  const matchDateObj = match.commenceTime 
+                    ? new Date(match.commenceTime)
+                    : (match.date ? new Date(match.date) : null);
+                  
+                  let dateLabel = match.dateLabel || 'Today';
+                  let timeLabel = match.startTime || '18:00';
+
+                  if (matchDateObj && !isNaN(matchDateObj.getTime())) {
+                    const isToday = matchDateObj.toDateString() === new Date().toDateString();
+                    const tomorrow = new Date(Date.now() + 86400000);
+                    const isTomorrow = matchDateObj.toDateString() === tomorrow.toDateString();
+                    const weekday = matchDateObj.toLocaleDateString('en-GB', { weekday: 'long' });
+                    const dayMonth = matchDateObj.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+                    
+                    dateLabel = isToday ? `Today ${dayMonth}` : isTomorrow ? `Tomorrow ${dayMonth}` : `${weekday} ${dayMonth}`;
+                    timeLabel = matchDateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  }
+
+                  return (
+                    <>
+                      <div className="text-xs text-neutral-400 font-medium">
+                        {dateLabel}
+                      </div>
+                      <div className="text-sm font-black text-white mt-0.5">
+                        {timeLabel}
+                      </div>
+                    </>
+                  );
+                })()
               )}
             </div>
 
