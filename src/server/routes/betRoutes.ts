@@ -224,25 +224,39 @@ betRouter.post('/place', async (req: Request, res: Response) => {
 // GET /api/bets/open
 betRouter.get('/open', async (req: Request, res: Response) => {
   try {
-    await connectToDatabase();
     const authHeader = req.headers.authorization;
     const cleanToken = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
 
-    let userPhone = '20******5';
+    if (!cleanToken) {
+      return res.json({ success: true, count: 0, bets: [] });
+    }
+
+    await connectToDatabase();
+    let userPhone = '';
+
     if (isDbConnected()) {
-      if (cleanToken) {
-        const u = await UserModel.findOne({ sessionTokens: cleanToken });
-        if (u) userPhone = u.phone;
-      }
-    } else {
+      const u = await UserModel.findOne({ sessionTokens: cleanToken });
+      if (u) userPhone = u.phone;
+    }
+
+    if (!userPhone) {
       const cached = db.getUserByToken(authHeader);
       if (cached && cached.phone) userPhone = cached.phone;
+    }
+
+    if (!userPhone) {
+      return res.json({ success: true, count: 0, bets: [] });
     }
 
     let bets: PlacedBet[] = [];
 
     if (isDbConnected()) {
-      const mongoBets = await BetModel.find({ userPhone, status: 'open' }).sort({ createdAt: -1 });
+      // Find open bets matching phone or stripped phone
+      const phoneQueries = [userPhone];
+      if (userPhone.startsWith('0')) phoneQueries.push(userPhone.slice(1));
+      if (!userPhone.startsWith('0')) phoneQueries.push('0' + userPhone);
+
+      const mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: 'open' }).sort({ createdAt: -1 });
       if (mongoBets.length > 0) {
         bets = mongoBets.map((doc: any) => ({
           id: doc.id,
@@ -275,33 +289,45 @@ betRouter.get('/open', async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     console.error('[Get Open Bets Error]', err);
-    const cached = db.openBets.get('20******5') || [];
-    return res.json({ success: true, count: cached.length, bets: cached });
+    return res.json({ success: true, count: 0, bets: [] });
   }
 });
 
 // GET /api/bets/history
 betRouter.get('/history', async (req: Request, res: Response) => {
   try {
-    await connectToDatabase();
     const authHeader = req.headers.authorization;
     const cleanToken = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
 
-    let userPhone = '20******5';
+    if (!cleanToken) {
+      return res.json({ success: true, count: 0, bets: [] });
+    }
+
+    await connectToDatabase();
+    let userPhone = '';
+
     if (isDbConnected()) {
-      if (cleanToken) {
-        const u = await UserModel.findOne({ sessionTokens: cleanToken });
-        if (u) userPhone = u.phone;
-      }
-    } else {
+      const u = await UserModel.findOne({ sessionTokens: cleanToken });
+      if (u) userPhone = u.phone;
+    }
+
+    if (!userPhone) {
       const cached = db.getUserByToken(authHeader);
       if (cached && cached.phone) userPhone = cached.phone;
+    }
+
+    if (!userPhone) {
+      return res.json({ success: true, count: 0, bets: [] });
     }
 
     let bets: PlacedBet[] = [];
 
     if (isDbConnected()) {
-      const mongoBets = await BetModel.find({ userPhone, status: { $ne: 'open' } }).sort({ createdAt: -1 });
+      const phoneQueries = [userPhone];
+      if (userPhone.startsWith('0')) phoneQueries.push(userPhone.slice(1));
+      if (!userPhone.startsWith('0')) phoneQueries.push('0' + userPhone);
+
+      const mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: { $ne: 'open' } }).sort({ createdAt: -1 });
       if (mongoBets.length > 0) {
         bets = mongoBets.map((doc: any) => ({
           id: doc.id,
@@ -334,8 +360,7 @@ betRouter.get('/history', async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     console.error('[Get Bet History Error]', err);
-    const cached = db.betHistory.get('20******5') || [];
-    return res.json({ success: true, count: cached.length, bets: cached });
+    return res.json({ success: true, count: 0, bets: [] });
   }
 });
 
