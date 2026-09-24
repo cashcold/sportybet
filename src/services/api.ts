@@ -151,7 +151,7 @@ export const api = {
 
   // --- BETS ENDPOINTS ---
   bets: {
-    async placeBet(selections: BetSelection[], stake: number, type: 'Single' | 'Multiple'): Promise<{ success: boolean; bet?: PlacedBet; remainingBalance?: number; ticketId?: string; message?: string; error?: string }> {
+    async placeBet(selections: BetSelection[], stake: number, type: 'Single' | 'Multiple'): Promise<{ success: boolean; bet?: PlacedBet; remainingBalance?: number; ticketId?: string; transactionId?: string; bookingCode?: string; message?: string; error?: string }> {
       try {
         const res = await fetch(`${getBaseUrl()}/bets/place`, {
           method: 'POST',

@@ -213,9 +213,20 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       id: 'all_sports',
       label: 'All Sports',
       icon: (
-        <div className="w-8 h-8 rounded-full border border-neutral-600 flex items-center justify-center text-white">
-          ⚽
-        </div>
+        <svg className="w-7 h-7 text-white" viewBox="0 0 32 32" fill="none">
+          {/* Top-left basketball */}
+          <circle cx="12" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M5 11h14 M12 4v14" stroke="currentColor" strokeWidth="1.2" />
+          <path d="M7 6.5c3 1.8 4.5 4.5 4.5 8" stroke="currentColor" strokeWidth="1.1" />
+          {/* Bottom soccer ball */}
+          <circle cx="16" cy="22" r="6.5" fill="#121922" stroke="currentColor" strokeWidth="1.8" />
+          <polygon points="16,19 18,20.5 17.5,23 14.5,23 14,20.5" fill="currentColor" />
+          <path d="M16 19v-2.5 M18 20.5l2-1 M17.5 23l1.5 2 M14.5 23l-1.5 2 M14 20.5l-2-1" stroke="currentColor" strokeWidth="1.2" />
+          {/* Right tennis ball */}
+          <circle cx="23.5" cy="10.5" r="5.5" fill="#121922" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M19 8c2.5 1 3.8 3.2 3.5 5.5" stroke="currentColor" strokeWidth="1.2" />
+          <path d="M22 15.5c1-2 2.8-3.2 5.5-3" stroke="currentColor" strokeWidth="1.2" />
+        </svg>
       ),
       action: () => showToast('Browsing All Sports')
     },
@@ -223,9 +234,14 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       id: 'live',
       label: 'Live',
       icon: (
-        <div className="w-8 h-8 rounded-full border border-neutral-600 flex items-center justify-center text-white">
-          <Tv className="w-4 h-4 text-white" />
-        </div>
+        <svg className="w-7 h-7 text-white" viewBox="0 0 28 28" fill="none">
+          {/* TV Antenna / Handle */}
+          <path d="M10 5l4 3 4-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          {/* TV Screen */}
+          <rect x="3" y="8" width="22" height="15" rx="2.5" stroke="currentColor" strokeWidth="2" />
+          {/* Play triangle inside */}
+          <polygon points="12,12 18,15.5 12,19" fill="currentColor" />
+        </svg>
       ),
       action: () => showToast('Filtered to Live Events')
     },
@@ -233,9 +249,16 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       id: 'load_code',
       label: 'Load Code',
       icon: (
-        <div className="w-8 h-8 rounded-full border border-neutral-600 flex items-center justify-center text-white">
-          <Share2 className="w-4 h-4 text-white" />
-        </div>
+        <svg className="w-7 h-7 text-white" viewBox="0 0 28 28" fill="none">
+          {/* 3 Nodes connecting lines */}
+          <line x1="14" y1="6.5" x2="6.5" y2="20.5" stroke="currentColor" strokeWidth="2.2" />
+          <line x1="14" y1="6.5" x2="21.5" y2="20.5" stroke="currentColor" strokeWidth="2.2" />
+          <line x1="6.5" y1="20.5" x2="21.5" y2="20.5" stroke="currentColor" strokeWidth="2.2" />
+          {/* 3 Node Circles */}
+          <circle cx="14" cy="6.5" r="3.2" fill="#121922" stroke="currentColor" strokeWidth="2.4" />
+          <circle cx="6.5" cy="20.5" r="3.2" fill="#121922" stroke="currentColor" strokeWidth="2.4" />
+          <circle cx="21.5" cy="20.5" r="3.2" fill="#121922" stroke="currentColor" strokeWidth="2.4" />
+        </svg>
       ),
       action: onOpenBookingCode
     },
@@ -243,9 +266,12 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       id: 'aviator',
       label: 'Aviator',
       icon: (
-        <div className="w-8 h-8 rounded-full border border-neutral-600 flex items-center justify-center text-[#ff3344]">
-          <Plane className="w-4 h-4 fill-current rotate-[-20deg]" />
-        </div>
+        <svg className="w-7 h-7 text-[#ff1a2d]" viewBox="0 0 30 22" fill="currentColor">
+          {/* Red Aviator Propeller Airplane from Screenshot 1 */}
+          <path d="M2 13.5c-.8 0-1.2-.6-.8-1.2l3-2.3L3.8 8.5c-.3-.7.1-1.2.7-1.2l2.5.5L13 4 8 1c-.4-.3-.1-.7.5-.7l8 2 7-2c1.8-.4 3.5.3 4 1.8l1 2.5 2.5.5c.6.1 1 .6 1 1.2s-.4 1.1-1 1.2l-2.5.5-3 4.5c-1 1.8-3.2 2.5-5.2 2.5l-6.2-2L10 18c-.3.6-1 .8-1.6.5L4 16.5l-2-3z" />
+          {/* Front Propeller */}
+          <line x1="28" y1="2.5" x2="29.5" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
       ),
       action: onOpenAviator
     },
@@ -253,9 +279,12 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       id: 'virtuals',
       label: 'Virtuals',
       icon: (
-        <div className="w-8 h-8 rounded-full border border-neutral-600 flex items-center justify-center font-black text-sm text-white">
-          V
-        </div>
+        <svg className="w-7 h-7 text-white" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+          {/* Outer Stylized V from Screenshot 1 */}
+          <path d="M4 6l10 17L24 6" strokeWidth="2.8" />
+          {/* Inner Stylized V from Screenshot 1 */}
+          <path d="M8.5 6l5.5 9.5L19.5 6" strokeWidth="2.8" />
+        </svg>
       ),
       action: () => showToast('Virtual Sports Arena')
     },
@@ -263,9 +292,13 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       id: 'more',
       label: 'More',
       icon: (
-        <div className="w-8 h-8 rounded-full border border-neutral-600 flex items-center justify-center text-white">
-          <MoreHorizontal className="w-4 h-4" />
-        </div>
+        <svg className="w-7 h-7 text-white" viewBox="0 0 28 28" fill="none">
+          {/* Circle outline with 3 dots from Screenshot 1 */}
+          <circle cx="14" cy="14" r="10.5" stroke="currentColor" strokeWidth="2.2" />
+          <circle cx="9.5" cy="14" r="1.5" fill="currentColor" />
+          <circle cx="14" cy="14" r="1.5" fill="currentColor" />
+          <circle cx="18.5" cy="14" r="1.5" fill="currentColor" />
+        </svg>
       ),
       action: () => setActiveTab('az_menu')
     }
@@ -316,15 +349,17 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       {/* =================================================================== */}
       {/* 2. QUICK NAVIGATION ICONS ROW (All Sports, Live, Load Code...) */}
       {/* =================================================================== */}
-      <div className="grid grid-cols-6 gap-1 px-2 py-2.5 border-t border-[#1c2430] text-center">
+      <div className="grid grid-cols-6 gap-1 px-1.5 py-2.5 border-t border-[#1c2430] bg-[#121922] text-center">
         {quickNavItems.map(item => (
           <button
             key={item.id}
             onClick={item.action}
-            className="flex flex-col items-center justify-center space-y-1 hover:opacity-90 active:scale-95 transition-transform"
+            className="flex flex-col items-center justify-center space-y-1.5 hover:opacity-90 active:scale-95 transition-transform"
           >
-            {item.icon}
-            <span className="text-[10px] text-neutral-300 font-semibold tracking-tight truncate w-full">
+            <div className="h-7 flex items-center justify-center">
+              {item.icon}
+            </div>
+            <span className="text-[11px] text-[#e2e8f0] font-normal tracking-tight truncate w-full">
               {item.label}
             </span>
           </button>

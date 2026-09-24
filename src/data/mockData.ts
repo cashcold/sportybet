@@ -459,38 +459,41 @@ export const INITIAL_MATCHES: Match[] = [
   }
 ];
 
-// Open Bets initial state from screenshot 3:
-// "Multiple Live" Inter Milano vs Hacken Gothe... Stake 20.00, Cashout Unavailable
+// Open Bets initial state from Screenshot 6 & 7:
+// 1. Multiple: Borussia Dortmund vs Werder ... Stake 7.00, Cashout GHS 7.00, Pot Win 16503.17
+// 2. Multiple: Austria vs Israel ... Stake 1.00, Cashout GHS 0.82
 export const INITIAL_OPEN_BETS: PlacedBet[] = [
   {
-    id: 'bet-101',
-    ticketId: 'SBGH-9821-4821',
+    id: 'bet-dortmund-7',
+    ticketId: 'SBGH-7819-2041',
+    transactionId: 'TX-GH-892184912',
+    bookingCode: 'DA2R3J',
     type: 'Multiple',
-    date: '22/09 18:24',
+    date: '24/09 07:55',
     isLive: true,
     selections: [
       {
-        matchId: 'live-2',
-        gameId: '38192',
-        matchTitle: 'Inter Milano vs Hacken Gothenburg W',
-        marketName: '1X2',
-        selectionName: 'Home',
-        odd: 2.10,
+        matchId: 'live-dortmund',
+        gameId: '10924',
+        matchTitle: 'Borussia Dortmund vs Werder ...',
+        marketName: 'Over/Under',
+        selectionName: 'Over 1.5',
+        odd: 1.32,
         isLive: true,
-        liveOdds: 1.09,
+        liveOdds: 1.25,
         liveOddsTrend: 'same',
         liveScore: '1:0',
-        liveTime: "84' H2",
+        liveTime: "68' H2",
         hasTracker: true,
         hasStats: true
       },
       {
-        matchId: 'live-1',
+        matchId: 'live-rayo',
         gameId: '29811',
-        matchTitle: 'Bayern Munich W vs Manchester City WFC',
-        marketName: 'Handicap 0:2',
-        selectionName: 'Away (0:2)',
-        odd: 1.27,
+        matchTitle: 'Rayo Vallecano vs Athletic Bilbao',
+        marketName: 'Over/Under',
+        selectionName: 'Over 1.5',
+        odd: 1.26,
         isLive: true,
         liveOdds: 1.18,
         liveOddsTrend: 'down',
@@ -498,94 +501,96 @@ export const INITIAL_OPEN_BETS: PlacedBet[] = [
         liveTime: "83' H2",
         hasTracker: true,
         hasStats: true
-      },
-      {
-        matchId: 'live-6',
-        gameId: '49120',
-        matchTitle: 'Peterborough United vs Colchester United',
-        marketName: '1X2',
-        selectionName: 'Home',
-        odd: 1.86,
-        isLive: true,
-        liveOdds: 1.46,
-        liveOddsTrend: 'same',
-        liveScore: '0:0',
-        liveTime: "26' H1",
-        hasTracker: true,
-        hasStream: true,
-        hasStats: false
       }
     ],
-    stake: 20.00,
-    totalOdds: 4.96,
-    potentialWin: 99.20,
+    stake: 7.00,
+    totalOdds: 2357.6,
+    potentialWin: 16503.17,
     status: 'open',
-    cashoutAvailable: false,
-    cashoutAmount: 24.50
+    cashoutAvailable: true,
+    cashoutAmount: 7.00
+  },
+  {
+    id: 'bet-austria-1',
+    ticketId: 'SBGH-9812-3312',
+    transactionId: 'TX-GH-312984921',
+    bookingCode: 'DA2R1A',
+    type: 'Multiple',
+    date: '24/09 07:56',
+    isLive: false,
+    selections: [
+      {
+        matchId: 'pre-austria',
+        gameId: '18492',
+        matchTitle: 'Austria vs Israel',
+        marketName: '1X2',
+        selectionName: 'Home',
+        odd: 1.22,
+        isLive: false,
+        hasTracker: false,
+        hasStats: true
+      }
+    ],
+    stake: 1.00,
+    totalOdds: 1.22,
+    potentialWin: 1.22,
+    status: 'open',
+    cashoutAvailable: true,
+    cashoutAmount: 0.82
   }
 ];
 
+// Bet History matching Screenshot 9:
+// 24 Sep: Multiple Won > Total Stake(GHS) 7.00, Total Return 7.00
 export const INITIAL_BET_HISTORY: PlacedBet[] = [
   {
-    id: 'bet-100',
-    ticketId: 'SBGH-9810-1129',
-    type: 'Single',
-    date: '21/09 20:45',
-    isLive: false,
-    selections: [
-      {
-        matchId: 'hist-1',
-        gameId: '88219',
-        matchTitle: 'Liverpool vs Bournemouth',
-        marketName: '1X2',
-        selectionName: '1',
-        odd: 1.28,
-        isLive: false
-      }
-    ],
-    stake: 50.00,
-    totalOdds: 1.28,
-    potentialWin: 64.00,
-    status: 'won',
-    cashoutAvailable: false
-  },
-  {
-    id: 'bet-99',
-    ticketId: 'SBGH-9799-0043',
+    id: 'bet-hist-won-1',
+    ticketId: 'SBGH-5512-9901',
+    transactionId: 'TX-GH-559182391',
+    bookingCode: 'DA2R3J',
     type: 'Multiple',
-    date: '20/09 16:30',
+    date: '24 Sep',
     isLive: false,
     selections: [
       {
-        matchId: 'hist-2',
-        gameId: '77123',
-        matchTitle: 'Barcelona vs Getafe',
+        matchId: 'h-1',
+        gameId: '5501',
+        matchTitle: 'Rayo Vallecano v Athletic Bilbao',
         marketName: '1X2',
-        selectionName: '1',
-        odd: 1.25,
+        selectionName: 'Home',
+        odd: 1.85,
         isLive: false
       },
       {
-        matchId: 'hist-3',
-        gameId: '77124',
-        matchTitle: 'Juventus vs Napoli',
-        marketName: 'O/U',
-        selectionName: 'Over 2.5',
-        odd: 2.10,
+        matchId: 'h-2',
+        gameId: '5502',
+        matchTitle: 'Alaves v Atletico Madrid',
+        marketName: '1X2',
+        selectionName: 'Away',
+        odd: 1.65,
+        isLive: false
+      },
+      {
+        matchId: 'h-3',
+        gameId: '5503',
+        matchTitle: 'Real Madrid v Villarreal',
+        marketName: '1X2',
+        selectionName: 'Home',
+        odd: 1.40,
         isLive: false
       }
     ],
-    stake: 15.00,
-    totalOdds: 2.62,
-    potentialWin: 39.30,
-    status: 'lost',
+    stake: 7.00,
+    totalOdds: 1.00,
+    potentialWin: 7.00,
+    status: 'won',
     cashoutAvailable: false
   }
 ];
 
 export const INITIAL_USER: UserProfile = {
   username: '', // "No username set"
-  balance: 9544500.00,
+  balance: 5000.00,
   currency: 'GHC',
   loyaltyTier: 'Tier 1',
   loyaltyProgress: 68,

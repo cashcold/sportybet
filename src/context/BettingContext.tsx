@@ -35,6 +35,7 @@ interface BettingContextType {
   selectedLeagueFilter: string | null;
   setSelectedLeagueFilter: (league: string | null) => void;
   toggleSelection: (match: Match, marketName: string, odd: OddItem) => void;
+  addSelection: (selection: BetSelection) => void;
   removeSelection: (matchId: string, marketName: string, selectionName: string) => void;
   clearBetslip: () => void;
   placeBet: (stake: number, type: 'Single' | 'Multiple') => Promise<{ success: boolean; error?: string }>;
@@ -45,7 +46,8 @@ interface BettingContextType {
   showToast: (msg: string) => void;
   updateUsername: (name: string) => void;
   updateProfile: (updates: Partial<UserProfile>) => void;
-  login: (phone?: string) => Promise<void>;
+  login: (phone?: string, password?: string) => Promise<{ success: boolean; error?: string }>;
+  register: (phone: string, password?: string, firstName?: string, lastName?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   loadBookingCode: (code: string) => Promise<boolean>;
   generateBookingCode: () => Promise<string | null>;
@@ -81,7 +83,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (parsed.balance === 0 || parsed.balance === undefined || parsed.currency !== 'GHC') {
+        if (parsed.balance === 0 || parsed.balance === undefined || parsed.currency !== 'GHC' || parsed.balance >= 9000000) {
           parsed.balance = INITIAL_USER.balance;
           parsed.currency = INITIAL_USER.currency;
           localStorage.setItem('sportybet_user', JSON.stringify(parsed));
@@ -138,6 +140,30 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         refreshLiveOdds();
       }
     }, 30000);
+
+    // Initial sync from MongoDB backend
+    const syncMongoData = async () => {
+      try {
+        const [meRes, openRes, historyRes] = await Promise.allSettled([
+          api.auth.getMe(),
+          api.bets.getOpenBets(),
+          api.bets.getBetHistory()
+        ]);
+        if (meRes.status === 'fulfilled' && meRes.value.success && meRes.value.user) {
+          setUser(meRes.value.user);
+        }
+        if (openRes.status === 'fulfilled' && openRes.value.success && openRes.value.bets) {
+          setOpenBets(openRes.value.bets);
+        }
+        if (historyRes.status === 'fulfilled' && historyRes.value.success && historyRes.value.bets) {
+          setBetHistory(historyRes.value.bets);
+        }
+      } catch (err) {
+        // Fallback to local state
+      }
+    };
+    syncMongoData();
+
     return () => clearInterval(pollInterval);
   }, [apiFootballConfigured]);
 
@@ -251,6 +277,16 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   };
 
+  const addSelection = (selection: BetSelection) => {
+    setBetslip(prev => {
+      const exists = prev.some(
+        s => s.matchId === selection.matchId && s.marketName === selection.marketName && s.selectionName === selection.selectionName
+      );
+      if (exists) return prev;
+      return [...prev, selection];
+    });
+  };
+
   const removeSelection = (matchId: string, marketName: string, selectionName: string) => {
     setBetslip(prev =>
       prev.filter(
@@ -284,9 +320,13 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const now = new Date();
     const dateFormatted = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
+    const randomTicketId = `B-GH-${Math.floor(10000000 + Math.random() * 90000000)}`;
+    const randomTxId = `TX-GH-${Math.floor(100000000 + Math.random() * 900000000)}`;
+
     const newBet: PlacedBet = {
       id: `bet-${Date.now()}`,
-      ticketId: `SBGH-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`,
+      ticketId: randomTicketId,
+      transactionId: randomTxId,
       type,
       date: dateFormatted,
       isLive: isAnyLive,
@@ -318,14 +358,14 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         if (serverRes.remainingBalance !== undefined) {
           setUser(prev => ({ ...prev, balance: serverRes.remainingBalance! }));
         }
-        showToast(`Bet placed! Ticket: ${serverRes.ticketId || newBet.ticketId}`);
+        showToast(`Bet placed! Ticket: ${serverRes.ticketId || newBet.ticketId} | Tx: ${serverRes.transactionId || randomTxId}`);
         return { success: true };
       }
     } catch {
       // Keep optimistic bet
     }
 
-    showToast(`Bet placed successfully! Ticket: ${newBet.ticketId}`);
+    showToast(`Bet placed successfully! Ticket: ${newBet.ticketId} | Tx: ${randomTxId}`);
     return { success: true };
   };
 
@@ -425,16 +465,31 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     showToast('Profile updated');
   };
 
-  const login = async (phone?: string) => {
+  const login = async (phone?: string, password?: string): Promise<{ success: boolean; error?: string }> => {
     const phoneNumber = phone || user.phone || '20******5';
     try {
-      const res = await api.auth.login(phoneNumber);
+      const res = await api.auth.login(phoneNumber, password);
       if (res.success && res.user) {
         setUser(res.user);
-        showToast('Logged in successfully');
-        return;
+        showToast('Logged in successfully to SportyBet account');
+
+        // Fetch user's live bets from MongoDB
+        const [openRes, historyRes] = await Promise.allSettled([
+          api.bets.getOpenBets(),
+          api.bets.getBetHistory()
+        ]);
+        if (openRes.status === 'fulfilled' && openRes.value.success && openRes.value.bets) {
+          setOpenBets(openRes.value.bets);
+        }
+        if (historyRes.status === 'fulfilled' && historyRes.value.success && historyRes.value.bets) {
+          setBetHistory(historyRes.value.bets);
+        }
+        return { success: true };
+      } else if (res.error) {
+        showToast(res.error);
+        return { success: false, error: res.error };
       }
-    } catch {
+    } catch (err: any) {
       //
     }
     setUser(prev => ({
@@ -443,6 +498,27 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       phone: phoneNumber
     }));
     showToast('Logged in successfully');
+    return { success: true };
+  };
+
+  const register = async (phone: string, password?: string, firstName?: string, lastName?: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await api.auth.register(phone, password);
+      if (res.success && res.user) {
+        setUser(res.user);
+        showToast(res.message || 'Account registered successfully in MongoDB!');
+        setOpenBets([]);
+        setBetHistory([]);
+        return { success: true };
+      } else if (res.error) {
+        showToast(res.error);
+        return { success: false, error: res.error };
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Registration failed');
+      return { success: false, error: err.message };
+    }
+    return { success: false, error: 'Registration failed' };
   };
 
   const logout = async () => {
@@ -480,6 +556,139 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const loadBookingCode = async (code: string): Promise<boolean> => {
     if (!code.trim()) return false;
     const cleanCode = code.trim().toUpperCase();
+
+    // Exact preset mappings from user screenshots
+    if (cleanCode === 'DA2R1A') {
+      const selections: BetSelection[] = [
+        {
+          matchId: 'sc-p1',
+          gameId: '1090',
+          matchTitle: 'Portugal vs Wales',
+          marketName: '1X2 - 1UP',
+          selectionName: 'Home',
+          odd: 1.10,
+          isLive: false
+        },
+        {
+          matchId: 'sc-p2',
+          gameId: '1091',
+          matchTitle: 'Austria vs Israel',
+          marketName: '1X2 - 1UP',
+          selectionName: 'Home',
+          odd: 1.22,
+          isLive: false
+        },
+        {
+          matchId: 'sc-p3',
+          gameId: '1092',
+          matchTitle: 'Armenia vs Latvia',
+          marketName: '1X2 - 1UP',
+          selectionName: 'Home',
+          odd: 1.39,
+          isLive: false
+        }
+      ];
+      setBetslip(selections);
+      setIsBetslipOpen(true);
+      showToast(`Booking Code DA2R1A loaded! (${selections.length} selections)`);
+      return true;
+    }
+
+    if (cleanCode === 'CXA7PN') {
+      const selections: BetSelection[] = [
+        {
+          matchId: 'sc-c1',
+          gameId: '201',
+          matchTitle: 'Arsenal vs Everton',
+          marketName: '1X2',
+          selectionName: 'Home',
+          odd: 1.32,
+          isLive: false
+        },
+        {
+          matchId: 'sc-c2',
+          gameId: '202',
+          matchTitle: 'Inter Milan vs Monza',
+          marketName: '1X2',
+          selectionName: 'Home',
+          odd: 1.28,
+          isLive: false
+        },
+        {
+          matchId: 'sc-c3',
+          gameId: '203',
+          matchTitle: 'Barcelona vs Sevilla',
+          marketName: 'Over/Under',
+          selectionName: 'Over 2.5',
+          odd: 1.55,
+          isLive: false
+        },
+        {
+          matchId: 'sc-c4',
+          gameId: '204',
+          matchTitle: 'Bayern Munich vs Wolfsburg',
+          marketName: 'Handicap 0:1',
+          selectionName: 'Home (-1)',
+          odd: 1.62,
+          isLive: false
+        },
+        {
+          matchId: 'sc-c5',
+          gameId: '205',
+          matchTitle: 'PSG vs Nantes',
+          marketName: '1X2',
+          selectionName: 'Home',
+          odd: 1.22,
+          isLive: false
+        },
+        {
+          matchId: 'sc-c6',
+          gameId: '206',
+          matchTitle: 'Sporting CP vs Braga',
+          marketName: 'Double Chance',
+          selectionName: '1X',
+          odd: 1.24,
+          isLive: false
+        }
+      ];
+      setBetslip(selections);
+      setIsBetslipOpen(true);
+      showToast(`Booking Code CXA7PN loaded! (${selections.length} folds, Odds: 12.83)`);
+      return true;
+    }
+
+    if (cleanCode === 'E98Y6D' || cleanCode === 'BC72A9') {
+      const selections: BetSelection[] = [
+        {
+          matchId: 'sc-1',
+          gameId: '1091',
+          matchTitle: 'Ivory Coast vs Ghana',
+          marketName: 'Handicap 0:2',
+          selectionName: 'Away (0:2)',
+          odd: 1.41
+        },
+        {
+          matchId: 'sc-2',
+          gameId: '1092',
+          matchTitle: 'Tunisia vs Uganda',
+          marketName: '1X2',
+          selectionName: 'Home',
+          odd: 1.47
+        },
+        {
+          matchId: 'sc-3',
+          gameId: '1093',
+          matchTitle: 'Morocco vs Egypt',
+          marketName: '1X2',
+          selectionName: 'Draw',
+          odd: 3.10
+        }
+      ];
+      setBetslip(selections);
+      setIsBetslipOpen(true);
+      showToast(`Booking Code ${cleanCode} loaded! (${selections.length} events)`);
+      return true;
+    }
 
     // Try fetching from server API first
     try {
@@ -535,6 +744,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         selectedLeagueFilter,
         setSelectedLeagueFilter,
         toggleSelection,
+        addSelection,
         removeSelection,
         clearBetslip,
         placeBet,
@@ -546,6 +756,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         updateUsername,
         updateProfile,
         login,
+        register,
         logout,
         loadBookingCode,
         generateBookingCode,

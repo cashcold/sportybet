@@ -39,7 +39,7 @@ export interface BetSelection {
   marketName: string;
   selectionName: string;
   odd: number;
-  isLive: boolean;
+  isLive?: boolean;
   liveOdds?: number;
   liveOddsTrend?: 'up' | 'down' | 'same';
   liveScore?: string;
@@ -53,6 +53,8 @@ export interface BetSelection {
 export interface PlacedBet {
   id: string;
   ticketId: string;
+  transactionId?: string;
+  bookingCode?: string;
   type: 'Single' | 'Multiple';
   date: string;
   isLive: boolean;

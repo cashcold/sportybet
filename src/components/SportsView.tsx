@@ -5,6 +5,7 @@ import { Match } from '../types';
 import { OddButton } from './OddButton';
 import { MatchDetailsModal } from './MatchDetailsModal';
 import { HomeHeroFeatured } from './HomeHeroFeatured';
+import { CodeHubModal } from './CodeHubModal';
 
 export const SportsView: React.FC = () => {
   const {
@@ -21,8 +22,8 @@ export const SportsView: React.FC = () => {
   } = useBetting();
   
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isBookingCodeModalOpen, setIsBookingCodeModalOpen] = useState(false);
-  const [bookingCodeInput, setBookingCodeInput] = useState('');
+  const [isCodeHubOpen, setIsCodeHubOpen] = useState(false);
+  const [codeHubTab, setCodeHubTab] = useState<'load' | 'popular'>('load');
 
   const handleManualSync = async () => {
     setIsRefreshing(true);
@@ -46,19 +47,6 @@ export const SportsView: React.FC = () => {
   const liveMatches = matches.filter(m => m.isLive);
   const upcomingMatches = matches.filter(m => !m.isLive);
 
-  const handleLoadBookingCodeSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!bookingCodeInput.trim()) return;
-    const ok = await loadBookingCode(bookingCodeInput.trim());
-    if (ok) {
-      setIsBookingCodeModalOpen(false);
-      setBookingCodeInput('');
-      showToast(`Booking Code ${bookingCodeInput.toUpperCase()} loaded into slip!`);
-    } else {
-      showToast('Booking code not found. Try code: SPORTY10');
-    }
-  };
-
   return (
     <div className="pb-24 bg-[#141a22] text-white min-h-screen">
       {/* ========================================================= */}
@@ -66,7 +54,10 @@ export const SportsView: React.FC = () => {
       {/* Stories, Quick Nav, Tournament Filters, Featured Match */}
       {/* ========================================================= */}
       <HomeHeroFeatured
-        onOpenBookingCode={() => setIsBookingCodeModalOpen(true)}
+        onOpenBookingCode={() => {
+          setCodeHubTab('load');
+          setIsCodeHubOpen(true);
+        }}
         onOpenAviator={() => setActiveTab('games')}
         onSelectTournament={(tourn) => {
           showToast(`Filtered: ${tourn}`);
@@ -425,57 +416,12 @@ export const SportsView: React.FC = () => {
         onClose={() => setDetailMatch(null)}
       />
 
-      {/* Booking Code Modal */}
-      {isBookingCodeModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-[#1b2532] border border-[#2b394a] rounded-lg w-full max-w-sm p-4 space-y-4 shadow-2xl animate-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-2 border-b border-[#243040]">
-              <h3 className="font-black text-sm text-white flex items-center space-x-2">
-                <span>📋</span>
-                <span>Load Booking Code</span>
-              </h3>
-              <button
-                onClick={() => setIsBookingCodeModalOpen(false)}
-                className="text-neutral-400 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleLoadBookingCodeSubmit} className="space-y-3">
-              <div>
-                <label className="text-[11px] font-bold text-neutral-300 block mb-1">
-                  Enter Booking Code
-                </label>
-                <input
-                  type="text"
-                  value={bookingCodeInput}
-                  onChange={(e) => setBookingCodeInput(e.target.value.toUpperCase())}
-                  placeholder="e.g. SPORTY10 or BC8912"
-                  className="w-full bg-[#121922] border border-neutral-700 rounded px-3 py-2.5 text-xs text-white uppercase font-mono tracking-widest focus:outline-none focus:border-[#00df59]"
-                  autoFocus
-                />
-              </div>
-
-              <div className="flex space-x-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setIsBookingCodeModalOpen(false)}
-                  className="flex-1 py-2 bg-[#253243] hover:bg-[#2d3c50] text-xs font-bold rounded text-neutral-300"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-2 bg-[#00a826] hover:bg-[#009221] text-xs font-black rounded text-white shadow"
-                >
-                  Load Slip
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Code Hub - Football Modal (Exact match to Screenshots 4 & 5) */}
+      <CodeHubModal
+        isOpen={isCodeHubOpen}
+        onClose={() => setIsCodeHubOpen(false)}
+        defaultTab={codeHubTab}
+      />
     </div>
   );
 };
