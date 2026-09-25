@@ -36,2990 +36,4921 @@ var import_bcryptjs = __toESM(require("bcryptjs"), 1);
 
 // src/data/realFixtures.ts
 var REAL_UPCOMING_FIXTURES = [
-  // =========================================================================
-  // 1. TODAY: Thursday 24/09 - Premier League Fixtures (Pasted by User)
-  // =========================================================================
   {
-    id: "up-pl-87055",
-    gameId: "87055",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Arsenal FC",
-    awayTeam: "Leeds United",
-    startTime: "11:30 AM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 218,
-    markets: {
+    "id": "live-alg-tun-u20",
+    "gameId": "21094",
+    "sport": "football",
+    "league": "Africa Cup of Nations U20 - Qualification",
+    "countryOrCategory": "Africa",
+    "homeTeam": "Algeria U20",
+    "awayTeam": "Tunisia U20",
+    "homeScore": 1,
+    "awayScore": 1,
+    "minute": "76' 2H",
+    "period": "2H",
+    "isLive": true,
+    "isHot": true,
+    "hasLiveStream": true,
+    "date": "2026-09-25",
+    "dateLabel": "Today 25/09",
+    "startTime": "Live",
+    "commenceTime": "2026-09-25T14:00:00Z",
+    "marketsCount": 68,
+    "markets": {
       "1X2": [
-        { id: "mpl-87055-1", name: "1", value: 1.32, trend: "same" },
-        { id: "mpl-87055-x", name: "X", value: 5.4, trend: "same" },
-        { id: "mpl-87055-2", name: "2", value: 8.8, trend: "same" }
+        {
+          "id": "lat-1",
+          "name": "1",
+          "value": 3.1,
+          "trend": "same"
+        },
+        {
+          "id": "lat-x",
+          "name": "X",
+          "value": 1.85,
+          "trend": "same"
+        },
+        {
+          "id": "lat-2",
+          "name": "2",
+          "value": 3.25,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mpl-87055-o2.5", name: "Over 2.5", value: 1.55, trend: "same" },
-        { id: "mpl-87055-u2.5", name: "Under 2.5", value: 2.35, trend: "same" }
+        {
+          "id": "lat-o",
+          "name": "Over 2.5",
+          "value": 2.45,
+          "trend": "same"
+        },
+        {
+          "id": "lat-u",
+          "name": "Under 2.5",
+          "value": 1.55,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mpl-87055-1x", name: "1X", value: 1.08, trend: "same" },
-        { id: "mpl-87055-12", name: "12", value: 1.14, trend: "same" },
-        { id: "mpl-87055-x2", name: "X2", value: 3.25, trend: "same" }
-      ],
-      "1st Half O/U": [
-        { id: "mpl-87055-ho1.5", name: "Over 1.5", value: 2.25, trend: "same" },
-        { id: "mpl-87055-hu1.5", name: "Under 1.5", value: 1.6, trend: "same" }
-      ],
-      "Handicap": [
-        { id: "mpl-87055-h1", name: "(-1) 1", value: 1.88, trend: "same" },
-        { id: "mpl-87055-h2", name: "(+1) 2", value: 1.92, trend: "same" }
+        {
+          "id": "lat-1x",
+          "name": "1X",
+          "value": 1.3,
+          "trend": "same"
+        },
+        {
+          "id": "lat-12",
+          "name": "12",
+          "value": 1.85,
+          "trend": "same"
+        },
+        {
+          "id": "lat-x2",
+          "name": "X2",
+          "value": 1.35,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-pl-02601",
-    gameId: "02601",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Aston Villa",
-    awayTeam: "Brentford",
-    startTime: "02:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 218,
-    markets: {
+    "id": "live-elva-kalev",
+    "gameId": "38192",
+    "sport": "football",
+    "league": "Estonian Cup",
+    "countryOrCategory": "Estonia",
+    "homeTeam": "Elva",
+    "awayTeam": "Tallinna Kalev",
+    "homeScore": 1,
+    "awayScore": 0,
+    "minute": "50' 2H",
+    "period": "2H",
+    "isLive": true,
+    "isHot": true,
+    "hasLiveStream": false,
+    "date": "2026-09-25",
+    "dateLabel": "Today 25/09",
+    "startTime": "Live",
+    "commenceTime": "2026-09-25T14:30:00Z",
+    "marketsCount": 52,
+    "markets": {
       "1X2": [
-        { id: "mpl-02601-1", name: "1", value: 1.75, trend: "same" },
-        { id: "mpl-02601-x", name: "X", value: 3.9, trend: "same" },
-        { id: "mpl-02601-2", name: "2", value: 4.4, trend: "same" }
+        {
+          "id": "lek-1",
+          "name": "1",
+          "value": 1.95,
+          "trend": "down"
+        },
+        {
+          "id": "lek-x",
+          "name": "X",
+          "value": 3.1,
+          "trend": "same"
+        },
+        {
+          "id": "lek-2",
+          "name": "2",
+          "value": 4.2,
+          "trend": "up"
+        }
       ],
       "O/U": [
-        { id: "mpl-02601-o2.5", name: "Over 2.5", value: 1.68, trend: "same" },
-        { id: "mpl-02601-u2.5", name: "Under 2.5", value: 2.15, trend: "same" }
+        {
+          "id": "lek-o",
+          "name": "Over 2.5",
+          "value": 1.8,
+          "trend": "same"
+        },
+        {
+          "id": "lek-u",
+          "name": "Under 2.5",
+          "value": 1.95,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mpl-02601-1x", name: "1X", value: 1.2, trend: "same" },
-        { id: "mpl-02601-12", name: "12", value: 1.24, trend: "same" },
-        { id: "mpl-02601-x2", name: "X2", value: 2.05, trend: "same" }
+        {
+          "id": "lek-1x",
+          "name": "1X",
+          "value": 1.2,
+          "trend": "same"
+        },
+        {
+          "id": "lek-12",
+          "name": "12",
+          "value": 1.3,
+          "trend": "same"
+        },
+        {
+          "id": "lek-x2",
+          "name": "X2",
+          "value": 1.75,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-pl-45446",
-    gameId: "45446",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Chelsea FC",
-    awayTeam: "AFC Bournemouth",
-    startTime: "02:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 218,
-    markets: {
+    "id": "live-oman-sur",
+    "gameId": "49201",
+    "sport": "football",
+    "league": "Oman FA Cup",
+    "countryOrCategory": "Oman",
+    "homeTeam": "Oman Club",
+    "awayTeam": "Sur Club",
+    "homeScore": 1,
+    "awayScore": 0,
+    "minute": "34' 1H",
+    "period": "1H",
+    "isLive": true,
+    "isHot": true,
+    "hasLiveStream": true,
+    "date": "2026-09-25",
+    "dateLabel": "Today 25/09",
+    "startTime": "Live",
+    "commenceTime": "2026-09-25T15:00:00Z",
+    "marketsCount": 55,
+    "markets": {
       "1X2": [
-        { id: "mpl-45446-1", name: "1", value: 1.58, trend: "same" },
-        { id: "mpl-45446-x", name: "X", value: 4.3, trend: "same" },
-        { id: "mpl-45446-2", name: "2", value: 5.2, trend: "same" }
+        {
+          "id": "los-1",
+          "name": "1",
+          "value": 1.62,
+          "trend": "same"
+        },
+        {
+          "id": "los-x",
+          "name": "X",
+          "value": 3.6,
+          "trend": "same"
+        },
+        {
+          "id": "los-2",
+          "name": "2",
+          "value": 5.4,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mpl-45446-o2.5", name: "Over 2.5", value: 1.62, trend: "same" },
-        { id: "mpl-45446-u2.5", name: "Under 2.5", value: 2.25, trend: "same" }
+        {
+          "id": "los-o",
+          "name": "Over 2.5",
+          "value": 1.92,
+          "trend": "same"
+        },
+        {
+          "id": "los-u",
+          "name": "Under 2.5",
+          "value": 1.84,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mpl-45446-1x", name: "1X", value: 1.15, trend: "same" },
-        { id: "mpl-45446-12", name: "12", value: 1.2, trend: "same" },
-        { id: "mpl-45446-x2", name: "X2", value: 2.3, trend: "same" }
+        {
+          "id": "los-1x",
+          "name": "1X",
+          "value": 1.14,
+          "trend": "same"
+        },
+        {
+          "id": "los-12",
+          "name": "12",
+          "value": 1.25,
+          "trend": "same"
+        },
+        {
+          "id": "los-x2",
+          "name": "X2",
+          "value": 2.2,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-pl-38082",
-    gameId: "38082",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Sunderland",
-    awayTeam: "Brighton and Hove Albion",
-    startTime: "02:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: false,
-    marketsCount: 218,
-    markets: {
+    "id": "live-sohar-seeb",
+    "gameId": "58190",
+    "sport": "football",
+    "league": "Oman FA Cup",
+    "countryOrCategory": "Oman",
+    "homeTeam": "Sohar",
+    "awayTeam": "Al Seeb",
+    "homeScore": 0,
+    "awayScore": 1,
+    "minute": "23' 1H",
+    "period": "1H",
+    "isLive": true,
+    "isHot": false,
+    "hasLiveStream": false,
+    "date": "2026-09-25",
+    "dateLabel": "Today 25/09",
+    "startTime": "Live",
+    "commenceTime": "2026-09-25T15:15:00Z",
+    "marketsCount": 48,
+    "markets": {
       "1X2": [
-        { id: "mpl-38082-1", name: "1", value: 3.4, trend: "same" },
-        { id: "mpl-38082-x", name: "X", value: 3.5, trend: "same" },
-        { id: "mpl-38082-2", name: "2", value: 2.1, trend: "same" }
+        {
+          "id": "lss-1",
+          "name": "1",
+          "value": 6.2,
+          "trend": "up"
+        },
+        {
+          "id": "lss-x",
+          "name": "X",
+          "value": 3.8,
+          "trend": "same"
+        },
+        {
+          "id": "lss-2",
+          "name": "2",
+          "value": 1.48,
+          "trend": "down"
+        }
       ],
       "O/U": [
-        { id: "mpl-38082-o2.5", name: "Over 2.5", value: 1.8, trend: "same" },
-        { id: "mpl-38082-u2.5", name: "Under 2.5", value: 2, trend: "same" }
+        {
+          "id": "lss-o",
+          "name": "Over 2.5",
+          "value": 1.88,
+          "trend": "same"
+        },
+        {
+          "id": "lss-u",
+          "name": "Under 2.5",
+          "value": 1.88,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mpl-38082-1x", name: "1X", value: 1.7, trend: "same" },
-        { id: "mpl-38082-12", name: "12", value: 1.28, trend: "same" },
-        { id: "mpl-38082-x2", name: "X2", value: 1.3, trend: "same" }
+        {
+          "id": "lss-1x",
+          "name": "1X",
+          "value": 2.45,
+          "trend": "same"
+        },
+        {
+          "id": "lss-12",
+          "name": "12",
+          "value": 1.22,
+          "trend": "same"
+        },
+        {
+          "id": "lss-x2",
+          "name": "X2",
+          "value": 1.08,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-pl-28840",
-    gameId: "28840",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Ipswich Town",
-    awayTeam: "Fulham",
-    startTime: "02:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 218,
-    markets: {
+    "id": "live-uzb-iran",
+    "gameId": "77291",
+    "sport": "football",
+    "league": "International Friendly",
+    "countryOrCategory": "World",
+    "homeTeam": "Uzbekistan",
+    "awayTeam": "Iran",
+    "homeScore": 1,
+    "awayScore": 0,
+    "minute": "46' 2H",
+    "period": "2H",
+    "isLive": true,
+    "isHot": true,
+    "hasLiveStream": true,
+    "date": "2026-09-25",
+    "dateLabel": "Today 25/09",
+    "startTime": "Live",
+    "commenceTime": "2026-09-25T14:45:00Z",
+    "marketsCount": 95,
+    "markets": {
       "1X2": [
-        { id: "mpl-28840-1", name: "1", value: 2.9, trend: "same" },
-        { id: "mpl-28840-x", name: "X", value: 3.4, trend: "same" },
-        { id: "mpl-28840-2", name: "2", value: 2.4, trend: "same" }
+        {
+          "id": "lui-1",
+          "name": "1",
+          "value": 2.05,
+          "trend": "down"
+        },
+        {
+          "id": "lui-x",
+          "name": "X",
+          "value": 2.95,
+          "trend": "same"
+        },
+        {
+          "id": "lui-2",
+          "name": "2",
+          "value": 3.85,
+          "trend": "up"
+        }
       ],
       "O/U": [
-        { id: "mpl-28840-o2.5", name: "Over 2.5", value: 1.85, trend: "same" },
-        { id: "mpl-28840-u2.5", name: "Under 2.5", value: 1.95, trend: "same" }
+        {
+          "id": "lui-o",
+          "name": "Over 2.5",
+          "value": 2.15,
+          "trend": "same"
+        },
+        {
+          "id": "lui-u",
+          "name": "Under 2.5",
+          "value": 1.68,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mpl-28840-1x", name: "1X", value: 1.55, trend: "same" },
-        { id: "mpl-28840-12", name: "12", value: 1.3, trend: "same" },
-        { id: "mpl-28840-x2", name: "X2", value: 1.4, trend: "same" }
+        {
+          "id": "lui-1x",
+          "name": "1X",
+          "value": 1.25,
+          "trend": "same"
+        },
+        {
+          "id": "lui-12",
+          "name": "12",
+          "value": 1.36,
+          "trend": "same"
+        },
+        {
+          "id": "lui-x2",
+          "name": "X2",
+          "value": 1.7,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-pl-22924",
-    gameId: "22924",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Manchester United",
-    awayTeam: "Tottenham Hotspur",
-    startTime: "04:30 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 218,
-    markets: {
+    "id": "theodds-d559e0b2cc9b79504ad6d3e221ea050f",
+    "gameId": "55902",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Armenia",
+    "awayTeam": "Latvia",
+    "isLive": false,
+    "startTime": "16:00",
+    "date": "2026-09-25",
+    "dateLabel": "Today 25/09",
+    "commenceTime": "2026-09-25T16:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 95,
+    "markets": {
       "1X2": [
-        { id: "mpl-22924-1", name: "1", value: 2.3, trend: "same" },
-        { id: "mpl-22924-x", name: "X", value: 3.75, trend: "same" },
-        { id: "mpl-22924-2", name: "2", value: 2.85, trend: "same" }
+        {
+          "id": "o-d559e0b2cc9b79504ad6d3e221ea050f-1",
+          "name": "1",
+          "value": 1.85,
+          "trend": "same"
+        },
+        {
+          "id": "o-d559e0b2cc9b79504ad6d3e221ea050f-X",
+          "name": "X",
+          "value": 3.4,
+          "trend": "same"
+        },
+        {
+          "id": "o-d559e0b2cc9b79504ad6d3e221ea050f-2",
+          "name": "2",
+          "value": 4.1,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mpl-22924-o2.5", name: "Over 2.5", value: 1.55, trend: "same" },
-        { id: "mpl-22924-u2.5", name: "Under 2.5", value: 2.4, trend: "same" }
+        {
+          "id": "o-d559e0b2cc9b79504ad6d3e221ea050f-over",
+          "name": "Over 2.5",
+          "value": 1.92,
+          "trend": "same"
+        },
+        {
+          "id": "o-d559e0b2cc9b79504ad6d3e221ea050f-under",
+          "name": "Under 2.5",
+          "value": 1.82,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mpl-22924-1x", name: "1X", value: 1.4, trend: "same" },
-        { id: "mpl-22924-12", name: "12", value: 1.25, trend: "same" },
-        { id: "mpl-22924-x2", name: "X2", value: 1.6, trend: "same" }
+        {
+          "id": "o-d559e0b2cc9b79504ad6d3e221ea050f-1x",
+          "name": "1X",
+          "value": 1.14,
+          "trend": "same"
+        },
+        {
+          "id": "o-d559e0b2cc9b79504ad6d3e221ea050f-12",
+          "name": "12",
+          "value": 1.21,
+          "trend": "same"
+        },
+        {
+          "id": "o-d559e0b2cc9b79504ad6d3e221ea050f-x2",
+          "name": "X2",
+          "value": 1.77,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-pl-86567",
-    gameId: "86567",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Crystal Palace",
-    awayTeam: "Nottingham Forest",
-    startTime: "01:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: false,
-    marketsCount: 218,
-    markets: {
+    "id": "theodds-56e89688e8dcce4889162404c8290f50",
+    "gameId": "56896",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Georgia",
+    "awayTeam": "Northern Ireland",
+    "isLive": false,
+    "startTime": "16:00",
+    "date": "2026-09-25",
+    "dateLabel": "Today 25/09",
+    "commenceTime": "2026-09-25T16:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 95,
+    "markets": {
       "1X2": [
-        { id: "mpl-86567-1", name: "1", value: 2.1, trend: "same" },
-        { id: "mpl-86567-x", name: "X", value: 3.35, trend: "same" },
-        { id: "mpl-86567-2", name: "2", value: 3.6, trend: "same" }
+        {
+          "id": "o-56e89688e8dcce4889162404c8290f50-1",
+          "name": "1",
+          "value": 1.9,
+          "trend": "same"
+        },
+        {
+          "id": "o-56e89688e8dcce4889162404c8290f50-X",
+          "name": "X",
+          "value": 3.3,
+          "trend": "same"
+        },
+        {
+          "id": "o-56e89688e8dcce4889162404c8290f50-2",
+          "name": "2",
+          "value": 4.4,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mpl-86567-o2.5", name: "Over 2.5", value: 1.95, trend: "same" },
-        { id: "mpl-86567-u2.5", name: "Under 2.5", value: 1.85, trend: "same" }
+        {
+          "id": "o-56e89688e8dcce4889162404c8290f50-over",
+          "name": "Over 2.5",
+          "value": 2.18,
+          "trend": "same"
+        },
+        {
+          "id": "o-56e89688e8dcce4889162404c8290f50-under",
+          "name": "Under 2.5",
+          "value": 1.65,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mpl-86567-1x", name: "1X", value: 1.3, trend: "same" },
-        { id: "mpl-86567-12", name: "12", value: 1.32, trend: "same" },
-        { id: "mpl-86567-x2", name: "X2", value: 1.7, trend: "same" }
+        {
+          "id": "o-56e89688e8dcce4889162404c8290f50-1x",
+          "name": "1X",
+          "value": 1.15,
+          "trend": "same"
+        },
+        {
+          "id": "o-56e89688e8dcce4889162404c8290f50-12",
+          "name": "12",
+          "value": 1.26,
+          "trend": "same"
+        },
+        {
+          "id": "o-56e89688e8dcce4889162404c8290f50-x2",
+          "name": "X2",
+          "value": 1.79,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-pl-04304",
-    gameId: "04304",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Hull City",
-    awayTeam: "Everton",
-    startTime: "01:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: false,
-    marketsCount: 218,
-    markets: {
+    "id": "theodds-95d5c8d1489bc284b68dc332fa1cb854",
+    "gameId": "95581",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Italy",
+    "awayTeam": "Belgium",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-25",
+    "dateLabel": "Today 25/09",
+    "commenceTime": "2026-09-25T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 100,
+    "markets": {
       "1X2": [
-        { id: "mpl-04304-1", name: "1", value: 3.1, trend: "same" },
-        { id: "mpl-04304-x", name: "X", value: 3.3, trend: "same" },
-        { id: "mpl-04304-2", name: "2", value: 2.3, trend: "same" }
+        {
+          "id": "o-95d5c8d1489bc284b68dc332fa1cb854-1",
+          "name": "1",
+          "value": 2.27,
+          "trend": "same"
+        },
+        {
+          "id": "o-95d5c8d1489bc284b68dc332fa1cb854-X",
+          "name": "X",
+          "value": 3.64,
+          "trend": "same"
+        },
+        {
+          "id": "o-95d5c8d1489bc284b68dc332fa1cb854-2",
+          "name": "2",
+          "value": 3.16,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mpl-04304-o2.5", name: "Over 2.5", value: 1.9, trend: "same" },
-        { id: "mpl-04304-u2.5", name: "Under 2.5", value: 1.9, trend: "same" }
+        {
+          "id": "o-95d5c8d1489bc284b68dc332fa1cb854-over",
+          "name": "Over 2.5",
+          "value": 1.7,
+          "trend": "same"
+        },
+        {
+          "id": "o-95d5c8d1489bc284b68dc332fa1cb854-under",
+          "name": "Under 2.5",
+          "value": 2.25,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mpl-04304-1x", name: "1X", value: 1.6, trend: "same" },
-        { id: "mpl-04304-12", name: "12", value: 1.32, trend: "same" },
-        { id: "mpl-04304-x2", name: "X2", value: 1.35, trend: "same" }
+        {
+          "id": "o-95d5c8d1489bc284b68dc332fa1cb854-1x",
+          "name": "1X",
+          "value": 1.33,
+          "trend": "same"
+        },
+        {
+          "id": "o-95d5c8d1489bc284b68dc332fa1cb854-12",
+          "name": "12",
+          "value": 1.25,
+          "trend": "same"
+        },
+        {
+          "id": "o-95d5c8d1489bc284b68dc332fa1cb854-x2",
+          "name": "X2",
+          "value": 1.61,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-pl-62328",
-    gameId: "62328",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Liverpool FC",
-    awayTeam: "Manchester City",
-    startTime: "03:30 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 218,
-    markets: {
+    "id": "theodds-bd6aee3c71bd9b3897ae6bc55bd43de4",
+    "gameId": "63719",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Poland",
+    "awayTeam": "Bosnia & Herzegovina",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-25",
+    "dateLabel": "Today 25/09",
+    "commenceTime": "2026-09-25T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 95,
+    "markets": {
       "1X2": [
-        { id: "mpl-62328-1", name: "1", value: 2.45, trend: "same" },
-        { id: "mpl-62328-x", name: "X", value: 3.65, trend: "same" },
-        { id: "mpl-62328-2", name: "2", value: 2.7, trend: "same" }
+        {
+          "id": "o-bd6aee3c71bd9b3897ae6bc55bd43de4-1",
+          "name": "1",
+          "value": 1.6,
+          "trend": "same"
+        },
+        {
+          "id": "o-bd6aee3c71bd9b3897ae6bc55bd43de4-X",
+          "name": "X",
+          "value": 3.85,
+          "trend": "same"
+        },
+        {
+          "id": "o-bd6aee3c71bd9b3897ae6bc55bd43de4-2",
+          "name": "2",
+          "value": 5.4,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mpl-62328-o2.5", name: "Over 2.5", value: 1.5, trend: "same" },
-        { id: "mpl-62328-u2.5", name: "Under 2.5", value: 2.5, trend: "same" }
+        {
+          "id": "o-bd6aee3c71bd9b3897ae6bc55bd43de4-over",
+          "name": "Over 2.5",
+          "value": 1.82,
+          "trend": "same"
+        },
+        {
+          "id": "o-bd6aee3c71bd9b3897ae6bc55bd43de4-under",
+          "name": "Under 2.5",
+          "value": 1.95,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mpl-62328-1x", name: "1X", value: 1.45, trend: "same" },
-        { id: "mpl-62328-12", name: "12", value: 1.28, trend: "same" },
-        { id: "mpl-62328-x2", name: "X2", value: 1.55, trend: "same" }
+        {
+          "id": "o-bd6aee3c71bd9b3897ae6bc55bd43de4-1x",
+          "name": "1X",
+          "value": 1.07,
+          "trend": "same"
+        },
+        {
+          "id": "o-bd6aee3c71bd9b3897ae6bc55bd43de4-12",
+          "name": "12",
+          "value": 1.17,
+          "trend": "same"
+        },
+        {
+          "id": "o-bd6aee3c71bd9b3897ae6bc55bd43de4-x2",
+          "name": "X2",
+          "value": 2.14,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-pl-59459",
-    gameId: "59459",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Coventry City",
-    awayTeam: "Newcastle United",
-    startTime: "07:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 218,
-    markets: {
+    "id": "theodds-8d8af5c471bb4fbf8f3dd85dbd414227",
+    "gameId": "88547",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Montenegro",
+    "awayTeam": "Cyprus",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-25",
+    "dateLabel": "Today 25/09",
+    "commenceTime": "2026-09-25T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 95,
+    "markets": {
       "1X2": [
-        { id: "mpl-59459-1", name: "1", value: 4.5, trend: "same" },
-        { id: "mpl-59459-x", name: "X", value: 3.9, trend: "same" },
-        { id: "mpl-59459-2", name: "2", value: 1.72, trend: "same" }
+        {
+          "id": "o-8d8af5c471bb4fbf8f3dd85dbd414227-1",
+          "name": "1",
+          "value": 1.8,
+          "trend": "same"
+        },
+        {
+          "id": "o-8d8af5c471bb4fbf8f3dd85dbd414227-X",
+          "name": "X",
+          "value": 3.4,
+          "trend": "same"
+        },
+        {
+          "id": "o-8d8af5c471bb4fbf8f3dd85dbd414227-2",
+          "name": "2",
+          "value": 4.25,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mpl-59459-o2.5", name: "Over 2.5", value: 1.7, trend: "same" },
-        { id: "mpl-59459-u2.5", name: "Under 2.5", value: 2.1, trend: "same" }
+        {
+          "id": "o-8d8af5c471bb4fbf8f3dd85dbd414227-over",
+          "name": "Over 2.5",
+          "value": 2.02,
+          "trend": "same"
+        },
+        {
+          "id": "o-8d8af5c471bb4fbf8f3dd85dbd414227-under",
+          "name": "Under 2.5",
+          "value": 1.72,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mpl-59459-1x", name: "1X", value: 2.05, trend: "same" },
-        { id: "mpl-59459-12", name: "12", value: 1.24, trend: "same" },
-        { id: "mpl-59459-x2", name: "X2", value: 1.18, trend: "same" }
+        {
+          "id": "o-8d8af5c471bb4fbf8f3dd85dbd414227-1x",
+          "name": "1X",
+          "value": 1.12,
+          "trend": "same"
+        },
+        {
+          "id": "o-8d8af5c471bb4fbf8f3dd85dbd414227-12",
+          "name": "12",
+          "value": 1.2,
+          "trend": "same"
+        },
+        {
+          "id": "o-8d8af5c471bb4fbf8f3dd85dbd414227-x2",
+          "name": "X2",
+          "value": 1.79,
+          "trend": "same"
+        }
       ]
     }
   },
-  // =========================================================================
-  // 2. TODAY: Thursday 24/09 - Spain La Liga Fixtures (Pasted by User)
-  // =========================================================================
   {
-    id: "up-ll-44676",
-    gameId: "44676",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "M\xE1laga",
-    awayTeam: "Espanyol",
-    startTime: "07:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 194,
-    markets: {
+    "id": "theodds-2b7592be536420c10378dd7522466f6a",
+    "gameId": "27592",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Turkey",
+    "awayTeam": "France",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-25",
+    "dateLabel": "Today 25/09",
+    "commenceTime": "2026-09-25T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 100,
+    "markets": {
       "1X2": [
-        { id: "mll-44676-1", name: "1", value: 2.5, trend: "same" },
-        { id: "mll-44676-x", name: "X", value: 3.1, trend: "same" },
-        { id: "mll-44676-2", name: "2", value: 2.95, trend: "same" }
+        {
+          "id": "o-2b7592be536420c10378dd7522466f6a-1",
+          "name": "1",
+          "value": 9.4,
+          "trend": "same"
+        },
+        {
+          "id": "o-2b7592be536420c10378dd7522466f6a-X",
+          "name": "X",
+          "value": 5.75,
+          "trend": "same"
+        },
+        {
+          "id": "o-2b7592be536420c10378dd7522466f6a-2",
+          "name": "2",
+          "value": 1.33,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mll-44676-o2.5", name: "Over 2.5", value: 2.15, trend: "same" },
-        { id: "mll-44676-u2.5", name: "Under 2.5", value: 1.68, trend: "same" }
+        {
+          "id": "o-2b7592be536420c10378dd7522466f6a-over",
+          "name": "Over 2.5",
+          "value": 1.96,
+          "trend": "same"
+        },
+        {
+          "id": "o-2b7592be536420c10378dd7522466f6a-under",
+          "name": "Under 2.5",
+          "value": 1.92,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mll-44676-1x", name: "1X", value: 1.38, trend: "same" },
-        { id: "mll-44676-12", name: "12", value: 1.34, trend: "same" },
-        { id: "mll-44676-x2", name: "X2", value: 1.5, trend: "same" }
+        {
+          "id": "o-2b7592be536420c10378dd7522466f6a-1x",
+          "name": "1X",
+          "value": 3.39,
+          "trend": "same"
+        },
+        {
+          "id": "o-2b7592be536420c10378dd7522466f6a-12",
+          "name": "12",
+          "value": 1.11,
+          "trend": "same"
+        },
+        {
+          "id": "o-2b7592be536420c10378dd7522466f6a-x2",
+          "name": "X2",
+          "value": 1.03,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-ll-34947",
-    gameId: "34947",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Rayo Vallecano",
-    awayTeam: "Athletic Bilbao",
-    startTime: "12:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 194,
-    markets: {
+    "id": "theodds-9061961fe607d2b8b3e7f686244c61ea",
+    "gameId": "90619",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Hungary",
+    "awayTeam": "Ukraine",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-25",
+    "dateLabel": "Today 25/09",
+    "commenceTime": "2026-09-25T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 95,
+    "markets": {
       "1X2": [
-        { id: "mll-34947-1", name: "1", value: 3.1, trend: "same" },
-        { id: "mll-34947-x", name: "X", value: 3.25, trend: "same" },
-        { id: "mll-34947-2", name: "2", value: 2.35, trend: "same" }
+        {
+          "id": "o-9061961fe607d2b8b3e7f686244c61ea-1",
+          "name": "1",
+          "value": 2.32,
+          "trend": "same"
+        },
+        {
+          "id": "o-9061961fe607d2b8b3e7f686244c61ea-X",
+          "name": "X",
+          "value": 3.15,
+          "trend": "same"
+        },
+        {
+          "id": "o-9061961fe607d2b8b3e7f686244c61ea-2",
+          "name": "2",
+          "value": 3.25,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mll-34947-o2.5", name: "Over 2.5", value: 2.05, trend: "same" },
-        { id: "mll-34947-u2.5", name: "Under 2.5", value: 1.75, trend: "same" }
+        {
+          "id": "o-9061961fe607d2b8b3e7f686244c61ea-over",
+          "name": "Over 2.5",
+          "value": 2.18,
+          "trend": "same"
+        },
+        {
+          "id": "o-9061961fe607d2b8b3e7f686244c61ea-under",
+          "name": "Under 2.5",
+          "value": 1.65,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mll-34947-1x", name: "1X", value: 1.58, trend: "same" },
-        { id: "mll-34947-12", name: "12", value: 1.32, trend: "same" },
-        { id: "mll-34947-x2", name: "X2", value: 1.35, trend: "same" }
+        {
+          "id": "o-9061961fe607d2b8b3e7f686244c61ea-1x",
+          "name": "1X",
+          "value": 1.27,
+          "trend": "same"
+        },
+        {
+          "id": "o-9061961fe607d2b8b3e7f686244c61ea-12",
+          "name": "12",
+          "value": 1.29,
+          "trend": "same"
+        },
+        {
+          "id": "o-9061961fe607d2b8b3e7f686244c61ea-x2",
+          "name": "X2",
+          "value": 1.52,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-ll-38693",
-    gameId: "38693",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Alav\xE9s",
-    awayTeam: "Atl\xE9tico Madrid",
-    startTime: "02:15 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 186,
-    markets: {
+    "id": "theodds-f7d490f8981f46b035b30f715b8ecdac",
+    "gameId": "74908",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Sweden",
+    "awayTeam": "Romania",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-25",
+    "dateLabel": "Today 25/09",
+    "commenceTime": "2026-09-25T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 95,
+    "markets": {
       "1X2": [
-        { id: "mll-38693-1", name: "1", value: 4.8, trend: "same" },
-        { id: "mll-38693-x", name: "X", value: 3.5, trend: "same" },
-        { id: "mll-38693-2", name: "2", value: 1.8, trend: "same" }
+        {
+          "id": "o-f7d490f8981f46b035b30f715b8ecdac-1",
+          "name": "1",
+          "value": 1.43,
+          "trend": "same"
+        },
+        {
+          "id": "o-f7d490f8981f46b035b30f715b8ecdac-X",
+          "name": "X",
+          "value": 4.55,
+          "trend": "same"
+        },
+        {
+          "id": "o-f7d490f8981f46b035b30f715b8ecdac-2",
+          "name": "2",
+          "value": 7.3,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mll-38693-o2.5", name: "Over 2.5", value: 2.1, trend: "same" },
-        { id: "mll-38693-u2.5", name: "Under 2.5", value: 1.72, trend: "same" }
+        {
+          "id": "o-f7d490f8981f46b035b30f715b8ecdac-over",
+          "name": "Over 2.5",
+          "value": 1.62,
+          "trend": "same"
+        },
+        {
+          "id": "o-f7d490f8981f46b035b30f715b8ecdac-under",
+          "name": "Under 2.5",
+          "value": 2.28,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mll-38693-1x", name: "1X", value: 1.95, trend: "same" },
-        { id: "mll-38693-12", name: "12", value: 1.28, trend: "same" },
-        { id: "mll-38693-x2", name: "X2", value: 1.18, trend: "same" }
+        {
+          "id": "o-f7d490f8981f46b035b30f715b8ecdac-1x",
+          "name": "1X",
+          "value": 1.03,
+          "trend": "same"
+        },
+        {
+          "id": "o-f7d490f8981f46b035b30f715b8ecdac-12",
+          "name": "12",
+          "value": 1.14,
+          "trend": "same"
+        },
+        {
+          "id": "o-f7d490f8981f46b035b30f715b8ecdac-x2",
+          "name": "X2",
+          "value": 2.66,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-ll-80633",
-    gameId: "80633",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "FC Barcelona",
-    awayTeam: "Getafe",
-    startTime: "04:30 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 194,
-    markets: {
+    "id": "theodds-567186cbb46d455027b928c7204fa1e8",
+    "gameId": "56718",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Slovenia",
+    "awayTeam": "Scotland",
+    "isLive": false,
+    "startTime": "13:00",
+    "date": "2026-09-26",
+    "dateLabel": "Tomorrow 26/09",
+    "commenceTime": "2026-09-26T13:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 95,
+    "markets": {
       "1X2": [
-        { id: "mll-80633-1", name: "1", value: 1.25, trend: "same" },
-        { id: "mll-80633-x", name: "X", value: 6.2, trend: "same" },
-        { id: "mll-80633-2", name: "2", value: 11, trend: "same" }
+        {
+          "id": "o-567186cbb46d455027b928c7204fa1e8-1",
+          "name": "1",
+          "value": 2.55,
+          "trend": "same"
+        },
+        {
+          "id": "o-567186cbb46d455027b928c7204fa1e8-X",
+          "name": "X",
+          "value": 3.1,
+          "trend": "same"
+        },
+        {
+          "id": "o-567186cbb46d455027b928c7204fa1e8-2",
+          "name": "2",
+          "value": 2.9,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mll-80633-o2.5", name: "Over 2.5", value: 1.5, trend: "same" },
-        { id: "mll-80633-u2.5", name: "Under 2.5", value: 2.5, trend: "same" }
+        {
+          "id": "o-567186cbb46d455027b928c7204fa1e8-over",
+          "name": "Over 2.5",
+          "value": 2.22,
+          "trend": "same"
+        },
+        {
+          "id": "o-567186cbb46d455027b928c7204fa1e8-under",
+          "name": "Under 2.5",
+          "value": 1.62,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mll-80633-1x", name: "1X", value: 1.04, trend: "same" },
-        { id: "mll-80633-12", name: "12", value: 1.1, trend: "same" },
-        { id: "mll-80633-x2", name: "X2", value: 3.8, trend: "same" }
+        {
+          "id": "o-567186cbb46d455027b928c7204fa1e8-1x",
+          "name": "1X",
+          "value": 1.33,
+          "trend": "same"
+        },
+        {
+          "id": "o-567186cbb46d455027b928c7204fa1e8-12",
+          "name": "12",
+          "value": 1.29,
+          "trend": "same"
+        },
+        {
+          "id": "o-567186cbb46d455027b928c7204fa1e8-x2",
+          "name": "X2",
+          "value": 1.42,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-ll-55124",
-    gameId: "55124",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Real Madrid",
-    awayTeam: "Villarreal",
-    startTime: "07:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 194,
-    markets: {
+    "id": "theodds-aa53f6f572fd2c1335f51cb641d885a0",
+    "gameId": "53657",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Bulgaria",
+    "awayTeam": "Luxembourg",
+    "isLive": false,
+    "startTime": "16:00",
+    "date": "2026-09-26",
+    "dateLabel": "Tomorrow 26/09",
+    "commenceTime": "2026-09-26T16:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 95,
+    "markets": {
       "1X2": [
-        { id: "mll-55124-1", name: "1", value: 1.36, trend: "same" },
-        { id: "mll-55124-x", name: "X", value: 5.25, trend: "same" },
-        { id: "mll-55124-2", name: "2", value: 7.5, trend: "same" }
+        {
+          "id": "o-aa53f6f572fd2c1335f51cb641d885a0-1",
+          "name": "1",
+          "value": 2.22,
+          "trend": "same"
+        },
+        {
+          "id": "o-aa53f6f572fd2c1335f51cb641d885a0-X",
+          "name": "X",
+          "value": 3.1,
+          "trend": "same"
+        },
+        {
+          "id": "o-aa53f6f572fd2c1335f51cb641d885a0-2",
+          "name": "2",
+          "value": 3.25,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mll-55124-o2.5", name: "Over 2.5", value: 1.45, trend: "same" },
-        { id: "mll-55124-u2.5", name: "Under 2.5", value: 2.65, trend: "same" }
+        {
+          "id": "o-aa53f6f572fd2c1335f51cb641d885a0-over",
+          "name": "Over 2.5",
+          "value": 2.38,
+          "trend": "same"
+        },
+        {
+          "id": "o-aa53f6f572fd2c1335f51cb641d885a0-under",
+          "name": "Under 2.5",
+          "value": 1.55,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "mll-55124-1x", name: "1X", value: 1.08, trend: "same" },
-        { id: "mll-55124-12", name: "12", value: 1.14, trend: "same" },
-        { id: "mll-55124-x2", name: "X2", value: 3, trend: "same" }
+        {
+          "id": "o-aa53f6f572fd2c1335f51cb641d885a0-1x",
+          "name": "1X",
+          "value": 1.23,
+          "trend": "same"
+        },
+        {
+          "id": "o-aa53f6f572fd2c1335f51cb641d885a0-12",
+          "name": "12",
+          "value": 1.25,
+          "trend": "same"
+        },
+        {
+          "id": "o-aa53f6f572fd2c1335f51cb641d885a0-x2",
+          "name": "X2",
+          "value": 1.51,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-ll-77572",
-    gameId: "77572",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Elche CF",
-    awayTeam: "Celta Vigo",
-    startTime: "12:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: false,
-    marketsCount: 202,
-    markets: {
+    "id": "theodds-c42d46144130858aea0b0c9ecd0dff1d",
+    "gameId": "42461",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Iceland",
+    "awayTeam": "Estonia",
+    "isLive": false,
+    "startTime": "16:00",
+    "date": "2026-09-26",
+    "dateLabel": "Tomorrow 26/09",
+    "commenceTime": "2026-09-26T16:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 90,
+    "markets": {
       "1X2": [
-        { id: "mll-77572-1", name: "1", value: 2.8, trend: "same" },
-        { id: "mll-77572-x", name: "X", value: 3.2, trend: "same" },
-        { id: "mll-77572-2", name: "2", value: 2.55, trend: "same" }
+        {
+          "id": "o-c42d46144130858aea0b0c9ecd0dff1d-1",
+          "name": "1",
+          "value": 1.23,
+          "trend": "same"
+        },
+        {
+          "id": "o-c42d46144130858aea0b0c9ecd0dff1d-X",
+          "name": "X",
+          "value": 5.25,
+          "trend": "same"
+        },
+        {
+          "id": "o-c42d46144130858aea0b0c9ecd0dff1d-2",
+          "name": "2",
+          "value": 11.5,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mll-77572-o2.5", name: "Over 2.5", value: 2.1, trend: "same" },
-        { id: "mll-77572-u2.5", name: "Under 2.5", value: 1.72, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-ll-29976",
-    gameId: "29976",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Real Sociedad",
-    awayTeam: "Deportivo La Coru\xF1a",
-    startTime: "02:15 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 194,
-    markets: {
-      "1X2": [
-        { id: "mll-29976-1", name: "1", value: 1.62, trend: "same" },
-        { id: "mll-29976-x", name: "X", value: 3.8, trend: "same" },
-        { id: "mll-29976-2", name: "2", value: 5.5, trend: "same" }
-      ],
-      "O/U": [
-        { id: "mll-29976-o2.5", name: "Over 2.5", value: 1.88, trend: "same" },
-        { id: "mll-29976-u2.5", name: "Under 2.5", value: 1.92, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-ll-98469",
-    gameId: "98469",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Real Betis",
-    awayTeam: "CA Osasuna",
-    startTime: "04:30 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 194,
-    markets: {
-      "1X2": [
-        { id: "mll-98469-1", name: "1", value: 1.95, trend: "same" },
-        { id: "mll-98469-x", name: "X", value: 3.4, trend: "same" },
-        { id: "mll-98469-2", name: "2", value: 3.9, trend: "same" }
-      ],
-      "O/U": [
-        { id: "mll-98469-o2.5", name: "Over 2.5", value: 1.98, trend: "same" },
-        { id: "mll-98469-u2.5", name: "Under 2.5", value: 1.82, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-ll-66442",
-    gameId: "66442",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Racing Santander",
-    awayTeam: "Valencia CF",
-    startTime: "07:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: false,
-    marketsCount: 202,
-    markets: {
-      "1X2": [
-        { id: "mll-66442-1", name: "1", value: 3.5, trend: "same" },
-        { id: "mll-66442-x", name: "X", value: 3.3, trend: "same" },
-        { id: "mll-66442-2", name: "2", value: 2.1, trend: "same" }
-      ],
-      "O/U": [
-        { id: "mll-66442-o2.5", name: "Over 2.5", value: 2.05, trend: "same" },
-        { id: "mll-66442-u2.5", name: "Under 2.5", value: 1.75, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-ll-52926",
-    gameId: "52926",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Levante",
-    awayTeam: "Sevilla FC",
-    startTime: "07:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 202,
-    markets: {
-      "1X2": [
-        { id: "mll-52926-1", name: "1", value: 2.85, trend: "same" },
-        { id: "mll-52926-x", name: "X", value: 3.35, trend: "same" },
-        { id: "mll-52926-2", name: "2", value: 2.45, trend: "same" }
-      ],
-      "O/U": [
-        { id: "mll-52926-o2.5", name: "Over 2.5", value: 1.85, trend: "same" },
-        { id: "mll-52926-u2.5", name: "Under 2.5", value: 1.95, trend: "same" }
-      ]
-    }
-  },
-  // =========================================================================
-  // 3. TODAY: Thursday 24/09 - Italy Serie A Fixtures (Pasted by User)
-  // =========================================================================
-  {
-    id: "up-sa-28871",
-    gameId: "28871",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Genoa",
-    awayTeam: "Fiorentina",
-    startTime: "01:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 210,
-    markets: {
-      "1X2": [
-        { id: "msa-28871-1", name: "1", value: 3, trend: "same" },
-        { id: "msa-28871-x", name: "X", value: 3.25, trend: "same" },
-        { id: "msa-28871-2", name: "2", value: 2.4, trend: "same" }
-      ],
-      "O/U": [
-        { id: "msa-28871-o2.5", name: "Over 2.5", value: 2.05, trend: "same" },
-        { id: "msa-28871-u2.5", name: "Under 2.5", value: 1.75, trend: "same" }
+        {
+          "id": "o-c42d46144130858aea0b0c9ecd0dff1d-over",
+          "name": "Over 2.5",
+          "value": 1.65,
+          "trend": "same"
+        },
+        {
+          "id": "o-c42d46144130858aea0b0c9ecd0dff1d-under",
+          "name": "Under 2.5",
+          "value": 2.18,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "msa-28871-1x", name: "1X", value: 1.55, trend: "same" },
-        { id: "msa-28871-12", name: "12", value: 1.32, trend: "same" },
-        { id: "msa-28871-x2", name: "X2", value: 1.38, trend: "same" }
+        {
+          "id": "o-c42d46144130858aea0b0c9ecd0dff1d-1x",
+          "name": "1X",
+          "value": 0.95,
+          "trend": "same"
+        },
+        {
+          "id": "o-c42d46144130858aea0b0c9ecd0dff1d-12",
+          "name": "12",
+          "value": 1.06,
+          "trend": "same"
+        },
+        {
+          "id": "o-c42d46144130858aea0b0c9ecd0dff1d-x2",
+          "name": "X2",
+          "value": 3.42,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-sa-10106",
-    gameId: "10106",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Inter Milan",
-    awayTeam: "Parma",
-    startTime: "04:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 210,
-    markets: {
+    "id": "theodds-4ba14febacc56908aa9eaf6fce35ea85",
+    "gameId": "41456",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Faroe Islands",
+    "awayTeam": "Kazakhstan",
+    "isLive": false,
+    "startTime": "16:00",
+    "date": "2026-09-26",
+    "dateLabel": "Tomorrow 26/09",
+    "commenceTime": "2026-09-26T16:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 75,
+    "markets": {
       "1X2": [
-        { id: "msa-10106-1", name: "1", value: 1.25, trend: "same" },
-        { id: "msa-10106-x", name: "X", value: 6, trend: "same" },
-        { id: "msa-10106-2", name: "2", value: 11.5, trend: "same" }
+        {
+          "id": "o-4ba14febacc56908aa9eaf6fce35ea85-1",
+          "name": "1",
+          "value": 2.35,
+          "trend": "same"
+        },
+        {
+          "id": "o-4ba14febacc56908aa9eaf6fce35ea85-X",
+          "name": "X",
+          "value": 3.25,
+          "trend": "same"
+        },
+        {
+          "id": "o-4ba14febacc56908aa9eaf6fce35ea85-2",
+          "name": "2",
+          "value": 3.35,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "msa-10106-o2.5", name: "Over 2.5", value: 1.48, trend: "same" },
-        { id: "msa-10106-u2.5", name: "Under 2.5", value: 2.55, trend: "same" }
+        {
+          "id": "o-4ba14febacc56908aa9eaf6fce35ea85-over",
+          "name": "Over 2.5",
+          "value": 2.53,
+          "trend": "same"
+        },
+        {
+          "id": "o-4ba14febacc56908aa9eaf6fce35ea85-under",
+          "name": "Under 2.5",
+          "value": 1.57,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "msa-10106-1x", name: "1X", value: 1.04, trend: "same" },
-        { id: "msa-10106-12", name: "12", value: 1.1, trend: "same" },
-        { id: "msa-10106-x2", name: "X2", value: 3.8, trend: "same" }
+        {
+          "id": "o-4ba14febacc56908aa9eaf6fce35ea85-1x",
+          "name": "1X",
+          "value": 1.3,
+          "trend": "same"
+        },
+        {
+          "id": "o-4ba14febacc56908aa9eaf6fce35ea85-12",
+          "name": "12",
+          "value": 1.31,
+          "trend": "same"
+        },
+        {
+          "id": "o-4ba14febacc56908aa9eaf6fce35ea85-x2",
+          "name": "X2",
+          "value": 1.57,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-sa-40170",
-    gameId: "40170",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Napoli",
-    awayTeam: "Frosinone",
-    startTime: "06:45 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 210,
-    markets: {
+    "id": "theodds-133c2380620459b6c4dcefe9ce9f16dd",
+    "gameId": "13323",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "San Marino",
+    "awayTeam": "Finland",
+    "isLive": false,
+    "startTime": "16:00",
+    "date": "2026-09-26",
+    "dateLabel": "Tomorrow 26/09",
+    "commenceTime": "2026-09-26T16:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 95,
+    "markets": {
       "1X2": [
-        { id: "msa-40170-1", name: "1", value: 1.3, trend: "same" },
-        { id: "msa-40170-x", name: "X", value: 5.5, trend: "same" },
-        { id: "msa-40170-2", name: "2", value: 9.5, trend: "same" }
+        {
+          "id": "o-133c2380620459b6c4dcefe9ce9f16dd-1",
+          "name": "1",
+          "value": 42,
+          "trend": "same"
+        },
+        {
+          "id": "o-133c2380620459b6c4dcefe9ce9f16dd-X",
+          "name": "X",
+          "value": 7.1,
+          "trend": "same"
+        },
+        {
+          "id": "o-133c2380620459b6c4dcefe9ce9f16dd-2",
+          "name": "2",
+          "value": 1.1,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "msa-40170-o2.5", name: "Over 2.5", value: 1.55, trend: "same" },
-        { id: "msa-40170-u2.5", name: "Under 2.5", value: 2.35, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sa-25470",
-    gameId: "25470",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Como",
-    awayTeam: "AS Roma",
-    startTime: "10:30 AM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: false,
-    marketsCount: 210,
-    markets: {
-      "1X2": [
-        { id: "msa-25470-1", name: "1", value: 4.1, trend: "same" },
-        { id: "msa-25470-x", name: "X", value: 3.5, trend: "same" },
-        { id: "msa-25470-2", name: "2", value: 1.9, trend: "same" }
-      ],
-      "O/U": [
-        { id: "msa-25470-o2.5", name: "Over 2.5", value: 1.95, trend: "same" },
-        { id: "msa-25470-u2.5", name: "Under 2.5", value: 1.85, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sa-94671",
-    gameId: "94671",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Lecce",
-    awayTeam: "Bologna",
-    startTime: "01:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: false,
-    marketsCount: 210,
-    markets: {
-      "1X2": [
-        { id: "msa-94671-1", name: "1", value: 3.25, trend: "same" },
-        { id: "msa-94671-x", name: "X", value: 3.15, trend: "same" },
-        { id: "msa-94671-2", name: "2", value: 2.3, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sa-07269",
-    gameId: "07269",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Lazio",
-    awayTeam: "Monza",
-    startTime: "01:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 210,
-    markets: {
-      "1X2": [
-        { id: "msa-07269-1", name: "1", value: 1.65, trend: "same" },
-        { id: "msa-07269-x", name: "X", value: 3.8, trend: "same" },
-        { id: "msa-07269-2", name: "2", value: 5.2, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sa-16416",
-    gameId: "16416",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Sassuolo",
-    awayTeam: "AC Milan",
-    startTime: "04:00 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 210,
-    markets: {
-      "1X2": [
-        { id: "msa-16416-1", name: "1", value: 4.6, trend: "same" },
-        { id: "msa-16416-x", name: "X", value: 3.9, trend: "same" },
-        { id: "msa-16416-2", name: "2", value: 1.72, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sa-40770",
-    gameId: "40770",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Cagliari",
-    awayTeam: "Juventus",
-    startTime: "06:45 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 210,
-    markets: {
-      "1X2": [
-        { id: "msa-40770-1", name: "1", value: 5.8, trend: "same" },
-        { id: "msa-40770-x", name: "X", value: 3.85, trend: "same" },
-        { id: "msa-40770-2", name: "2", value: 1.6, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sa-02790",
-    gameId: "02790",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Atalanta BC",
-    awayTeam: "Venezia",
-    startTime: "04:30 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 210,
-    markets: {
-      "1X2": [
-        { id: "msa-02790-1", name: "1", value: 1.35, trend: "same" },
-        { id: "msa-02790-x", name: "X", value: 5.1, trend: "same" },
-        { id: "msa-02790-2", name: "2", value: 8.5, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sa-42851",
-    gameId: "42851",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Torino",
-    awayTeam: "Udinese",
-    startTime: "06:45 PM",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: false,
-    marketsCount: 210,
-    markets: {
-      "1X2": [
-        { id: "msa-42851-1", name: "1", value: 2.25, trend: "same" },
-        { id: "msa-42851-x", name: "X", value: 3.1, trend: "same" },
-        { id: "msa-42851-2", name: "2", value: 3.4, trend: "same" }
-      ]
-    }
-  },
-  // =========================================================================
-  // 4. TODAY: Thursday 24/09 - UEFA Nations League Fixtures (Flashscore Feed)
-  // =========================================================================
-  {
-    id: "up-unl-ned-ger",
-    gameId: "90111",
-    sport: "football",
-    league: "UEFA Nations League - League A",
-    countryOrCategory: "Europe",
-    homeTeam: "Netherlands",
-    awayTeam: "Germany",
-    startTime: "18:45",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 280,
-    markets: {
-      "1X2": [
-        { id: "unl-111-1", name: "1", value: 2.6, trend: "same" },
-        { id: "unl-111-x", name: "X", value: 3.5, trend: "same" },
-        { id: "unl-111-2", name: "2", value: 2.65, trend: "same" }
-      ],
-      "O/U": [
-        { id: "unl-111-o2.5", name: "Over 2.5", value: 1.65, trend: "same" },
-        { id: "unl-111-u2.5", name: "Under 2.5", value: 2.25, trend: "same" }
+        {
+          "id": "o-133c2380620459b6c4dcefe9ce9f16dd-over",
+          "name": "Over 2.5",
+          "value": 1.52,
+          "trend": "same"
+        },
+        {
+          "id": "o-133c2380620459b6c4dcefe9ce9f16dd-under",
+          "name": "Under 2.5",
+          "value": 2.48,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "unl-111-1x", name: "1X", value: 1.48, trend: "same" },
-        { id: "unl-111-12", name: "12", value: 1.28, trend: "same" },
-        { id: "unl-111-x2", name: "X2", value: 1.5, trend: "same" }
+        {
+          "id": "o-133c2380620459b6c4dcefe9ce9f16dd-1x",
+          "name": "1X",
+          "value": 5.77,
+          "trend": "same"
+        },
+        {
+          "id": "o-133c2380620459b6c4dcefe9ce9f16dd-12",
+          "name": "12",
+          "value": 1.02,
+          "trend": "same"
+        },
+        {
+          "id": "o-133c2380620459b6c4dcefe9ce9f16dd-x2",
+          "name": "X2",
+          "value": 0.9,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-unl-nor-den",
-    gameId: "90112",
-    sport: "football",
-    league: "UEFA Nations League - League A",
-    countryOrCategory: "Europe",
-    homeTeam: "Norway",
-    awayTeam: "Denmark",
-    startTime: "18:45",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 250,
-    markets: {
+    "id": "theodds-d88315e01313cc27f24422f32663671e",
+    "gameId": "88315",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Albania",
+    "awayTeam": "Belarus",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-26",
+    "dateLabel": "Tomorrow 26/09",
+    "commenceTime": "2026-09-26T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 95,
+    "markets": {
       "1X2": [
-        { id: "unl-112-1", name: "1", value: 2.55, trend: "same" },
-        { id: "unl-112-x", name: "X", value: 3.3, trend: "same" },
-        { id: "unl-112-2", name: "2", value: 2.8, trend: "same" }
+        {
+          "id": "o-d88315e01313cc27f24422f32663671e-1",
+          "name": "1",
+          "value": 1.53,
+          "trend": "same"
+        },
+        {
+          "id": "o-d88315e01313cc27f24422f32663671e-X",
+          "name": "X",
+          "value": 4.14,
+          "trend": "same"
+        },
+        {
+          "id": "o-d88315e01313cc27f24422f32663671e-2",
+          "name": "2",
+          "value": 7.38,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "unl-112-o2.5", name: "Over 2.5", value: 1.85, trend: "same" },
-        { id: "unl-112-u2.5", name: "Under 2.5", value: 1.95, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-unl-por-wal",
-    gameId: "90113",
-    sport: "football",
-    league: "UEFA Nations League - League A",
-    countryOrCategory: "Europe",
-    homeTeam: "Portugal",
-    awayTeam: "Wales",
-    startTime: "18:45",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 260,
-    markets: {
-      "1X2": [
-        { id: "unl-113-1", name: "1", value: 1.35, trend: "same" },
-        { id: "unl-113-x", name: "X", value: 5, trend: "same" },
-        { id: "unl-113-2", name: "2", value: 9, trend: "same" }
-      ],
-      "O/U": [
-        { id: "unl-113-o2.5", name: "Over 2.5", value: 1.62, trend: "same" },
-        { id: "unl-113-u2.5", name: "Under 2.5", value: 2.25, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-unl-srb-gre",
-    gameId: "90114",
-    sport: "football",
-    league: "UEFA Nations League - League A",
-    countryOrCategory: "Europe",
-    homeTeam: "Serbia",
-    awayTeam: "Greece",
-    startTime: "18:45",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: false,
-    marketsCount: 220,
-    markets: {
-      "1X2": [
-        { id: "unl-114-1", name: "1", value: 2.1, trend: "same" },
-        { id: "unl-114-x", name: "X", value: 3.25, trend: "same" },
-        { id: "unl-114-2", name: "2", value: 3.6, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-unl-aut-isr",
-    gameId: "90115",
-    sport: "football",
-    league: "UEFA Nations League - League B",
-    countryOrCategory: "Europe",
-    homeTeam: "Austria",
-    awayTeam: "Israel",
-    startTime: "18:45",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 235,
-    markets: {
-      "1X2": [
-        { id: "unl-115-1", name: "1", value: 1.25, trend: "same" },
-        { id: "unl-115-x", name: "X", value: 6, trend: "same" },
-        { id: "unl-115-2", name: "2", value: 11, trend: "same" }
-      ],
-      "O/U": [
-        { id: "unl-115-o2.5", name: "Over 2.5", value: 1.5, trend: "same" },
-        { id: "unl-115-u2.5", name: "Under 2.5", value: 2.5, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-unl-kos-ire",
-    gameId: "90116",
-    sport: "football",
-    league: "UEFA Nations League - League B",
-    countryOrCategory: "Europe",
-    homeTeam: "Kosovo",
-    awayTeam: "Republic of Ireland",
-    startTime: "18:45",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: false,
-    marketsCount: 215,
-    markets: {
-      "1X2": [
-        { id: "unl-116-1", name: "1", value: 2.8, trend: "same" },
-        { id: "unl-116-x", name: "X", value: 3.1, trend: "same" },
-        { id: "unl-116-2", name: "2", value: 2.65, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-unl-and-mlt",
-    gameId: "90117",
-    sport: "football",
-    league: "UEFA Nations League - League D",
-    countryOrCategory: "Europe",
-    homeTeam: "Andorra",
-    awayTeam: "Malta",
-    startTime: "16:00",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: false,
-    hasLiveStream: false,
-    marketsCount: 175,
-    markets: {
-      "1X2": [
-        { id: "unl-117-1", name: "1", value: 3.4, trend: "same" },
-        { id: "unl-117-x", name: "X", value: 2.9, trend: "same" },
-        { id: "unl-117-2", name: "2", value: 2.35, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-unl-lie-ltu",
-    gameId: "90118",
-    sport: "football",
-    league: "UEFA Nations League - League D",
-    countryOrCategory: "Europe",
-    homeTeam: "Liechtenstein",
-    awayTeam: "Lithuania",
-    startTime: "18:45",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: false,
-    hasLiveStream: false,
-    marketsCount: 170,
-    markets: {
-      "1X2": [
-        { id: "unl-118-1", name: "1", value: 4.8, trend: "same" },
-        { id: "unl-118-x", name: "X", value: 3.3, trend: "same" },
-        { id: "unl-118-2", name: "2", value: 1.82, trend: "same" }
-      ]
-    }
-  },
-  // =========================================================================
-  // 5. TODAY: Thursday 24/09 - Africa Cup of Nations Qualification (Flashscore Feed)
-  // =========================================================================
-  {
-    id: "up-afcon-drc-eqg",
-    gameId: "88101",
-    sport: "football",
-    league: "Africa Cup of Nations - Qualification",
-    countryOrCategory: "Africa",
-    homeTeam: "D.R. Congo",
-    awayTeam: "Equatorial Guinea",
-    startTime: "16:00",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 215,
-    markets: {
-      "1X2": [
-        { id: "afc-101-1", name: "1", value: 1.55, trend: "same" },
-        { id: "afc-101-x", name: "X", value: 3.75, trend: "same" },
-        { id: "afc-101-2", name: "2", value: 6.5, trend: "same" }
-      ],
-      "O/U": [
-        { id: "afc-101-o2.5", name: "Over 2.5", value: 2.1, trend: "same" },
-        { id: "afc-101-u2.5", name: "Under 2.5", value: 1.7, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-afcon-lby-bot",
-    gameId: "88102",
-    sport: "football",
-    league: "Africa Cup of Nations - Qualification",
-    countryOrCategory: "Africa",
-    homeTeam: "Libya",
-    awayTeam: "Botswana",
-    startTime: "16:00",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: false,
-    hasLiveStream: false,
-    marketsCount: 180,
-    markets: {
-      "1X2": [
-        { id: "afc-102-1", name: "1", value: 1.85, trend: "same" },
-        { id: "afc-102-x", name: "X", value: 3.2, trend: "same" },
-        { id: "afc-102-2", name: "2", value: 4.6, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-afcon-mrt-cta",
-    gameId: "88103",
-    sport: "football",
-    league: "Africa Cup of Nations - Qualification",
-    countryOrCategory: "Africa",
-    homeTeam: "Mauritania",
-    awayTeam: "Central Africa",
-    startTime: "16:00",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: false,
-    hasLiveStream: false,
-    marketsCount: 175,
-    markets: {
-      "1X2": [
-        { id: "afc-103-1", name: "1", value: 1.72, trend: "same" },
-        { id: "afc-103-x", name: "X", value: 3.3, trend: "same" },
-        { id: "afc-103-2", name: "2", value: 5.25, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-afcon-cmr-com",
-    gameId: "88104",
-    sport: "football",
-    league: "Africa Cup of Nations - Qualification",
-    countryOrCategory: "Africa",
-    homeTeam: "Cameroon",
-    awayTeam: "Comoros",
-    startTime: "19:00",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 220,
-    markets: {
-      "1X2": [
-        { id: "afc-104-1", name: "1", value: 1.38, trend: "same" },
-        { id: "afc-104-x", name: "X", value: 4.5, trend: "same" },
-        { id: "afc-104-2", name: "2", value: 8.5, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-afcon-civ-gha",
-    gameId: "88105",
-    sport: "football",
-    league: "Africa Cup of Nations - Qualification",
-    countryOrCategory: "Africa",
-    homeTeam: "Ivory Coast",
-    awayTeam: "Ghana",
-    startTime: "19:00",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 245,
-    markets: {
-      "1X2": [
-        { id: "afc-105-1", name: "1", value: 2.05, trend: "same" },
-        { id: "afc-105-x", name: "X", value: 3.2, trend: "same" },
-        { id: "afc-105-2", name: "2", value: 3.8, trend: "same" }
-      ],
-      "O/U": [
-        { id: "afc-105-o2.5", name: "Over 2.5", value: 2.15, trend: "same" },
-        { id: "afc-105-u2.5", name: "Under 2.5", value: 1.68, trend: "same" }
+        {
+          "id": "o-d88315e01313cc27f24422f32663671e-over",
+          "name": "Over 2.5",
+          "value": 2.29,
+          "trend": "same"
+        },
+        {
+          "id": "o-d88315e01313cc27f24422f32663671e-under",
+          "name": "Under 2.5",
+          "value": 1.69,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "afc-105-1x", name: "1X", value: 1.25, trend: "same" },
-        { id: "afc-105-12", name: "12", value: 1.32, trend: "same" },
-        { id: "afc-105-x2", name: "X2", value: 1.74, trend: "same" }
+        {
+          "id": "o-d88315e01313cc27f24422f32663671e-1x",
+          "name": "1X",
+          "value": 1.06,
+          "trend": "same"
+        },
+        {
+          "id": "o-d88315e01313cc27f24422f32663671e-12",
+          "name": "12",
+          "value": 1.2,
+          "trend": "same"
+        },
+        {
+          "id": "o-d88315e01313cc27f24422f32663671e-x2",
+          "name": "X2",
+          "value": 2.52,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-afcon-sle-zim",
-    gameId: "88106",
-    sport: "football",
-    league: "Africa Cup of Nations - Qualification",
-    countryOrCategory: "Africa",
-    homeTeam: "Sierra Leone",
-    awayTeam: "Zimbabwe",
-    startTime: "19:00",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: false,
-    hasLiveStream: false,
-    marketsCount: 185,
-    markets: {
+    "id": "theodds-54f94d1a1c5002076c378685a0026580",
+    "gameId": "54941",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Czech Republic",
+    "awayTeam": "Croatia",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-26",
+    "dateLabel": "Tomorrow 26/09",
+    "commenceTime": "2026-09-26T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 100,
+    "markets": {
       "1X2": [
-        { id: "afc-106-1", name: "1", value: 2.3, trend: "same" },
-        { id: "afc-106-x", name: "X", value: 3.05, trend: "same" },
-        { id: "afc-106-2", name: "2", value: 3.35, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-afcon-tun-uga",
-    gameId: "88107",
-    sport: "football",
-    league: "Africa Cup of Nations - Qualification",
-    countryOrCategory: "Africa",
-    homeTeam: "Tunisia",
-    awayTeam: "Uganda",
-    startTime: "19:00",
-    date: "2026-09-24",
-    dateLabel: "Thursday 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 210,
-    markets: {
-      "1X2": [
-        { id: "afc-107-1", name: "1", value: 1.45, trend: "same" },
-        { id: "afc-107-x", name: "X", value: 4.1, trend: "same" },
-        { id: "afc-107-2", name: "2", value: 7.5, trend: "same" }
-      ]
-    }
-  },
-  // =========================================================================
-  // 6. FRIDAY 25/09 FIXTURES
-  // =========================================================================
-  {
-    id: "up-fri-che-bha",
-    gameId: "81945",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Chelsea FC",
-    awayTeam: "Brighton and Hove Albion",
-    startTime: "08:00 PM",
-    date: "2026-09-25",
-    dateLabel: "Friday 25/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 265,
-    markets: {
-      "1X2": [
-        { id: "fri-che-1", name: "1", value: 1.82, trend: "same" },
-        { id: "fri-che-x", name: "X", value: 3.95, trend: "same" },
-        { id: "fri-che-2", name: "2", value: 4.1, trend: "same" }
+        {
+          "id": "o-54f94d1a1c5002076c378685a0026580-1",
+          "name": "1",
+          "value": 3.42,
+          "trend": "same"
+        },
+        {
+          "id": "o-54f94d1a1c5002076c378685a0026580-X",
+          "name": "X",
+          "value": 3.56,
+          "trend": "same"
+        },
+        {
+          "id": "o-54f94d1a1c5002076c378685a0026580-2",
+          "name": "2",
+          "value": 2.18,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "fri-che-o2.5", name: "Over 2.5", value: 1.55, trend: "same" },
-        { id: "fri-che-u2.5", name: "Under 2.5", value: 2.45, trend: "same" }
+        {
+          "id": "o-54f94d1a1c5002076c378685a0026580-over",
+          "name": "Over 2.5",
+          "value": 1.83,
+          "trend": "same"
+        },
+        {
+          "id": "o-54f94d1a1c5002076c378685a0026580-under",
+          "name": "Under 2.5",
+          "value": 2.06,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "fri-che-1x", name: "1X", value: 1.22, trend: "same" },
-        { id: "fri-che-12", name: "12", value: 1.25, trend: "same" },
-        { id: "fri-che-x2", name: "X2", value: 1.95, trend: "same" }
+        {
+          "id": "o-54f94d1a1c5002076c378685a0026580-1x",
+          "name": "1X",
+          "value": 1.66,
+          "trend": "same"
+        },
+        {
+          "id": "o-54f94d1a1c5002076c378685a0026580-12",
+          "name": "12",
+          "value": 1.26,
+          "trend": "same"
+        },
+        {
+          "id": "o-54f94d1a1c5002076c378685a0026580-x2",
+          "name": "X2",
+          "value": 1.28,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-fri-dor-boc",
-    gameId: "49102",
-    sport: "football",
-    league: "Bundesliga",
-    countryOrCategory: "Germany",
-    homeTeam: "Borussia Dortmund",
-    awayTeam: "VfL Bochum",
-    startTime: "06:30 PM",
-    date: "2026-09-25",
-    dateLabel: "Friday 25/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 240,
-    markets: {
+    "id": "theodds-229a537cdaa737d936ba7f111d31bbd7",
+    "gameId": "22953",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "England",
+    "awayTeam": "Spain",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-26",
+    "dateLabel": "Tomorrow 26/09",
+    "commenceTime": "2026-09-26T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 100,
+    "markets": {
       "1X2": [
-        { id: "fri-dor-1", name: "1", value: 1.28, trend: "same" },
-        { id: "fri-dor-x", name: "X", value: 5.75, trend: "same" },
-        { id: "fri-dor-2", name: "2", value: 9.8, trend: "same" }
+        {
+          "id": "o-229a537cdaa737d936ba7f111d31bbd7-1",
+          "name": "1",
+          "value": 3.14,
+          "trend": "same"
+        },
+        {
+          "id": "o-229a537cdaa737d936ba7f111d31bbd7-X",
+          "name": "X",
+          "value": 3.46,
+          "trend": "same"
+        },
+        {
+          "id": "o-229a537cdaa737d936ba7f111d31bbd7-2",
+          "name": "2",
+          "value": 2.36,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "fri-dor-o3.5", name: "Over 3.5", value: 1.85, trend: "same" },
-        { id: "fri-dor-u3.5", name: "Under 3.5", value: 1.92, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-fri-mil-lec",
-    gameId: "82914",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "AC Milan",
-    awayTeam: "Lecce",
-    startTime: "06:45 PM",
-    date: "2026-09-25",
-    dateLabel: "Friday 25/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 215,
-    markets: {
-      "1X2": [
-        { id: "fri-mil-1", name: "1", value: 1.35, trend: "same" },
-        { id: "fri-mil-x", name: "X", value: 4.9, trend: "same" },
-        { id: "fri-mil-2", name: "2", value: 8.5, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-fri-val-mal",
-    gameId: "58210",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Real Valladolid",
-    awayTeam: "RCD Mallorca",
-    startTime: "07:00 PM",
-    date: "2026-09-25",
-    dateLabel: "Friday 25/09",
-    isLive: false,
-    isHot: false,
-    marketsCount: 174,
-    markets: {
-      "1X2": [
-        { id: "fri-val-1", name: "1", value: 2.65, trend: "same" },
-        { id: "fri-val-x", name: "X", value: 3, trend: "same" },
-        { id: "fri-val-2", name: "2", value: 2.9, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-fri-psg-ren",
-    gameId: "93012",
-    sport: "football",
-    league: "Ligue 1",
-    countryOrCategory: "France",
-    homeTeam: "Paris Saint-Germain",
-    awayTeam: "Rennes",
-    startTime: "07:00 PM",
-    date: "2026-09-25",
-    dateLabel: "Friday 25/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 245,
-    markets: {
-      "1X2": [
-        { id: "fri-psg-1", name: "1", value: 1.48, trend: "same" },
-        { id: "fri-psg-x", name: "X", value: 4.6, trend: "same" },
-        { id: "fri-psg-2", name: "2", value: 6.2, trend: "same" }
-      ]
-    }
-  },
-  // =========================================================================
-  // 7. SATURDAY 26/09 FIXTURES (Blockbuster Super Saturday)
-  // =========================================================================
-  {
-    id: "up-sat-new-mci",
-    gameId: "19823",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Newcastle United",
-    awayTeam: "Manchester City",
-    startTime: "11:30 AM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 320,
-    markets: {
-      "1X2": [
-        { id: "sat-nm-1", name: "1", value: 4.8, trend: "same" },
-        { id: "sat-nm-x", name: "X", value: 4.2, trend: "same" },
-        { id: "sat-nm-2", name: "2", value: 1.68, trend: "same" }
-      ],
-      "O/U": [
-        { id: "sat-nm-o2.5", name: "Over 2.5", value: 1.6, trend: "same" },
-        { id: "sat-nm-u2.5", name: "Under 2.5", value: 2.3, trend: "same" }
+        {
+          "id": "o-229a537cdaa737d936ba7f111d31bbd7-over",
+          "name": "Over 2.5",
+          "value": 1.85,
+          "trend": "same"
+        },
+        {
+          "id": "o-229a537cdaa737d936ba7f111d31bbd7-under",
+          "name": "Under 2.5",
+          "value": 2.04,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "sat-nm-1x", name: "1X", value: 2.15, trend: "same" },
-        { id: "sat-nm-12", name: "12", value: 1.22, trend: "same" },
-        { id: "sat-nm-x2", name: "X2", value: 1.18, trend: "same" }
+        {
+          "id": "o-229a537cdaa737d936ba7f111d31bbd7-1x",
+          "name": "1X",
+          "value": 1.56,
+          "trend": "same"
+        },
+        {
+          "id": "o-229a537cdaa737d936ba7f111d31bbd7-12",
+          "name": "12",
+          "value": 1.28,
+          "trend": "same"
+        },
+        {
+          "id": "o-229a537cdaa737d936ba7f111d31bbd7-x2",
+          "name": "X2",
+          "value": 1.33,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-sat-ars-lei",
-    gameId: "87056",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Arsenal FC",
-    awayTeam: "Leicester City",
-    startTime: "02:00 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 295,
-    markets: {
+    "id": "theodds-fad69b34d56fcff0b32645c7121a8d81",
+    "gameId": "69345",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Slovakia",
+    "awayTeam": "Moldova",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-26",
+    "dateLabel": "Tomorrow 26/09",
+    "commenceTime": "2026-09-26T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 90,
+    "markets": {
       "1X2": [
-        { id: "sat-al-1", name: "1", value: 1.22, trend: "same" },
-        { id: "sat-al-x", name: "X", value: 6.8, trend: "same" },
-        { id: "sat-al-2", name: "2", value: 11.5, trend: "same" }
+        {
+          "id": "o-fad69b34d56fcff0b32645c7121a8d81-1",
+          "name": "1",
+          "value": 1.21,
+          "trend": "same"
+        },
+        {
+          "id": "o-fad69b34d56fcff0b32645c7121a8d81-X",
+          "name": "X",
+          "value": 6.93,
+          "trend": "same"
+        },
+        {
+          "id": "o-fad69b34d56fcff0b32645c7121a8d81-2",
+          "name": "2",
+          "value": 16,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "sat-al-o2.5", name: "Over 2.5", value: 1.45, trend: "same" },
-        { id: "sat-al-u2.5", name: "Under 2.5", value: 2.65, trend: "same" }
+        {
+          "id": "o-fad69b34d56fcff0b32645c7121a8d81-over",
+          "name": "Over 2.5",
+          "value": 1.65,
+          "trend": "same"
+        },
+        {
+          "id": "o-fad69b34d56fcff0b32645c7121a8d81-under",
+          "name": "Under 2.5",
+          "value": 2.35,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "sat-al-1x", name: "1X", value: 1.04, trend: "same" },
-        { id: "sat-al-12", name: "12", value: 1.1, trend: "same" },
-        { id: "sat-al-x2", name: "X2", value: 4.1, trend: "same" }
+        {
+          "id": "o-fad69b34d56fcff0b32645c7121a8d81-1x",
+          "name": "1X",
+          "value": 0.98,
+          "trend": "same"
+        },
+        {
+          "id": "o-fad69b34d56fcff0b32645c7121a8d81-12",
+          "name": "12",
+          "value": 1.07,
+          "trend": "same"
+        },
+        {
+          "id": "o-fad69b34d56fcff0b32645c7121a8d81-x2",
+          "name": "X2",
+          "value": 4.59,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-sat-wol-liv",
-    gameId: "43912",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Wolverhampton Wanderers",
-    awayTeam: "Liverpool FC",
-    startTime: "04:30 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 285,
-    markets: {
+    "id": "theodds-54853b10baa6409ded41f1b15b6e261c",
+    "gameId": "54853",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "North Macedonia",
+    "awayTeam": "Switzerland",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-26",
+    "dateLabel": "Tomorrow 26/09",
+    "commenceTime": "2026-09-26T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 95,
+    "markets": {
       "1X2": [
-        { id: "sat-wl-1", name: "1", value: 7.2, trend: "same" },
-        { id: "sat-wl-x", name: "X", value: 4.9, trend: "same" },
-        { id: "sat-wl-2", name: "2", value: 1.4, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sat-bay-lev",
-    gameId: "32104",
-    sport: "football",
-    league: "Bundesliga",
-    countryOrCategory: "Germany",
-    homeTeam: "Bayern Munich",
-    awayTeam: "Bayer Leverkusen",
-    startTime: "04:30 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 310,
-    markets: {
-      "1X2": [
-        { id: "sat-bl-1", name: "1", value: 1.7, trend: "same" },
-        { id: "sat-bl-x", name: "X", value: 4.4, trend: "same" },
-        { id: "sat-bl-2", name: "2", value: 4.1, trend: "same" }
+        {
+          "id": "o-54853b10baa6409ded41f1b15b6e261c-1",
+          "name": "1",
+          "value": 8.25,
+          "trend": "same"
+        },
+        {
+          "id": "o-54853b10baa6409ded41f1b15b6e261c-X",
+          "name": "X",
+          "value": 5.01,
+          "trend": "same"
+        },
+        {
+          "id": "o-54853b10baa6409ded41f1b15b6e261c-2",
+          "name": "2",
+          "value": 1.41,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "sat-bl-o3.5", name: "Over 3.5", value: 1.95, trend: "same" },
-        { id: "sat-bl-u3.5", name: "Under 3.5", value: 1.85, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sat-osa-bar",
-    gameId: "54201",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "CA Osasuna",
-    awayTeam: "FC Barcelona",
-    startTime: "07:00 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 290,
-    markets: {
-      "1X2": [
-        { id: "sat-ob-1", name: "1", value: 6.5, trend: "same" },
-        { id: "sat-ob-x", name: "X", value: 4.6, trend: "same" },
-        { id: "sat-ob-2", name: "2", value: 1.48, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sat-udi-int",
-    gameId: "29841",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Udinese",
-    awayTeam: "Inter Milan",
-    startTime: "02:00 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 230,
-    markets: {
-      "1X2": [
-        { id: "sat-ui-1", name: "1", value: 6.2, trend: "same" },
-        { id: "sat-ui-x", name: "X", value: 4.2, trend: "same" },
-        { id: "sat-ui-2", name: "2", value: 1.52, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sat-gen-juv",
-    gameId: "66102",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Genoa",
-    awayTeam: "Juventus",
-    startTime: "05:00 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 240,
-    markets: {
-      "1X2": [
-        { id: "sat-gj-1", name: "1", value: 5.2, trend: "same" },
-        { id: "sat-gj-x", name: "X", value: 3.5, trend: "same" },
-        { id: "sat-gj-2", name: "2", value: 1.75, trend: "same" }
-      ]
-    }
-  },
-  // =========================================================================
-  // 8. SUNDAY 27/09 FIXTURES (Blockbuster Super Sunday)
-  // =========================================================================
-  {
-    id: "up-sun-ips-ast",
-    gameId: "13430",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Ipswich Town",
-    awayTeam: "Aston Villa",
-    startTime: "01:00 PM",
-    date: "2026-09-27",
-    dateLabel: "Sunday 27/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 275,
-    markets: {
-      "1X2": [
-        { id: "sun-ia-1", name: "1", value: 4.1, trend: "same" },
-        { id: "sun-ia-x", name: "X", value: 3.8, trend: "same" },
-        { id: "sun-ia-2", name: "2", value: 1.82, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sun-mun-tot",
-    gameId: "22925",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Manchester United",
-    awayTeam: "Tottenham Hotspur",
-    startTime: "03:30 PM",
-    date: "2026-09-27",
-    dateLabel: "Sunday 27/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 340,
-    markets: {
-      "1X2": [
-        { id: "sun-mt-1", name: "1", value: 2.3, trend: "same" },
-        { id: "sun-mt-x", name: "X", value: 3.75, trend: "same" },
-        { id: "sun-mt-2", name: "2", value: 2.9, trend: "same" }
-      ],
-      "O/U": [
-        { id: "sun-mt-o2.5", name: "Over 2.5", value: 1.52, trend: "same" },
-        { id: "sun-mt-u2.5", name: "Under 2.5", value: 2.45, trend: "same" }
+        {
+          "id": "o-54853b10baa6409ded41f1b15b6e261c-over",
+          "name": "Over 2.5",
+          "value": 1.78,
+          "trend": "same"
+        },
+        {
+          "id": "o-54853b10baa6409ded41f1b15b6e261c-under",
+          "name": "Under 2.5",
+          "value": 2.13,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "sun-mt-1x", name: "1X", value: 1.4, trend: "same" },
-        { id: "sun-mt-12", name: "12", value: 1.25, trend: "same" },
-        { id: "sun-mt-x2", name: "X2", value: 1.62, trend: "same" }
+        {
+          "id": "o-54853b10baa6409ded41f1b15b6e261c-1x",
+          "name": "1X",
+          "value": 2.96,
+          "trend": "same"
+        },
+        {
+          "id": "o-54853b10baa6409ded41f1b15b6e261c-12",
+          "name": "12",
+          "value": 1.14,
+          "trend": "same"
+        },
+        {
+          "id": "o-54853b10baa6409ded41f1b15b6e261c-x2",
+          "name": "X2",
+          "value": 1.05,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-sun-atm-rma",
-    gameId: "55125",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Atl\xE9tico Madrid",
-    awayTeam: "Real Madrid",
-    startTime: "07:00 PM",
-    date: "2026-09-27",
-    dateLabel: "Sunday 27/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 420,
-    markets: {
+    "id": "theodds-b6b917cb6ec3b496cb9d3263ede19b41",
+    "gameId": "69176",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Lithuania",
+    "awayTeam": "Azerbaijan",
+    "isLive": false,
+    "startTime": "13:00",
+    "date": "2026-09-27",
+    "dateLabel": "Sun 27/09",
+    "commenceTime": "2026-09-27T13:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 90,
+    "markets": {
       "1X2": [
-        { id: "sun-ar-1", name: "1", value: 2.8, trend: "same" },
-        { id: "sun-ar-x", name: "X", value: 3.45, trend: "same" },
-        { id: "sun-ar-2", name: "2", value: 2.45, trend: "same" }
+        {
+          "id": "o-b6b917cb6ec3b496cb9d3263ede19b41-1",
+          "name": "1",
+          "value": 2.51,
+          "trend": "same"
+        },
+        {
+          "id": "o-b6b917cb6ec3b496cb9d3263ede19b41-X",
+          "name": "X",
+          "value": 3.13,
+          "trend": "same"
+        },
+        {
+          "id": "o-b6b917cb6ec3b496cb9d3263ede19b41-2",
+          "name": "2",
+          "value": 3.19,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "sun-ar-o2.5", name: "Over 2.5", value: 1.82, trend: "same" },
-        { id: "sun-ar-u2.5", name: "Under 2.5", value: 1.98, trend: "same" }
+        {
+          "id": "o-b6b917cb6ec3b496cb9d3263ede19b41-over",
+          "name": "Over 2.5",
+          "value": 2.61,
+          "trend": "same"
+        },
+        {
+          "id": "o-b6b917cb6ec3b496cb9d3263ede19b41-under",
+          "name": "Under 2.5",
+          "value": 1.54,
+          "trend": "same"
+        }
       ],
       "DC": [
-        { id: "sun-ar-1x", name: "1X", value: 1.55, trend: "same" },
-        { id: "sun-ar-12", name: "12", value: 1.3, trend: "same" },
-        { id: "sun-ar-x2", name: "X2", value: 1.42, trend: "same" }
+        {
+          "id": "o-b6b917cb6ec3b496cb9d3263ede19b41-1x",
+          "name": "1X",
+          "value": 1.32,
+          "trend": "same"
+        },
+        {
+          "id": "o-b6b917cb6ec3b496cb9d3263ede19b41-12",
+          "name": "12",
+          "value": 1.33,
+          "trend": "same"
+        },
+        {
+          "id": "o-b6b917cb6ec3b496cb9d3263ede19b41-x2",
+          "name": "X2",
+          "value": 1.5,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-sun-nap-mon",
-    gameId: "34948",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Napoli",
-    awayTeam: "Monza",
-    startTime: "06:45 PM",
-    date: "2026-09-27",
-    dateLabel: "Sunday 27/09",
-    isLive: false,
-    isHot: true,
-    marketsCount: 230,
-    markets: {
+    "id": "theodds-9468e8e2c54974a99a73c0b25040178b",
+    "gameId": "94688",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Gibraltar",
+    "awayTeam": "Andorra",
+    "isLive": false,
+    "startTime": "16:00",
+    "date": "2026-09-27",
+    "dateLabel": "Sun 27/09",
+    "commenceTime": "2026-09-27T16:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 85,
+    "markets": {
       "1X2": [
-        { id: "sun-nm-1", name: "1", value: 1.38, trend: "same" },
-        { id: "sun-nm-x", name: "X", value: 4.8, trend: "same" },
-        { id: "sun-nm-2", name: "2", value: 8.2, trend: "same" }
-      ]
-    }
-  },
-  // =========================================================================
-  // 9. MONDAY 28/09 FIXTURES
-  // =========================================================================
-  {
-    id: "up-mon-bou-sou",
-    gameId: "56648",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "AFC Bournemouth",
-    awayTeam: "Southampton",
-    startTime: "07:00 PM",
-    date: "2026-09-28",
-    dateLabel: "Monday 28/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 260,
-    markets: {
-      "1X2": [
-        { id: "mon-bs-1", name: "1", value: 1.75, trend: "same" },
-        { id: "mon-bs-x", name: "X", value: 3.9, trend: "same" },
-        { id: "mon-bs-2", name: "2", value: 4.4, trend: "same" }
+        {
+          "id": "o-9468e8e2c54974a99a73c0b25040178b-1",
+          "name": "1",
+          "value": 3.44,
+          "trend": "same"
+        },
+        {
+          "id": "o-9468e8e2c54974a99a73c0b25040178b-X",
+          "name": "X",
+          "value": 2.91,
+          "trend": "same"
+        },
+        {
+          "id": "o-9468e8e2c54974a99a73c0b25040178b-2",
+          "name": "2",
+          "value": 2.52,
+          "trend": "same"
+        }
       ],
       "O/U": [
-        { id: "mon-bs-o2.5", name: "Over 2.5", value: 1.68, trend: "same" },
-        { id: "mon-bs-u2.5", name: "Under 2.5", value: 2.15, trend: "same" }
+        {
+          "id": "o-9468e8e2c54974a99a73c0b25040178b-over",
+          "name": "Over 2.5",
+          "value": 1.7,
+          "trend": "same"
+        },
+        {
+          "id": "o-9468e8e2c54974a99a73c0b25040178b-under",
+          "name": "Under 2.5",
+          "value": 2.27,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-9468e8e2c54974a99a73c0b25040178b-1x",
+          "name": "1X",
+          "value": 1.5,
+          "trend": "same"
+        },
+        {
+          "id": "o-9468e8e2c54974a99a73c0b25040178b-12",
+          "name": "12",
+          "value": 1.38,
+          "trend": "same"
+        },
+        {
+          "id": "o-9468e8e2c54974a99a73c0b25040178b-x2",
+          "name": "X2",
+          "value": 1.28,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-mon-vil-lpa",
-    gameId: "63768",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Villarreal",
-    awayTeam: "Las Palmas",
-    startTime: "07:00 PM",
-    date: "2026-09-28",
-    dateLabel: "Monday 28/09",
-    isLive: false,
-    marketsCount: 225,
-    markets: {
+    "id": "theodds-c0d45a56952f736fdeda96b0aa3f7bbe",
+    "gameId": "04556",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Austria",
+    "awayTeam": "Kosovo",
+    "isLive": false,
+    "startTime": "16:00",
+    "date": "2026-09-27",
+    "dateLabel": "Sun 27/09",
+    "commenceTime": "2026-09-27T16:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 85,
+    "markets": {
       "1X2": [
-        { id: "mon-vl-1", name: "1", value: 1.48, trend: "same" },
-        { id: "mon-vl-x", name: "X", value: 4.6, trend: "same" },
-        { id: "mon-vl-2", name: "2", value: 6.2, trend: "same" }
+        {
+          "id": "o-c0d45a56952f736fdeda96b0aa3f7bbe-1",
+          "name": "1",
+          "value": 1.56,
+          "trend": "same"
+        },
+        {
+          "id": "o-c0d45a56952f736fdeda96b0aa3f7bbe-X",
+          "name": "X",
+          "value": 4.35,
+          "trend": "same"
+        },
+        {
+          "id": "o-c0d45a56952f736fdeda96b0aa3f7bbe-2",
+          "name": "2",
+          "value": 6.27,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-c0d45a56952f736fdeda96b0aa3f7bbe-over",
+          "name": "Over 2.5",
+          "value": 1.84,
+          "trend": "same"
+        },
+        {
+          "id": "o-c0d45a56952f736fdeda96b0aa3f7bbe-under",
+          "name": "Under 2.5",
+          "value": 2.05,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-c0d45a56952f736fdeda96b0aa3f7bbe-1x",
+          "name": "1X",
+          "value": 1.09,
+          "trend": "same"
+        },
+        {
+          "id": "o-c0d45a56952f736fdeda96b0aa3f7bbe-12",
+          "name": "12",
+          "value": 1.19,
+          "trend": "same"
+        },
+        {
+          "id": "o-c0d45a56952f736fdeda96b0aa3f7bbe-x2",
+          "name": "X2",
+          "value": 2.44,
+          "trend": "same"
+        }
       ]
     }
   },
   {
-    id: "up-mon-par-cag",
-    gameId: "73160",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Parma",
-    awayTeam: "Cagliari",
-    startTime: "06:45 PM",
-    date: "2026-09-28",
-    dateLabel: "Monday 28/09",
-    isLive: false,
-    marketsCount: 205,
-    markets: {
+    "id": "theodds-663bf315127df32b389f73d7b570955a",
+    "gameId": "66331",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Denmark",
+    "awayTeam": "Wales",
+    "isLive": false,
+    "startTime": "16:00",
+    "date": "2026-09-27",
+    "dateLabel": "Sun 27/09",
+    "commenceTime": "2026-09-27T16:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 90,
+    "markets": {
       "1X2": [
-        { id: "mon-pc-1", name: "1", value: 2.1, trend: "same" },
-        { id: "mon-pc-x", name: "X", value: 3.35, trend: "same" },
-        { id: "mon-pc-2", name: "2", value: 3.5, trend: "same" }
+        {
+          "id": "o-663bf315127df32b389f73d7b570955a-1",
+          "name": "1",
+          "value": 1.51,
+          "trend": "same"
+        },
+        {
+          "id": "o-663bf315127df32b389f73d7b570955a-X",
+          "name": "X",
+          "value": 4.5,
+          "trend": "same"
+        },
+        {
+          "id": "o-663bf315127df32b389f73d7b570955a-2",
+          "name": "2",
+          "value": 6.87,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-663bf315127df32b389f73d7b570955a-over",
+          "name": "Over 2.5",
+          "value": 1.88,
+          "trend": "same"
+        },
+        {
+          "id": "o-663bf315127df32b389f73d7b570955a-under",
+          "name": "Under 2.5",
+          "value": 2,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-663bf315127df32b389f73d7b570955a-1x",
+          "name": "1X",
+          "value": 1.07,
+          "trend": "same"
+        },
+        {
+          "id": "o-663bf315127df32b389f73d7b570955a-12",
+          "name": "12",
+          "value": 1.18,
+          "trend": "same"
+        },
+        {
+          "id": "o-663bf315127df32b389f73d7b570955a-x2",
+          "name": "X2",
+          "value": 2.58,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-677958752613df2bf54dcb7a1cbf4d92",
+    "gameId": "67795",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Serbia",
+    "awayTeam": "Netherlands",
+    "isLive": false,
+    "startTime": "16:00",
+    "date": "2026-09-27",
+    "dateLabel": "Sun 27/09",
+    "commenceTime": "2026-09-27T16:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 100,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-677958752613df2bf54dcb7a1cbf4d92-1",
+          "name": "1",
+          "value": 7.48,
+          "trend": "same"
+        },
+        {
+          "id": "o-677958752613df2bf54dcb7a1cbf4d92-X",
+          "name": "X",
+          "value": 4.86,
+          "trend": "same"
+        },
+        {
+          "id": "o-677958752613df2bf54dcb7a1cbf4d92-2",
+          "name": "2",
+          "value": 1.45,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-677958752613df2bf54dcb7a1cbf4d92-over",
+          "name": "Over 2.5",
+          "value": 1.71,
+          "trend": "same"
+        },
+        {
+          "id": "o-677958752613df2bf54dcb7a1cbf4d92-under",
+          "name": "Under 2.5",
+          "value": 2.25,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-677958752613df2bf54dcb7a1cbf4d92-1x",
+          "name": "1X",
+          "value": 2.8,
+          "trend": "same"
+        },
+        {
+          "id": "o-677958752613df2bf54dcb7a1cbf4d92-12",
+          "name": "12",
+          "value": 1.15,
+          "trend": "same"
+        },
+        {
+          "id": "o-677958752613df2bf54dcb7a1cbf4d92-x2",
+          "name": "X2",
+          "value": 1.06,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-dc64003d7ab95aed0bd0f9d5a9f67a1f",
+    "gameId": "64003",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Germany",
+    "awayTeam": "Greece",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-27",
+    "dateLabel": "Sun 27/09",
+    "commenceTime": "2026-09-27T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 90,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-dc64003d7ab95aed0bd0f9d5a9f67a1f-1",
+          "name": "1",
+          "value": 1.43,
+          "trend": "same"
+        },
+        {
+          "id": "o-dc64003d7ab95aed0bd0f9d5a9f67a1f-X",
+          "name": "X",
+          "value": 5.25,
+          "trend": "same"
+        },
+        {
+          "id": "o-dc64003d7ab95aed0bd0f9d5a9f67a1f-2",
+          "name": "2",
+          "value": 7.17,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-dc64003d7ab95aed0bd0f9d5a9f67a1f-over",
+          "name": "Over 2.5",
+          "value": 2.27,
+          "trend": "same"
+        },
+        {
+          "id": "o-dc64003d7ab95aed0bd0f9d5a9f67a1f-under",
+          "name": "Under 2.5",
+          "value": 1.7,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-dc64003d7ab95aed0bd0f9d5a9f67a1f-1x",
+          "name": "1X",
+          "value": 1.07,
+          "trend": "same"
+        },
+        {
+          "id": "o-dc64003d7ab95aed0bd0f9d5a9f67a1f-12",
+          "name": "12",
+          "value": 1.13,
+          "trend": "same"
+        },
+        {
+          "id": "o-dc64003d7ab95aed0bd0f9d5a9f67a1f-x2",
+          "name": "X2",
+          "value": 2.88,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-0c6a5a6baedfe7fe967f8773f2cdd747",
+    "gameId": "06567",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Israel",
+    "awayTeam": "Republic of Ireland",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-27",
+    "dateLabel": "Sun 27/09",
+    "commenceTime": "2026-09-27T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 85,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-0c6a5a6baedfe7fe967f8773f2cdd747-1",
+          "name": "1",
+          "value": 3.08,
+          "trend": "same"
+        },
+        {
+          "id": "o-0c6a5a6baedfe7fe967f8773f2cdd747-X",
+          "name": "X",
+          "value": 3.34,
+          "trend": "same"
+        },
+        {
+          "id": "o-0c6a5a6baedfe7fe967f8773f2cdd747-2",
+          "name": "2",
+          "value": 2.46,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-0c6a5a6baedfe7fe967f8773f2cdd747-over",
+          "name": "Over 2.5",
+          "value": 2.04,
+          "trend": "same"
+        },
+        {
+          "id": "o-0c6a5a6baedfe7fe967f8773f2cdd747-under",
+          "name": "Under 2.5",
+          "value": 1.85,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-0c6a5a6baedfe7fe967f8773f2cdd747-1x",
+          "name": "1X",
+          "value": 1.52,
+          "trend": "same"
+        },
+        {
+          "id": "o-0c6a5a6baedfe7fe967f8773f2cdd747-12",
+          "name": "12",
+          "value": 1.3,
+          "trend": "same"
+        },
+        {
+          "id": "o-0c6a5a6baedfe7fe967f8773f2cdd747-x2",
+          "name": "X2",
+          "value": 1.35,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-78b06a6382b3534d4dcf9a48ad063ef1",
+    "gameId": "78066",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Norway",
+    "awayTeam": "Portugal",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-27",
+    "dateLabel": "Sun 27/09",
+    "commenceTime": "2026-09-27T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 90,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-78b06a6382b3534d4dcf9a48ad063ef1-1",
+          "name": "1",
+          "value": 2.61,
+          "trend": "same"
+        },
+        {
+          "id": "o-78b06a6382b3534d4dcf9a48ad063ef1-X",
+          "name": "X",
+          "value": 3.76,
+          "trend": "same"
+        },
+        {
+          "id": "o-78b06a6382b3534d4dcf9a48ad063ef1-2",
+          "name": "2",
+          "value": 2.62,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-78b06a6382b3534d4dcf9a48ad063ef1-over",
+          "name": "Over 2.5",
+          "value": 2.35,
+          "trend": "same"
+        },
+        {
+          "id": "o-78b06a6382b3534d4dcf9a48ad063ef1-under",
+          "name": "Under 2.5",
+          "value": 1.65,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-78b06a6382b3534d4dcf9a48ad063ef1-1x",
+          "name": "1X",
+          "value": 1.46,
+          "trend": "same"
+        },
+        {
+          "id": "o-78b06a6382b3534d4dcf9a48ad063ef1-12",
+          "name": "12",
+          "value": 1.24,
+          "trend": "same"
+        },
+        {
+          "id": "o-78b06a6382b3534d4dcf9a48ad063ef1-x2",
+          "name": "X2",
+          "value": 1.47,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-0891f1ff09ec9c814d38c2465c9f53da",
+    "gameId": "08911",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Armenia",
+    "awayTeam": "Montenegro",
+    "isLive": false,
+    "startTime": "16:00",
+    "date": "2026-09-28",
+    "dateLabel": "Mon 28/09",
+    "commenceTime": "2026-09-28T16:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 80,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-0891f1ff09ec9c814d38c2465c9f53da-1",
+          "name": "1",
+          "value": 2.73,
+          "trend": "same"
+        },
+        {
+          "id": "o-0891f1ff09ec9c814d38c2465c9f53da-X",
+          "name": "X",
+          "value": 3.34,
+          "trend": "same"
+        },
+        {
+          "id": "o-0891f1ff09ec9c814d38c2465c9f53da-2",
+          "name": "2",
+          "value": 2.73,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-0891f1ff09ec9c814d38c2465c9f53da-over",
+          "name": "Over 2.5",
+          "value": 2.25,
+          "trend": "same"
+        },
+        {
+          "id": "o-0891f1ff09ec9c814d38c2465c9f53da-under",
+          "name": "Under 2.5",
+          "value": 1.71,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-0891f1ff09ec9c814d38c2465c9f53da-1x",
+          "name": "1X",
+          "value": 1.43,
+          "trend": "same"
+        },
+        {
+          "id": "o-0891f1ff09ec9c814d38c2465c9f53da-12",
+          "name": "12",
+          "value": 1.3,
+          "trend": "same"
+        },
+        {
+          "id": "o-0891f1ff09ec9c814d38c2465c9f53da-x2",
+          "name": "X2",
+          "value": 1.43,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-e4b63f94de5a52095f9d94be94b2c4aa",
+    "gameId": "46394",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Latvia",
+    "awayTeam": "Cyprus",
+    "isLive": false,
+    "startTime": "16:00",
+    "date": "2026-09-28",
+    "dateLabel": "Mon 28/09",
+    "commenceTime": "2026-09-28T16:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 80,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-e4b63f94de5a52095f9d94be94b2c4aa-1",
+          "name": "1",
+          "value": 2.66,
+          "trend": "same"
+        },
+        {
+          "id": "o-e4b63f94de5a52095f9d94be94b2c4aa-X",
+          "name": "X",
+          "value": 3.35,
+          "trend": "same"
+        },
+        {
+          "id": "o-e4b63f94de5a52095f9d94be94b2c4aa-2",
+          "name": "2",
+          "value": 2.8,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-e4b63f94de5a52095f9d94be94b2c4aa-over",
+          "name": "Over 2.5",
+          "value": 2.21,
+          "trend": "same"
+        },
+        {
+          "id": "o-e4b63f94de5a52095f9d94be94b2c4aa-under",
+          "name": "Under 2.5",
+          "value": 1.73,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-e4b63f94de5a52095f9d94be94b2c4aa-1x",
+          "name": "1X",
+          "value": 1.41,
+          "trend": "same"
+        },
+        {
+          "id": "o-e4b63f94de5a52095f9d94be94b2c4aa-12",
+          "name": "12",
+          "value": 1.3,
+          "trend": "same"
+        },
+        {
+          "id": "o-e4b63f94de5a52095f9d94be94b2c4aa-x2",
+          "name": "X2",
+          "value": 1.45,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-ede91daefcca16990379ab59f170ad5c",
+    "gameId": "91169",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Georgia",
+    "awayTeam": "Ukraine",
+    "isLive": false,
+    "startTime": "16:00",
+    "date": "2026-09-28",
+    "dateLabel": "Mon 28/09",
+    "commenceTime": "2026-09-28T16:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 85,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-ede91daefcca16990379ab59f170ad5c-1",
+          "name": "1",
+          "value": 2.73,
+          "trend": "same"
+        },
+        {
+          "id": "o-ede91daefcca16990379ab59f170ad5c-X",
+          "name": "X",
+          "value": 3.29,
+          "trend": "same"
+        },
+        {
+          "id": "o-ede91daefcca16990379ab59f170ad5c-2",
+          "name": "2",
+          "value": 2.77,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-ede91daefcca16990379ab59f170ad5c-over",
+          "name": "Over 2.5",
+          "value": 2.15,
+          "trend": "same"
+        },
+        {
+          "id": "o-ede91daefcca16990379ab59f170ad5c-under",
+          "name": "Under 2.5",
+          "value": 1.77,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-ede91daefcca16990379ab59f170ad5c-1x",
+          "name": "1X",
+          "value": 1.42,
+          "trend": "same"
+        },
+        {
+          "id": "o-ede91daefcca16990379ab59f170ad5c-12",
+          "name": "12",
+          "value": 1.31,
+          "trend": "same"
+        },
+        {
+          "id": "o-ede91daefcca16990379ab59f170ad5c-x2",
+          "name": "X2",
+          "value": 1.43,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-bb8c6293badc2a09ec9d7994c4895a6e",
+    "gameId": "86293",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Belgium",
+    "awayTeam": "France",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-28",
+    "dateLabel": "Mon 28/09",
+    "commenceTime": "2026-09-28T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 90,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-bb8c6293badc2a09ec9d7994c4895a6e-1",
+          "name": "1",
+          "value": 4.09,
+          "trend": "same"
+        },
+        {
+          "id": "o-bb8c6293badc2a09ec9d7994c4895a6e-X",
+          "name": "X",
+          "value": 4.09,
+          "trend": "same"
+        },
+        {
+          "id": "o-bb8c6293badc2a09ec9d7994c4895a6e-2",
+          "name": "2",
+          "value": 1.84,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-bb8c6293badc2a09ec9d7994c4895a6e-over",
+          "name": "Over 2.5",
+          "value": 1.64,
+          "trend": "same"
+        },
+        {
+          "id": "o-bb8c6293badc2a09ec9d7994c4895a6e-under",
+          "name": "Under 2.5",
+          "value": 2.38,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-bb8c6293badc2a09ec9d7994c4895a6e-1x",
+          "name": "1X",
+          "value": 1.94,
+          "trend": "same"
+        },
+        {
+          "id": "o-bb8c6293badc2a09ec9d7994c4895a6e-12",
+          "name": "12",
+          "value": 1.21,
+          "trend": "same"
+        },
+        {
+          "id": "o-bb8c6293badc2a09ec9d7994c4895a6e-x2",
+          "name": "X2",
+          "value": 1.21,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-f3f0913d41ae698f82c06ef5ff26187a",
+    "gameId": "30913",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Romania",
+    "awayTeam": "Bosnia & Herzegovina",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-28",
+    "dateLabel": "Mon 28/09",
+    "commenceTime": "2026-09-28T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 85,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-f3f0913d41ae698f82c06ef5ff26187a-1",
+          "name": "1",
+          "value": 2.19,
+          "trend": "same"
+        },
+        {
+          "id": "o-f3f0913d41ae698f82c06ef5ff26187a-X",
+          "name": "X",
+          "value": 3.54,
+          "trend": "same"
+        },
+        {
+          "id": "o-f3f0913d41ae698f82c06ef5ff26187a-2",
+          "name": "2",
+          "value": 3.44,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-f3f0913d41ae698f82c06ef5ff26187a-over",
+          "name": "Over 2.5",
+          "value": 2.04,
+          "trend": "same"
+        },
+        {
+          "id": "o-f3f0913d41ae698f82c06ef5ff26187a-under",
+          "name": "Under 2.5",
+          "value": 1.85,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-f3f0913d41ae698f82c06ef5ff26187a-1x",
+          "name": "1X",
+          "value": 1.29,
+          "trend": "same"
+        },
+        {
+          "id": "o-f3f0913d41ae698f82c06ef5ff26187a-12",
+          "name": "12",
+          "value": 1.27,
+          "trend": "same"
+        },
+        {
+          "id": "o-f3f0913d41ae698f82c06ef5ff26187a-x2",
+          "name": "X2",
+          "value": 1.66,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-ca4e66bc4c5b00d3da48863e51527d13",
+    "gameId": "46645",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Northern Ireland",
+    "awayTeam": "Hungary",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-28",
+    "dateLabel": "Mon 28/09",
+    "commenceTime": "2026-09-28T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 85,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-ca4e66bc4c5b00d3da48863e51527d13-1",
+          "name": "1",
+          "value": 3.4,
+          "trend": "same"
+        },
+        {
+          "id": "o-ca4e66bc4c5b00d3da48863e51527d13-X",
+          "name": "X",
+          "value": 3.23,
+          "trend": "same"
+        },
+        {
+          "id": "o-ca4e66bc4c5b00d3da48863e51527d13-2",
+          "name": "2",
+          "value": 2.34,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-ca4e66bc4c5b00d3da48863e51527d13-over",
+          "name": "Over 2.5",
+          "value": 2.53,
+          "trend": "same"
+        },
+        {
+          "id": "o-ca4e66bc4c5b00d3da48863e51527d13-under",
+          "name": "Under 2.5",
+          "value": 1.57,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-ca4e66bc4c5b00d3da48863e51527d13-1x",
+          "name": "1X",
+          "value": 1.57,
+          "trend": "same"
+        },
+        {
+          "id": "o-ca4e66bc4c5b00d3da48863e51527d13-12",
+          "name": "12",
+          "value": 1.32,
+          "trend": "same"
+        },
+        {
+          "id": "o-ca4e66bc4c5b00d3da48863e51527d13-x2",
+          "name": "X2",
+          "value": 1.29,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-058603d04d090992dc3bbdf040e0f50c",
+    "gameId": "05860",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Turkey",
+    "awayTeam": "Italy",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-28",
+    "dateLabel": "Mon 28/09",
+    "commenceTime": "2026-09-28T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 90,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-058603d04d090992dc3bbdf040e0f50c-1",
+          "name": "1",
+          "value": 2.81,
+          "trend": "same"
+        },
+        {
+          "id": "o-058603d04d090992dc3bbdf040e0f50c-X",
+          "name": "X",
+          "value": 3.66,
+          "trend": "same"
+        },
+        {
+          "id": "o-058603d04d090992dc3bbdf040e0f50c-2",
+          "name": "2",
+          "value": 2.49,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-058603d04d090992dc3bbdf040e0f50c-over",
+          "name": "Over 2.5",
+          "value": 1.82,
+          "trend": "same"
+        },
+        {
+          "id": "o-058603d04d090992dc3bbdf040e0f50c-under",
+          "name": "Under 2.5",
+          "value": 2.08,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-058603d04d090992dc3bbdf040e0f50c-1x",
+          "name": "1X",
+          "value": 1.51,
+          "trend": "same"
+        },
+        {
+          "id": "o-058603d04d090992dc3bbdf040e0f50c-12",
+          "name": "12",
+          "value": 1.25,
+          "trend": "same"
+        },
+        {
+          "id": "o-058603d04d090992dc3bbdf040e0f50c-x2",
+          "name": "X2",
+          "value": 1.41,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-8d7b8ce34cb79368b97c0e14cefe817c",
+    "gameId": "87834",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Sweden",
+    "awayTeam": "Poland",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-28",
+    "dateLabel": "Mon 28/09",
+    "commenceTime": "2026-09-28T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 80,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-8d7b8ce34cb79368b97c0e14cefe817c-1",
+          "name": "1",
+          "value": 1.85,
+          "trend": "same"
+        },
+        {
+          "id": "o-8d7b8ce34cb79368b97c0e14cefe817c-X",
+          "name": "X",
+          "value": 3.4,
+          "trend": "same"
+        },
+        {
+          "id": "o-8d7b8ce34cb79368b97c0e14cefe817c-2",
+          "name": "2",
+          "value": 3.7,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-8d7b8ce34cb79368b97c0e14cefe817c-over",
+          "name": "Over 2.5",
+          "value": 1.75,
+          "trend": "same"
+        },
+        {
+          "id": "o-8d7b8ce34cb79368b97c0e14cefe817c-under",
+          "name": "Under 2.5",
+          "value": 1.95,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-8d7b8ce34cb79368b97c0e14cefe817c-1x",
+          "name": "1X",
+          "value": 1.14,
+          "trend": "same"
+        },
+        {
+          "id": "o-8d7b8ce34cb79368b97c0e14cefe817c-12",
+          "name": "12",
+          "value": 1.17,
+          "trend": "same"
+        },
+        {
+          "id": "o-8d7b8ce34cb79368b97c0e14cefe817c-x2",
+          "name": "X2",
+          "value": 1.68,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-562098ccc1859420552f95039d168817",
+    "gameId": "56209",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Spain",
+    "awayTeam": "Croatia",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-29",
+    "dateLabel": "Tue 29/09",
+    "commenceTime": "2026-09-29T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 85,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-562098ccc1859420552f95039d168817-1",
+          "name": "1",
+          "value": 1.29,
+          "trend": "same"
+        },
+        {
+          "id": "o-562098ccc1859420552f95039d168817-X",
+          "name": "X",
+          "value": 5.52,
+          "trend": "same"
+        },
+        {
+          "id": "o-562098ccc1859420552f95039d168817-2",
+          "name": "2",
+          "value": 9.86,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-562098ccc1859420552f95039d168817-over",
+          "name": "Over 2.5",
+          "value": 1.88,
+          "trend": "same"
+        },
+        {
+          "id": "o-562098ccc1859420552f95039d168817-under",
+          "name": "Under 2.5",
+          "value": 1.96,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-562098ccc1859420552f95039d168817-1x",
+          "name": "1X",
+          "value": 0.99,
+          "trend": "same"
+        },
+        {
+          "id": "o-562098ccc1859420552f95039d168817-12",
+          "name": "12",
+          "value": 1.08,
+          "trend": "same"
+        },
+        {
+          "id": "o-562098ccc1859420552f95039d168817-x2",
+          "name": "X2",
+          "value": 3.36,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-19d41854211c2ad2a43283d92e9b8a44",
+    "gameId": "19418",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Czech Republic",
+    "awayTeam": "England",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-29",
+    "dateLabel": "Tue 29/09",
+    "commenceTime": "2026-09-29T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 85,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-19d41854211c2ad2a43283d92e9b8a44-1",
+          "name": "1",
+          "value": 6.77,
+          "trend": "same"
+        },
+        {
+          "id": "o-19d41854211c2ad2a43283d92e9b8a44-X",
+          "name": "X",
+          "value": 4.62,
+          "trend": "same"
+        },
+        {
+          "id": "o-19d41854211c2ad2a43283d92e9b8a44-2",
+          "name": "2",
+          "value": 1.44,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-19d41854211c2ad2a43283d92e9b8a44-over",
+          "name": "Over 2.5",
+          "value": 1.95,
+          "trend": "same"
+        },
+        {
+          "id": "o-19d41854211c2ad2a43283d92e9b8a44-under",
+          "name": "Under 2.5",
+          "value": 1.88,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-19d41854211c2ad2a43283d92e9b8a44-1x",
+          "name": "1X",
+          "value": 2.61,
+          "trend": "same"
+        },
+        {
+          "id": "o-19d41854211c2ad2a43283d92e9b8a44-12",
+          "name": "12",
+          "value": 1.13,
+          "trend": "same"
+        },
+        {
+          "id": "o-19d41854211c2ad2a43283d92e9b8a44-x2",
+          "name": "X2",
+          "value": 1.04,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-85506167f42ea07df572481f38ee3ba7",
+    "gameId": "85506",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Slovenia",
+    "awayTeam": "North Macedonia",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-29",
+    "dateLabel": "Tue 29/09",
+    "commenceTime": "2026-09-29T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 80,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-85506167f42ea07df572481f38ee3ba7-1",
+          "name": "1",
+          "value": 1.75,
+          "trend": "same"
+        },
+        {
+          "id": "o-85506167f42ea07df572481f38ee3ba7-X",
+          "name": "X",
+          "value": 3.6,
+          "trend": "same"
+        },
+        {
+          "id": "o-85506167f42ea07df572481f38ee3ba7-2",
+          "name": "2",
+          "value": 5.8,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-85506167f42ea07df572481f38ee3ba7-over",
+          "name": "Over 2.5",
+          "value": 1.85,
+          "trend": "same"
+        },
+        {
+          "id": "o-85506167f42ea07df572481f38ee3ba7-under",
+          "name": "Under 2.5",
+          "value": 1.95,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-85506167f42ea07df572481f38ee3ba7-1x",
+          "name": "1X",
+          "value": 1.12,
+          "trend": "same"
+        },
+        {
+          "id": "o-85506167f42ea07df572481f38ee3ba7-12",
+          "name": "12",
+          "value": 1.28,
+          "trend": "same"
+        },
+        {
+          "id": "o-85506167f42ea07df572481f38ee3ba7-x2",
+          "name": "X2",
+          "value": 2.11,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-267fa609da39d3dacc04a6d6a41a559a",
+    "gameId": "26760",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Scotland",
+    "awayTeam": "Switzerland",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-09-29",
+    "dateLabel": "Tue 29/09",
+    "commenceTime": "2026-09-29T18:45:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 80,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-267fa609da39d3dacc04a6d6a41a559a-1",
+          "name": "1",
+          "value": 3.4,
+          "trend": "same"
+        },
+        {
+          "id": "o-267fa609da39d3dacc04a6d6a41a559a-X",
+          "name": "X",
+          "value": 3.32,
+          "trend": "same"
+        },
+        {
+          "id": "o-267fa609da39d3dacc04a6d6a41a559a-2",
+          "name": "2",
+          "value": 1.98,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-267fa609da39d3dacc04a6d6a41a559a-over",
+          "name": "Over 2.5",
+          "value": 1.85,
+          "trend": "same"
+        },
+        {
+          "id": "o-267fa609da39d3dacc04a6d6a41a559a-under",
+          "name": "Under 2.5",
+          "value": 1.95,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-267fa609da39d3dacc04a6d6a41a559a-1x",
+          "name": "1X",
+          "value": 1.6,
+          "trend": "same"
+        },
+        {
+          "id": "o-267fa609da39d3dacc04a6d6a41a559a-12",
+          "name": "12",
+          "value": 1.19,
+          "trend": "same"
+        },
+        {
+          "id": "o-267fa609da39d3dacc04a6d6a41a559a-x2",
+          "name": "X2",
+          "value": 1.18,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-6321b7d465a21274f0da7a5e50dbf5ef",
+    "gameId": "63217",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "Europe",
+    "homeTeam": "Greece",
+    "awayTeam": "Netherlands",
+    "isLive": false,
+    "startTime": "18:45",
+    "date": "2026-10-01",
+    "dateLabel": "Thu 01/10",
+    "commenceTime": "2026-10-01T18:45:00Z",
+    "isHot": false,
+    "hasLiveStream": true,
+    "marketsCount": 70,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-6321b7d465a21274f0da7a5e50dbf5ef-1",
+          "name": "1",
+          "value": 3.4,
+          "trend": "same"
+        },
+        {
+          "id": "o-6321b7d465a21274f0da7a5e50dbf5ef-X",
+          "name": "X",
+          "value": 3.1,
+          "trend": "same"
+        },
+        {
+          "id": "o-6321b7d465a21274f0da7a5e50dbf5ef-2",
+          "name": "2",
+          "value": 1.86,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-6321b7d465a21274f0da7a5e50dbf5ef-over",
+          "name": "Over 2.5",
+          "value": 1.85,
+          "trend": "same"
+        },
+        {
+          "id": "o-6321b7d465a21274f0da7a5e50dbf5ef-under",
+          "name": "Under 2.5",
+          "value": 1.95,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-6321b7d465a21274f0da7a5e50dbf5ef-1x",
+          "name": "1X",
+          "value": 1.54,
+          "trend": "same"
+        },
+        {
+          "id": "o-6321b7d465a21274f0da7a5e50dbf5ef-12",
+          "name": "12",
+          "value": 1.14,
+          "trend": "same"
+        },
+        {
+          "id": "o-6321b7d465a21274f0da7a5e50dbf5ef-x2",
+          "name": "X2",
+          "value": 1.1,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-b870dcfba5e5920d3f1551a3aa1ea435",
+    "gameId": "87055",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Arsenal",
+    "awayTeam": "Leeds United",
+    "isLive": false,
+    "startTime": "11:30",
+    "date": "2026-10-10",
+    "dateLabel": "Sat 10/10",
+    "commenceTime": "2026-10-10T11:30:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 155,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-b870dcfba5e5920d3f1551a3aa1ea435-1",
+          "name": "1",
+          "value": 1.44,
+          "trend": "same"
+        },
+        {
+          "id": "o-b870dcfba5e5920d3f1551a3aa1ea435-X",
+          "name": "X",
+          "value": 5.03,
+          "trend": "same"
+        },
+        {
+          "id": "o-b870dcfba5e5920d3f1551a3aa1ea435-2",
+          "name": "2",
+          "value": 8.2,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-b870dcfba5e5920d3f1551a3aa1ea435-over",
+          "name": "Over 2.5",
+          "value": 1.83,
+          "trend": "same"
+        },
+        {
+          "id": "o-b870dcfba5e5920d3f1551a3aa1ea435-under",
+          "name": "Under 2.5",
+          "value": 2.14,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-b870dcfba5e5920d3f1551a3aa1ea435-1x",
+          "name": "1X",
+          "value": 1.06,
+          "trend": "same"
+        },
+        {
+          "id": "o-b870dcfba5e5920d3f1551a3aa1ea435-12",
+          "name": "12",
+          "value": 1.16,
+          "trend": "same"
+        },
+        {
+          "id": "o-b870dcfba5e5920d3f1551a3aa1ea435-x2",
+          "name": "X2",
+          "value": 2.96,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-02e6c0ccb11bb7ce78989ce49d67110b",
+    "gameId": "02601",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Aston Villa",
+    "awayTeam": "Brentford",
+    "isLive": false,
+    "startTime": "14:00",
+    "date": "2026-10-10",
+    "dateLabel": "Sat 10/10",
+    "commenceTime": "2026-10-10T14:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 155,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-02e6c0ccb11bb7ce78989ce49d67110b-1",
+          "name": "1",
+          "value": 2.62,
+          "trend": "same"
+        },
+        {
+          "id": "o-02e6c0ccb11bb7ce78989ce49d67110b-X",
+          "name": "X",
+          "value": 3.63,
+          "trend": "same"
+        },
+        {
+          "id": "o-02e6c0ccb11bb7ce78989ce49d67110b-2",
+          "name": "2",
+          "value": 2.79,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-02e6c0ccb11bb7ce78989ce49d67110b-over",
+          "name": "Over 2.5",
+          "value": 1.73,
+          "trend": "same"
+        },
+        {
+          "id": "o-02e6c0ccb11bb7ce78989ce49d67110b-under",
+          "name": "Under 2.5",
+          "value": 2.28,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-02e6c0ccb11bb7ce78989ce49d67110b-1x",
+          "name": "1X",
+          "value": 1.45,
+          "trend": "same"
+        },
+        {
+          "id": "o-02e6c0ccb11bb7ce78989ce49d67110b-12",
+          "name": "12",
+          "value": 1.28,
+          "trend": "same"
+        },
+        {
+          "id": "o-02e6c0ccb11bb7ce78989ce49d67110b-x2",
+          "name": "X2",
+          "value": 1.5,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-45d4a466e32cd2b4ea535207923ceaf5",
+    "gameId": "45446",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Chelsea",
+    "awayTeam": "Bournemouth",
+    "isLive": false,
+    "startTime": "14:00",
+    "date": "2026-10-10",
+    "dateLabel": "Sat 10/10",
+    "commenceTime": "2026-10-10T14:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 155,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-45d4a466e32cd2b4ea535207923ceaf5-1",
+          "name": "1",
+          "value": 1.89,
+          "trend": "same"
+        },
+        {
+          "id": "o-45d4a466e32cd2b4ea535207923ceaf5-X",
+          "name": "X",
+          "value": 4.11,
+          "trend": "same"
+        },
+        {
+          "id": "o-45d4a466e32cd2b4ea535207923ceaf5-2",
+          "name": "2",
+          "value": 4.11,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-45d4a466e32cd2b4ea535207923ceaf5-over",
+          "name": "Over 2.5",
+          "value": 2.27,
+          "trend": "same"
+        },
+        {
+          "id": "o-45d4a466e32cd2b4ea535207923ceaf5-under",
+          "name": "Under 2.5",
+          "value": 1.74,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-45d4a466e32cd2b4ea535207923ceaf5-1x",
+          "name": "1X",
+          "value": 1.23,
+          "trend": "same"
+        },
+        {
+          "id": "o-45d4a466e32cd2b4ea535207923ceaf5-12",
+          "name": "12",
+          "value": 1.23,
+          "trend": "same"
+        },
+        {
+          "id": "o-45d4a466e32cd2b4ea535207923ceaf5-x2",
+          "name": "X2",
+          "value": 1.95,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-380b8f24ec5430fb545a7490c1017285",
+    "gameId": "38082",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Sunderland",
+    "awayTeam": "Brighton and Hove Albion",
+    "isLive": false,
+    "startTime": "14:00",
+    "date": "2026-10-10",
+    "dateLabel": "Sat 10/10",
+    "commenceTime": "2026-10-10T14:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 155,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-380b8f24ec5430fb545a7490c1017285-1",
+          "name": "1",
+          "value": 2.96,
+          "trend": "same"
+        },
+        {
+          "id": "o-380b8f24ec5430fb545a7490c1017285-X",
+          "name": "X",
+          "value": 3.56,
+          "trend": "same"
+        },
+        {
+          "id": "o-380b8f24ec5430fb545a7490c1017285-2",
+          "name": "2",
+          "value": 2.53,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-380b8f24ec5430fb545a7490c1017285-over",
+          "name": "Over 2.5",
+          "value": 1.87,
+          "trend": "same"
+        },
+        {
+          "id": "o-380b8f24ec5430fb545a7490c1017285-under",
+          "name": "Under 2.5",
+          "value": 2.08,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-380b8f24ec5430fb545a7490c1017285-1x",
+          "name": "1X",
+          "value": 1.54,
+          "trend": "same"
+        },
+        {
+          "id": "o-380b8f24ec5430fb545a7490c1017285-12",
+          "name": "12",
+          "value": 1.3,
+          "trend": "same"
+        },
+        {
+          "id": "o-380b8f24ec5430fb545a7490c1017285-x2",
+          "name": "X2",
+          "value": 1.41,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-288b4ff00c79daa712c911c564fe1be7",
+    "gameId": "28840",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Ipswich Town",
+    "awayTeam": "Fulham",
+    "isLive": false,
+    "startTime": "14:00",
+    "date": "2026-10-10",
+    "dateLabel": "Sat 10/10",
+    "commenceTime": "2026-10-10T14:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 155,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-288b4ff00c79daa712c911c564fe1be7-1",
+          "name": "1",
+          "value": 2.79,
+          "trend": "same"
+        },
+        {
+          "id": "o-288b4ff00c79daa712c911c564fe1be7-X",
+          "name": "X",
+          "value": 3.62,
+          "trend": "same"
+        },
+        {
+          "id": "o-288b4ff00c79daa712c911c564fe1be7-2",
+          "name": "2",
+          "value": 2.63,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-288b4ff00c79daa712c911c564fe1be7-over",
+          "name": "Over 2.5",
+          "value": 1.83,
+          "trend": "same"
+        },
+        {
+          "id": "o-288b4ff00c79daa712c911c564fe1be7-under",
+          "name": "Under 2.5",
+          "value": 2.14,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-288b4ff00c79daa712c911c564fe1be7-1x",
+          "name": "1X",
+          "value": 1.5,
+          "trend": "same"
+        },
+        {
+          "id": "o-288b4ff00c79daa712c911c564fe1be7-12",
+          "name": "12",
+          "value": 1.29,
+          "trend": "same"
+        },
+        {
+          "id": "o-288b4ff00c79daa712c911c564fe1be7-x2",
+          "name": "X2",
+          "value": 1.45,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-22c9b2c43cbe1334381269550dab78e6",
+    "gameId": "22924",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Manchester United",
+    "awayTeam": "Tottenham Hotspur",
+    "isLive": false,
+    "startTime": "16:30",
+    "date": "2026-10-10",
+    "dateLabel": "Sat 10/10",
+    "commenceTime": "2026-10-10T16:30:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 155,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-22c9b2c43cbe1334381269550dab78e6-1",
+          "name": "1",
+          "value": 1.76,
+          "trend": "same"
+        },
+        {
+          "id": "o-22c9b2c43cbe1334381269550dab78e6-X",
+          "name": "X",
+          "value": 4.31,
+          "trend": "same"
+        },
+        {
+          "id": "o-22c9b2c43cbe1334381269550dab78e6-2",
+          "name": "2",
+          "value": 4.67,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-22c9b2c43cbe1334381269550dab78e6-over",
+          "name": "Over 2.5",
+          "value": 2.32,
+          "trend": "same"
+        },
+        {
+          "id": "o-22c9b2c43cbe1334381269550dab78e6-under",
+          "name": "Under 2.5",
+          "value": 1.71,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-22c9b2c43cbe1334381269550dab78e6-1x",
+          "name": "1X",
+          "value": 1.19,
+          "trend": "same"
+        },
+        {
+          "id": "o-22c9b2c43cbe1334381269550dab78e6-12",
+          "name": "12",
+          "value": 1.21,
+          "trend": "same"
+        },
+        {
+          "id": "o-22c9b2c43cbe1334381269550dab78e6-x2",
+          "name": "X2",
+          "value": 2.13,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-86effab5c6e7bfd58c8e88b1fb7c6ba9",
+    "gameId": "86567",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Crystal Palace",
+    "awayTeam": "Nottingham Forest",
+    "isLive": false,
+    "startTime": "13:00",
+    "date": "2026-10-11",
+    "dateLabel": "Sun 11/10",
+    "commenceTime": "2026-10-11T13:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 155,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-86effab5c6e7bfd58c8e88b1fb7c6ba9-1",
+          "name": "1",
+          "value": 2.74,
+          "trend": "same"
+        },
+        {
+          "id": "o-86effab5c6e7bfd58c8e88b1fb7c6ba9-X",
+          "name": "X",
+          "value": 3.47,
+          "trend": "same"
+        },
+        {
+          "id": "o-86effab5c6e7bfd58c8e88b1fb7c6ba9-2",
+          "name": "2",
+          "value": 2.75,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-86effab5c6e7bfd58c8e88b1fb7c6ba9-over",
+          "name": "Over 2.5",
+          "value": 2.1,
+          "trend": "same"
+        },
+        {
+          "id": "o-86effab5c6e7bfd58c8e88b1fb7c6ba9-under",
+          "name": "Under 2.5",
+          "value": 1.86,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-86effab5c6e7bfd58c8e88b1fb7c6ba9-1x",
+          "name": "1X",
+          "value": 1.45,
+          "trend": "same"
+        },
+        {
+          "id": "o-86effab5c6e7bfd58c8e88b1fb7c6ba9-12",
+          "name": "12",
+          "value": 1.3,
+          "trend": "same"
+        },
+        {
+          "id": "o-86effab5c6e7bfd58c8e88b1fb7c6ba9-x2",
+          "name": "X2",
+          "value": 1.46,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-0bdae4d304810578e47386606bff7106",
+    "gameId": "04304",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Hull City",
+    "awayTeam": "Everton",
+    "isLive": false,
+    "startTime": "13:00",
+    "date": "2026-10-11",
+    "dateLabel": "Sun 11/10",
+    "commenceTime": "2026-10-11T13:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 155,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-0bdae4d304810578e47386606bff7106-1",
+          "name": "1",
+          "value": 3.8,
+          "trend": "same"
+        },
+        {
+          "id": "o-0bdae4d304810578e47386606bff7106-X",
+          "name": "X",
+          "value": 3.54,
+          "trend": "same"
+        },
+        {
+          "id": "o-0bdae4d304810578e47386606bff7106-2",
+          "name": "2",
+          "value": 2.13,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-0bdae4d304810578e47386606bff7106-over",
+          "name": "Over 2.5",
+          "value": 2.17,
+          "trend": "same"
+        },
+        {
+          "id": "o-0bdae4d304810578e47386606bff7106-under",
+          "name": "Under 2.5",
+          "value": 1.81,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-0bdae4d304810578e47386606bff7106-1x",
+          "name": "1X",
+          "value": 1.74,
+          "trend": "same"
+        },
+        {
+          "id": "o-0bdae4d304810578e47386606bff7106-12",
+          "name": "12",
+          "value": 1.3,
+          "trend": "same"
+        },
+        {
+          "id": "o-0bdae4d304810578e47386606bff7106-x2",
+          "name": "X2",
+          "value": 1.26,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-6dbab232dd8d2aed0cb1d6f7978fb7b1",
+    "gameId": "62328",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Liverpool",
+    "awayTeam": "Manchester City",
+    "isLive": false,
+    "startTime": "15:30",
+    "date": "2026-10-11",
+    "dateLabel": "Sun 11/10",
+    "commenceTime": "2026-10-11T15:30:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 155,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-6dbab232dd8d2aed0cb1d6f7978fb7b1-1",
+          "name": "1",
+          "value": 2.83,
+          "trend": "same"
+        },
+        {
+          "id": "o-6dbab232dd8d2aed0cb1d6f7978fb7b1-X",
+          "name": "X",
+          "value": 3.8,
+          "trend": "same"
+        },
+        {
+          "id": "o-6dbab232dd8d2aed0cb1d6f7978fb7b1-2",
+          "name": "2",
+          "value": 2.51,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-6dbab232dd8d2aed0cb1d6f7978fb7b1-over",
+          "name": "Over 2.5",
+          "value": 1.63,
+          "trend": "same"
+        },
+        {
+          "id": "o-6dbab232dd8d2aed0cb1d6f7978fb7b1-under",
+          "name": "Under 2.5",
+          "value": 2.49,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-6dbab232dd8d2aed0cb1d6f7978fb7b1-1x",
+          "name": "1X",
+          "value": 1.54,
+          "trend": "same"
+        },
+        {
+          "id": "o-6dbab232dd8d2aed0cb1d6f7978fb7b1-12",
+          "name": "12",
+          "value": 1.26,
+          "trend": "same"
+        },
+        {
+          "id": "o-6dbab232dd8d2aed0cb1d6f7978fb7b1-x2",
+          "name": "X2",
+          "value": 1.44,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-acd5bd945dd953ad1e300df5bfe696f9",
+    "gameId": "59459",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Coventry City",
+    "awayTeam": "Newcastle United",
+    "isLive": false,
+    "startTime": "19:00",
+    "date": "2026-10-12",
+    "dateLabel": "Mon 12/10",
+    "commenceTime": "2026-10-12T19:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 155,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-acd5bd945dd953ad1e300df5bfe696f9-1",
+          "name": "1",
+          "value": 3.48,
+          "trend": "same"
+        },
+        {
+          "id": "o-acd5bd945dd953ad1e300df5bfe696f9-X",
+          "name": "X",
+          "value": 3.72,
+          "trend": "same"
+        },
+        {
+          "id": "o-acd5bd945dd953ad1e300df5bfe696f9-2",
+          "name": "2",
+          "value": 2.18,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-acd5bd945dd953ad1e300df5bfe696f9-over",
+          "name": "Over 2.5",
+          "value": 1.73,
+          "trend": "same"
+        },
+        {
+          "id": "o-acd5bd945dd953ad1e300df5bfe696f9-under",
+          "name": "Under 2.5",
+          "value": 2.28,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-acd5bd945dd953ad1e300df5bfe696f9-1x",
+          "name": "1X",
+          "value": 1.71,
+          "trend": "same"
+        },
+        {
+          "id": "o-acd5bd945dd953ad1e300df5bfe696f9-12",
+          "name": "12",
+          "value": 1.27,
+          "trend": "same"
+        },
+        {
+          "id": "o-acd5bd945dd953ad1e300df5bfe696f9-x2",
+          "name": "X2",
+          "value": 1.31,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-764e6513cb3f348881503df70ccb90e0",
+    "gameId": "76465",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Everton",
+    "awayTeam": "Chelsea",
+    "isLive": false,
+    "startTime": "11:30",
+    "date": "2026-10-17",
+    "dateLabel": "Sat 17/10",
+    "commenceTime": "2026-10-17T11:30:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 135,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-764e6513cb3f348881503df70ccb90e0-1",
+          "name": "1",
+          "value": 2.96,
+          "trend": "same"
+        },
+        {
+          "id": "o-764e6513cb3f348881503df70ccb90e0-X",
+          "name": "X",
+          "value": 3.88,
+          "trend": "same"
+        },
+        {
+          "id": "o-764e6513cb3f348881503df70ccb90e0-2",
+          "name": "2",
+          "value": 2.38,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-764e6513cb3f348881503df70ccb90e0-over",
+          "name": "Over 2.5",
+          "value": 1.7,
+          "trend": "same"
+        },
+        {
+          "id": "o-764e6513cb3f348881503df70ccb90e0-under",
+          "name": "Under 2.5",
+          "value": 2.34,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-764e6513cb3f348881503df70ccb90e0-1x",
+          "name": "1X",
+          "value": 1.6,
+          "trend": "same"
+        },
+        {
+          "id": "o-764e6513cb3f348881503df70ccb90e0-12",
+          "name": "12",
+          "value": 1.25,
+          "trend": "same"
+        },
+        {
+          "id": "o-764e6513cb3f348881503df70ccb90e0-x2",
+          "name": "X2",
+          "value": 1.4,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-8f1945e7272bc7e89016439f5ab321c7",
+    "gameId": "81945",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Brentford",
+    "awayTeam": "Liverpool",
+    "isLive": false,
+    "startTime": "14:00",
+    "date": "2026-10-17",
+    "dateLabel": "Sat 17/10",
+    "commenceTime": "2026-10-17T14:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 135,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-8f1945e7272bc7e89016439f5ab321c7-1",
+          "name": "1",
+          "value": 2.88,
+          "trend": "same"
+        },
+        {
+          "id": "o-8f1945e7272bc7e89016439f5ab321c7-X",
+          "name": "X",
+          "value": 3.74,
+          "trend": "same"
+        },
+        {
+          "id": "o-8f1945e7272bc7e89016439f5ab321c7-2",
+          "name": "2",
+          "value": 2.5,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-8f1945e7272bc7e89016439f5ab321c7-over",
+          "name": "Over 2.5",
+          "value": 2.42,
+          "trend": "same"
+        },
+        {
+          "id": "o-8f1945e7272bc7e89016439f5ab321c7-under",
+          "name": "Under 2.5",
+          "value": 1.66,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-8f1945e7272bc7e89016439f5ab321c7-1x",
+          "name": "1X",
+          "value": 1.55,
+          "trend": "same"
+        },
+        {
+          "id": "o-8f1945e7272bc7e89016439f5ab321c7-12",
+          "name": "12",
+          "value": 1.27,
+          "trend": "same"
+        },
+        {
+          "id": "o-8f1945e7272bc7e89016439f5ab321c7-x2",
+          "name": "X2",
+          "value": 1.42,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-7895f97f2f9577f3b13287a3d086859d",
+    "gameId": "78959",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Fulham",
+    "awayTeam": "Hull City",
+    "isLive": false,
+    "startTime": "14:00",
+    "date": "2026-10-17",
+    "dateLabel": "Sat 17/10",
+    "commenceTime": "2026-10-17T14:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 135,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-7895f97f2f9577f3b13287a3d086859d-1",
+          "name": "1",
+          "value": 1.72,
+          "trend": "same"
+        },
+        {
+          "id": "o-7895f97f2f9577f3b13287a3d086859d-X",
+          "name": "X",
+          "value": 4.16,
+          "trend": "same"
+        },
+        {
+          "id": "o-7895f97f2f9577f3b13287a3d086859d-2",
+          "name": "2",
+          "value": 5.13,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-7895f97f2f9577f3b13287a3d086859d-over",
+          "name": "Over 2.5",
+          "value": 1.74,
+          "trend": "same"
+        },
+        {
+          "id": "o-7895f97f2f9577f3b13287a3d086859d-under",
+          "name": "Under 2.5",
+          "value": 2.27,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-7895f97f2f9577f3b13287a3d086859d-1x",
+          "name": "1X",
+          "value": 1.16,
+          "trend": "same"
+        },
+        {
+          "id": "o-7895f97f2f9577f3b13287a3d086859d-12",
+          "name": "12",
+          "value": 1.22,
+          "trend": "same"
+        },
+        {
+          "id": "o-7895f97f2f9577f3b13287a3d086859d-x2",
+          "name": "X2",
+          "value": 2.18,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-bf2142d1ca76ba2fc9e61afce80f86c0",
+    "gameId": "21421",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Manchester City",
+    "awayTeam": "Ipswich Town",
+    "isLive": false,
+    "startTime": "14:00",
+    "date": "2026-10-17",
+    "dateLabel": "Sat 17/10",
+    "commenceTime": "2026-10-17T14:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 135,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-bf2142d1ca76ba2fc9e61afce80f86c0-1",
+          "name": "1",
+          "value": 1.26,
+          "trend": "same"
+        },
+        {
+          "id": "o-bf2142d1ca76ba2fc9e61afce80f86c0-X",
+          "name": "X",
+          "value": 7.16,
+          "trend": "same"
+        },
+        {
+          "id": "o-bf2142d1ca76ba2fc9e61afce80f86c0-2",
+          "name": "2",
+          "value": 11.8,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-bf2142d1ca76ba2fc9e61afce80f86c0-over",
+          "name": "Over 2.5",
+          "value": 2,
+          "trend": "same"
+        },
+        {
+          "id": "o-bf2142d1ca76ba2fc9e61afce80f86c0-under",
+          "name": "Under 2.5",
+          "value": 1.94,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-bf2142d1ca76ba2fc9e61afce80f86c0-1x",
+          "name": "1X",
+          "value": 1.02,
+          "trend": "same"
+        },
+        {
+          "id": "o-bf2142d1ca76ba2fc9e61afce80f86c0-12",
+          "name": "12",
+          "value": 1.08,
+          "trend": "same"
+        },
+        {
+          "id": "o-bf2142d1ca76ba2fc9e61afce80f86c0-x2",
+          "name": "X2",
+          "value": 4.23,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-d1bbbdcd3d430e70091b518369b559cf",
+    "gameId": "13430",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Newcastle United",
+    "awayTeam": "Aston Villa",
+    "isLive": false,
+    "startTime": "16:30",
+    "date": "2026-10-17",
+    "dateLabel": "Sat 17/10",
+    "commenceTime": "2026-10-17T16:30:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 135,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-d1bbbdcd3d430e70091b518369b559cf-1",
+          "name": "1",
+          "value": 2.17,
+          "trend": "same"
+        },
+        {
+          "id": "o-d1bbbdcd3d430e70091b518369b559cf-X",
+          "name": "X",
+          "value": 3.88,
+          "trend": "same"
+        },
+        {
+          "id": "o-d1bbbdcd3d430e70091b518369b559cf-2",
+          "name": "2",
+          "value": 3.37,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-d1bbbdcd3d430e70091b518369b559cf-over",
+          "name": "Over 2.5",
+          "value": 1.69,
+          "trend": "same"
+        },
+        {
+          "id": "o-d1bbbdcd3d430e70091b518369b559cf-under",
+          "name": "Under 2.5",
+          "value": 2.36,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-d1bbbdcd3d430e70091b518369b559cf-1x",
+          "name": "1X",
+          "value": 1.32,
+          "trend": "same"
+        },
+        {
+          "id": "o-d1bbbdcd3d430e70091b518369b559cf-12",
+          "name": "12",
+          "value": 1.25,
+          "trend": "same"
+        },
+        {
+          "id": "o-d1bbbdcd3d430e70091b518369b559cf-x2",
+          "name": "X2",
+          "value": 1.71,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-dfd5d6648be46426e418801584d46a68",
+    "gameId": "56648",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Bournemouth",
+    "awayTeam": "Sunderland",
+    "isLive": false,
+    "startTime": "13:00",
+    "date": "2026-10-18",
+    "dateLabel": "Sun 18/10",
+    "commenceTime": "2026-10-18T13:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 135,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-dfd5d6648be46426e418801584d46a68-1",
+          "name": "1",
+          "value": 2.02,
+          "trend": "same"
+        },
+        {
+          "id": "o-dfd5d6648be46426e418801584d46a68-X",
+          "name": "X",
+          "value": 3.77,
+          "trend": "same"
+        },
+        {
+          "id": "o-dfd5d6648be46426e418801584d46a68-2",
+          "name": "2",
+          "value": 3.9,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-dfd5d6648be46426e418801584d46a68-over",
+          "name": "Over 2.5",
+          "value": 1.88,
+          "trend": "same"
+        },
+        {
+          "id": "o-dfd5d6648be46426e418801584d46a68-under",
+          "name": "Under 2.5",
+          "value": 2.07,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-dfd5d6648be46426e418801584d46a68-1x",
+          "name": "1X",
+          "value": 1.25,
+          "trend": "same"
+        },
+        {
+          "id": "o-dfd5d6648be46426e418801584d46a68-12",
+          "name": "12",
+          "value": 1.26,
+          "trend": "same"
+        },
+        {
+          "id": "o-dfd5d6648be46426e418801584d46a68-x2",
+          "name": "X2",
+          "value": 1.82,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-9fc08b390a49c4434f7cf631a0bb88fb",
+    "gameId": "90839",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Brighton and Hove Albion",
+    "awayTeam": "Crystal Palace",
+    "isLive": false,
+    "startTime": "13:00",
+    "date": "2026-10-18",
+    "dateLabel": "Sun 18/10",
+    "commenceTime": "2026-10-18T13:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 135,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-9fc08b390a49c4434f7cf631a0bb88fb-1",
+          "name": "1",
+          "value": 1.59,
+          "trend": "same"
+        },
+        {
+          "id": "o-9fc08b390a49c4434f7cf631a0bb88fb-X",
+          "name": "X",
+          "value": 4.67,
+          "trend": "same"
+        },
+        {
+          "id": "o-9fc08b390a49c4434f7cf631a0bb88fb-2",
+          "name": "2",
+          "value": 5.75,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-9fc08b390a49c4434f7cf631a0bb88fb-over",
+          "name": "Over 2.5",
+          "value": 1.63,
+          "trend": "same"
+        },
+        {
+          "id": "o-9fc08b390a49c4434f7cf631a0bb88fb-under",
+          "name": "Under 2.5",
+          "value": 2.49,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-9fc08b390a49c4434f7cf631a0bb88fb-1x",
+          "name": "1X",
+          "value": 1.13,
+          "trend": "same"
+        },
+        {
+          "id": "o-9fc08b390a49c4434f7cf631a0bb88fb-12",
+          "name": "12",
+          "value": 1.18,
+          "trend": "same"
+        },
+        {
+          "id": "o-9fc08b390a49c4434f7cf631a0bb88fb-x2",
+          "name": "X2",
+          "value": 2.45,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-676b3b0b609e9cf565da450786618d26",
+    "gameId": "67630",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Leeds United",
+    "awayTeam": "Manchester United",
+    "isLive": false,
+    "startTime": "13:00",
+    "date": "2026-10-18",
+    "dateLabel": "Sun 18/10",
+    "commenceTime": "2026-10-18T13:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 135,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-676b3b0b609e9cf565da450786618d26-1",
+          "name": "1",
+          "value": 2.9,
+          "trend": "same"
+        },
+        {
+          "id": "o-676b3b0b609e9cf565da450786618d26-X",
+          "name": "X",
+          "value": 3.71,
+          "trend": "same"
+        },
+        {
+          "id": "o-676b3b0b609e9cf565da450786618d26-2",
+          "name": "2",
+          "value": 2.5,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-676b3b0b609e9cf565da450786618d26-over",
+          "name": "Over 2.5",
+          "value": 1.73,
+          "trend": "same"
+        },
+        {
+          "id": "o-676b3b0b609e9cf565da450786618d26-under",
+          "name": "Under 2.5",
+          "value": 2.28,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-676b3b0b609e9cf565da450786618d26-1x",
+          "name": "1X",
+          "value": 1.55,
+          "trend": "same"
+        },
+        {
+          "id": "o-676b3b0b609e9cf565da450786618d26-12",
+          "name": "12",
+          "value": 1.28,
+          "trend": "same"
+        },
+        {
+          "id": "o-676b3b0b609e9cf565da450786618d26-x2",
+          "name": "X2",
+          "value": 1.42,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-f696a248965373d9071dc0662e5c58a8",
+    "gameId": "69624",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Nottingham Forest",
+    "awayTeam": "Arsenal",
+    "isLive": false,
+    "startTime": "15:30",
+    "date": "2026-10-18",
+    "dateLabel": "Sun 18/10",
+    "commenceTime": "2026-10-18T15:30:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 135,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-f696a248965373d9071dc0662e5c58a8-1",
+          "name": "1",
+          "value": 5.95,
+          "trend": "same"
+        },
+        {
+          "id": "o-f696a248965373d9071dc0662e5c58a8-X",
+          "name": "X",
+          "value": 3.94,
+          "trend": "same"
+        },
+        {
+          "id": "o-f696a248965373d9071dc0662e5c58a8-2",
+          "name": "2",
+          "value": 1.68,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-f696a248965373d9071dc0662e5c58a8-over",
+          "name": "Over 2.5",
+          "value": 1.97,
+          "trend": "same"
+        },
+        {
+          "id": "o-f696a248965373d9071dc0662e5c58a8-under",
+          "name": "Under 2.5",
+          "value": 1.97,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-f696a248965373d9071dc0662e5c58a8-1x",
+          "name": "1X",
+          "value": 2.25,
+          "trend": "same"
+        },
+        {
+          "id": "o-f696a248965373d9071dc0662e5c58a8-12",
+          "name": "12",
+          "value": 1.24,
+          "trend": "same"
+        },
+        {
+          "id": "o-f696a248965373d9071dc0662e5c58a8-x2",
+          "name": "X2",
+          "value": 1.12,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-9baaf4e48b041cfef04e70e42532502e",
+    "gameId": "94480",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Tottenham Hotspur",
+    "awayTeam": "Coventry City",
+    "isLive": false,
+    "startTime": "19:00",
+    "date": "2026-10-19",
+    "dateLabel": "Mon 19/10",
+    "commenceTime": "2026-10-19T19:00:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 135,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-9baaf4e48b041cfef04e70e42532502e-1",
+          "name": "1",
+          "value": 1.54,
+          "trend": "same"
+        },
+        {
+          "id": "o-9baaf4e48b041cfef04e70e42532502e-X",
+          "name": "X",
+          "value": 4.67,
+          "trend": "same"
+        },
+        {
+          "id": "o-9baaf4e48b041cfef04e70e42532502e-2",
+          "name": "2",
+          "value": 6.57,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-9baaf4e48b041cfef04e70e42532502e-over",
+          "name": "Over 2.5",
+          "value": 1.65,
+          "trend": "same"
+        },
+        {
+          "id": "o-9baaf4e48b041cfef04e70e42532502e-under",
+          "name": "Under 2.5",
+          "value": 2.45,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-9baaf4e48b041cfef04e70e42532502e-1x",
+          "name": "1X",
+          "value": 1.1,
+          "trend": "same"
+        },
+        {
+          "id": "o-9baaf4e48b041cfef04e70e42532502e-12",
+          "name": "12",
+          "value": 1.19,
+          "trend": "same"
+        },
+        {
+          "id": "o-9baaf4e48b041cfef04e70e42532502e-x2",
+          "name": "X2",
+          "value": 2.59,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-knicks-heat",
+    "gameId": "35223",
+    "sport": "basketball",
+    "league": "NBA",
+    "countryOrCategory": "USA",
+    "homeTeam": "New York Knicks",
+    "awayTeam": "Miami Heat",
+    "isLive": false,
+    "startTime": "00:10",
+    "date": "2026-11-28",
+    "dateLabel": "Sat 28/11",
+    "commenceTime": "2026-11-28T00:10:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 58,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-knicks-heat-1",
+          "name": "1",
+          "value": 1.41,
+          "trend": "same"
+        },
+        {
+          "id": "o-knicks-heat-X",
+          "name": "X",
+          "value": 14,
+          "trend": "same"
+        },
+        {
+          "id": "o-knicks-heat-2",
+          "name": "2",
+          "value": 2.61,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-knicks-heat-over",
+          "name": "Over 214.5",
+          "value": 1.85,
+          "trend": "same"
+        },
+        {
+          "id": "o-knicks-heat-under",
+          "name": "Under 214.5",
+          "value": 1.85,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-knicks-heat-1x",
+          "name": "1X",
+          "value": 1.35,
+          "trend": "same"
+        },
+        {
+          "id": "o-knicks-heat-12",
+          "name": "12",
+          "value": 1.05,
+          "trend": "same"
+        },
+        {
+          "id": "o-knicks-heat-x2",
+          "name": "X2",
+          "value": 2.3,
+          "trend": "same"
+        }
+      ]
+    }
+  },
+  {
+    "id": "theodds-spurs-lakers",
+    "gameId": "13936",
+    "sport": "basketball",
+    "league": "NBA",
+    "countryOrCategory": "USA",
+    "homeTeam": "San Antonio Spurs",
+    "awayTeam": "Los Angeles Lakers",
+    "isLive": false,
+    "startTime": "02:40",
+    "date": "2026-11-28",
+    "dateLabel": "Sat 28/11",
+    "commenceTime": "2026-11-28T02:40:00Z",
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 58,
+    "markets": {
+      "1X2": [
+        {
+          "id": "o-spurs-lakers-1",
+          "name": "1",
+          "value": 1.27,
+          "trend": "same"
+        },
+        {
+          "id": "o-spurs-lakers-X",
+          "name": "X",
+          "value": 15,
+          "trend": "same"
+        },
+        {
+          "id": "o-spurs-lakers-2",
+          "name": "2",
+          "value": 3.29,
+          "trend": "same"
+        }
+      ],
+      "O/U": [
+        {
+          "id": "o-spurs-lakers-over",
+          "name": "Over 222.5",
+          "value": 1.85,
+          "trend": "same"
+        },
+        {
+          "id": "o-spurs-lakers-under",
+          "name": "Under 222.5",
+          "value": 1.85,
+          "trend": "same"
+        }
+      ],
+      "DC": [
+        {
+          "id": "o-spurs-lakers-1x",
+          "name": "1X",
+          "value": 1.2,
+          "trend": "same"
+        },
+        {
+          "id": "o-spurs-lakers-12",
+          "name": "12",
+          "value": 1.04,
+          "trend": "same"
+        },
+        {
+          "id": "o-spurs-lakers-x2",
+          "name": "X2",
+          "value": 2.75,
+          "trend": "same"
+        }
       ]
     }
   }
 ];
 
 // src/data/mockData.ts
-var INITIAL_MATCHES = [
-  // --- LIVE MATCHES (Active, Top Tier, Realistic Live Clocks & Odds) ---
-  {
-    id: "live-ars-mci",
-    gameId: "84920",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Arsenal FC",
-    awayTeam: "Manchester City",
-    homeScore: 1,
-    awayScore: 1,
-    minute: "68' 2H",
-    period: "2H",
-    isLive: true,
-    isHot: true,
-    hasLiveStream: true,
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    marketsCount: 142,
-    markets: {
-      "1X2": [
-        { id: "lam-1", name: "1", value: 2.85, trend: "same" },
-        { id: "lam-x", name: "X", value: 2.3, trend: "same" },
-        { id: "lam-2", name: "2", value: 3.1, trend: "up" }
-      ],
-      "O/U": [
-        { id: "lam-o2.5", name: "Over 2.5", value: 1.88, trend: "same" },
-        { id: "lam-u2.5", name: "Under 2.5", value: 1.92, trend: "same" }
-      ],
-      "DC": [
-        { id: "lam-1x", name: "1X", value: 1.35, trend: "same" },
-        { id: "lam-12", name: "12", value: 1.45, trend: "same" },
-        { id: "lam-x2", name: "X2", value: 1.4, trend: "same" }
-      ],
-      "1st Half O/U": [
-        { id: "lam-h-o", name: "Over 1.5", value: 2.1, trend: "same" },
-        { id: "lam-h-u", name: "Under 1.5", value: 1.68, trend: "same" }
-      ],
-      "Handicap": [
-        { id: "lam-h1", name: "(0) 1", value: 1.9, trend: "same" },
-        { id: "lam-h2", name: "(0) 2", value: 1.9, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "live-rma-bar",
-    gameId: "91832",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Real Madrid",
-    awayTeam: "FC Barcelona",
-    homeScore: 2,
-    awayScore: 1,
-    minute: "74' 2H",
-    period: "2H",
-    isLive: true,
-    isHot: true,
-    hasLiveStream: true,
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    marketsCount: 156,
-    markets: {
-      "1X2": [
-        { id: "lrb-1", name: "1", value: 1.25, trend: "same" },
-        { id: "lrb-x", name: "X", value: 4.8, trend: "same" },
-        { id: "lrb-2", name: "2", value: 11.5, trend: "down" }
-      ],
-      "O/U": [
-        { id: "lrb-o3.5", name: "Over 3.5", value: 1.95, trend: "same" },
-        { id: "lrb-u3.5", name: "Under 3.5", value: 1.8, trend: "same" }
-      ],
-      "DC": [
-        { id: "lrb-1x", name: "1X", value: 1.05, trend: "same" },
-        { id: "lrb-12", name: "12", value: 1.15, trend: "same" },
-        { id: "lrb-x2", name: "X2", value: 3.6, trend: "down" }
-      ],
-      "1st Half O/U": [
-        { id: "lrb-h-o", name: "Over 2.5", value: 2.3, trend: "up" },
-        { id: "lrb-h-u", name: "Under 2.5", value: 1.55, trend: "down" }
-      ],
-      "Handicap": [
-        { id: "lrb-h1", name: "(-1) 1", value: 2.15, trend: "same" },
-        { id: "lrb-h2", name: "(+1) 2", value: 1.7, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "live-liv-che",
-    gameId: "73910",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Liverpool FC",
-    awayTeam: "Chelsea FC",
-    homeScore: 0,
-    awayScore: 0,
-    minute: "32' 1H",
-    period: "1H",
-    isLive: true,
-    isHot: true,
-    hasLiveStream: false,
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    marketsCount: 118,
-    markets: {
-      "1X2": [
-        { id: "llc-1", name: "1", value: 2.1, trend: "same" },
-        { id: "llc-x", name: "X", value: 3.2, trend: "same" },
-        { id: "llc-2", name: "2", value: 3.4, trend: "same" }
-      ],
-      "O/U": [
-        { id: "llc-o2.5", name: "Over 2.5", value: 2.05, trend: "same" },
-        { id: "llc-u2.5", name: "Under 2.5", value: 1.75, trend: "same" }
-      ],
-      "DC": [
-        { id: "llc-1x", name: "1X", value: 1.3, trend: "same" },
-        { id: "llc-12", name: "12", value: 1.32, trend: "same" },
-        { id: "llc-x2", name: "X2", value: 1.65, trend: "same" }
-      ],
-      "1st Half O/U": [
-        { id: "llc-h-o", name: "Over 0.5", value: 1.55, trend: "same" },
-        { id: "llc-h-u", name: "Under 0.5", value: 2.3, trend: "same" }
-      ],
-      "Handicap": [
-        { id: "llc-h1", name: "(-1) 1", value: 3.2, trend: "same" },
-        { id: "llc-h2", name: "(+1) 2", value: 1.35, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "live-bay-dor",
-    gameId: "62104",
-    sport: "football",
-    league: "Bundesliga",
-    countryOrCategory: "Germany",
-    homeTeam: "Bayern Munich",
-    awayTeam: "Borussia Dortmund",
-    homeScore: 3,
-    awayScore: 2,
-    minute: "81' 2H",
-    period: "2H",
-    isLive: true,
-    isHot: true,
-    hasLiveStream: true,
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    marketsCount: 164,
-    markets: {
-      "1X2": [
-        { id: "lbd-1", name: "1", value: 1.15, trend: "same" },
-        { id: "lbd-x", name: "X", value: 6, trend: "up" },
-        { id: "lbd-2", name: "2", value: 16, trend: "down" }
-      ],
-      "O/U": [
-        { id: "lbd-o5.5", name: "Over 5.5", value: 2.1, trend: "same" },
-        { id: "lbd-u5.5", name: "Under 5.5", value: 1.7, trend: "same" }
-      ],
-      "DC": [
-        { id: "lbd-1x", name: "1X", value: 1.02, trend: "same" },
-        { id: "lbd-12", name: "12", value: 1.1, trend: "same" },
-        { id: "lbd-x2", name: "X2", value: 4.5, trend: "down" }
-      ],
-      "1st Half O/U": [
-        { id: "lbd-h-o", name: "Over 1.5", value: 1.4, trend: "same" },
-        { id: "lbd-h-u", name: "Under 1.5", value: 2.8, trend: "same" }
-      ],
-      "Handicap": [
-        { id: "lbd-h1", name: "(-1) 1", value: 2.8, trend: "same" },
-        { id: "lbd-h2", name: "(+1) 2", value: 1.42, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "live-int-mil",
-    gameId: "45981",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Inter Milan",
-    awayTeam: "AC Milan",
-    homeScore: 1,
-    awayScore: 0,
-    minute: "41' 1H",
-    period: "1H",
-    isLive: true,
-    isHot: true,
-    hasLiveStream: true,
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    marketsCount: 130,
-    markets: {
-      "1X2": [
-        { id: "lim-1", name: "1", value: 1.6, trend: "same" },
-        { id: "lim-x", name: "X", value: 3.6, trend: "same" },
-        { id: "lim-2", name: "2", value: 5.2, trend: "up" }
-      ],
-      "O/U": [
-        { id: "lim-o2.5", name: "Over 2.5", value: 1.75, trend: "same" },
-        { id: "lim-u2.5", name: "Under 2.5", value: 2.05, trend: "same" }
-      ],
-      "DC": [
-        { id: "lim-1x", name: "1X", value: 1.14, trend: "same" },
-        { id: "lim-12", name: "12", value: 1.25, trend: "same" },
-        { id: "lim-x2", name: "X2", value: 2.2, trend: "up" }
-      ],
-      "1st Half O/U": [
-        { id: "lim-h-o", name: "Over 1.5", value: 2.8, trend: "same" },
-        { id: "lim-h-u", name: "Under 1.5", value: 1.4, trend: "same" }
-      ],
-      "Handicap": [
-        { id: "lim-h1", name: "(-1) 1", value: 2.45, trend: "same" },
-        { id: "lim-h2", name: "(+1) 2", value: 1.55, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "live-psg-om",
-    gameId: "57312",
-    sport: "football",
-    league: "Ligue 1",
-    countryOrCategory: "France",
-    homeTeam: "Paris Saint-Germain",
-    awayTeam: "Olympique Marseille",
-    homeScore: 2,
-    awayScore: 0,
-    minute: "56' 2H",
-    period: "2H",
-    isLive: true,
-    isHot: false,
-    hasLiveStream: true,
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    marketsCount: 124,
-    markets: {
-      "1X2": [
-        { id: "lpo-1", name: "1", value: 1.08, trend: "same" },
-        { id: "lpo-x", name: "X", value: 8.5, trend: "same" },
-        { id: "lpo-2", name: "2", value: 18, trend: "down" }
-      ],
-      "O/U": [
-        { id: "lpo-o2.5", name: "Over 2.5", value: 1.3, trend: "same" },
-        { id: "lpo-u2.5", name: "Under 2.5", value: 3.2, trend: "same" }
-      ],
-      "DC": [
-        { id: "lpo-1x", name: "1X", value: 1.01, trend: "same" },
-        { id: "lpo-12", name: "12", value: 1.05, trend: "same" },
-        { id: "lpo-x2", name: "X2", value: 6.5, trend: "down" }
-      ],
-      "1st Half O/U": [
-        { id: "lpo-h-o", name: "Over 2.5", value: 1.95, trend: "same" },
-        { id: "lpo-h-u", name: "Under 2.5", value: 1.8, trend: "same" }
-      ],
-      "Handicap": [
-        { id: "lpo-h1", name: "(-2) 1", value: 2.1, trend: "same" },
-        { id: "lpo-h2", name: "(+2) 2", value: 1.68, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "live-lal-gsw",
-    gameId: "88201",
-    sport: "basketball",
-    league: "NBA",
-    countryOrCategory: "USA",
-    homeTeam: "Los Angeles Lakers",
-    awayTeam: "Golden State Warriors",
-    homeScore: 88,
-    awayScore: 84,
-    minute: "04:15 Q3",
-    period: "Q3",
-    isLive: true,
-    isHot: true,
-    hasLiveStream: true,
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    marketsCount: 85,
-    markets: {
-      "1X2": [
-        { id: "llg-1", name: "1", value: 1.65, trend: "same" },
-        { id: "llg-x", name: "X", value: 14, trend: "same" },
-        { id: "llg-2", name: "2", value: 2.25, trend: "up" }
-      ],
-      "O/U": [
-        { id: "llg-o215", name: "Over 215.5", value: 1.85, trend: "same" },
-        { id: "llg-u215", name: "Under 215.5", value: 1.95, trend: "same" }
-      ],
-      "DC": [
-        { id: "llg-1x", name: "1X", value: 1.25, trend: "same" },
-        { id: "llg-12", name: "12", value: 1.05, trend: "same" },
-        { id: "llg-x2", name: "X2", value: 1.6, trend: "same" }
-      ],
-      "Handicap": [
-        { id: "llg-h1", name: "(-3.5) 1", value: 1.9, trend: "same" },
-        { id: "llg-h2", name: "(+3.5) 2", value: 1.9, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "live-bos-mia",
-    gameId: "88202",
-    sport: "basketball",
-    league: "NBA",
-    countryOrCategory: "USA",
-    homeTeam: "Boston Celtics",
-    awayTeam: "Miami Heat",
-    homeScore: 62,
-    awayScore: 58,
-    minute: "01:30 Q2",
-    period: "Q2",
-    isLive: true,
-    isHot: false,
-    hasLiveStream: false,
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    marketsCount: 72,
-    markets: {
-      "1X2": [
-        { id: "lbm-1", name: "1", value: 1.45, trend: "same" },
-        { id: "lbm-x", name: "X", value: 15, trend: "same" },
-        { id: "lbm-2", name: "2", value: 2.75, trend: "same" }
-      ],
-      "O/U": [
-        { id: "lbm-o210", name: "Over 210.5", value: 1.88, trend: "same" },
-        { id: "lbm-u210", name: "Under 210.5", value: 1.92, trend: "same" }
-      ],
-      "DC": [
-        { id: "lbm-1x", name: "1X", value: 1.18, trend: "same" },
-        { id: "lbm-12", name: "12", value: 1.04, trend: "same" },
-        { id: "lbm-x2", name: "X2", value: 1.95, trend: "same" }
-      ],
-      "Handicap": [
-        { id: "lbm-h1", name: "(-5.5) 1", value: 1.9, trend: "same" },
-        { id: "lbm-h2", name: "(+5.5) 2", value: 1.9, trend: "same" }
-      ]
-    }
-  },
-  // --- UPCOMING / TODAY / HIGHLIGHTS MATCHES FOR TODAY & FOLLOWING DAYS ---
-  ...REAL_UPCOMING_FIXTURES,
-  // Additional Evening Europa League & International Fixtures
-  {
-    id: "up-today-1",
-    gameId: "41392",
-    sport: "football",
-    league: "UEFA Europa League",
-    countryOrCategory: "Europe",
-    homeTeam: "Tottenham Hotspur",
-    awayTeam: "Qaraba\u011F FK",
-    startTime: "19:00",
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 234,
-    markets: {
-      "1X2": [
-        { id: "ut1-1", name: "1", value: 1.18, trend: "same" },
-        { id: "ut1-x", name: "X", value: 7.2, trend: "same" },
-        { id: "ut1-2", name: "2", value: 13.5, trend: "same" }
-      ],
-      "O/U": [
-        { id: "ut1-o2.5", name: "Over 2.5", value: 1.4, trend: "same" },
-        { id: "ut1-u2.5", name: "Under 2.5", value: 2.85, trend: "same" }
-      ],
-      "DC": [
-        { id: "ut1-1x", name: "1X", value: 1.02, trend: "same" },
-        { id: "ut1-12", name: "12", value: 1.08, trend: "same" },
-        { id: "ut1-x2", name: "X2", value: 4.5, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-today-2",
-    gameId: "54968",
-    sport: "football",
-    league: "UEFA Europa League",
-    countryOrCategory: "Europe",
-    homeTeam: "AS Roma",
-    awayTeam: "Athletic Bilbao",
-    startTime: "19:00",
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 195,
-    markets: {
-      "1X2": [
-        { id: "ut2-1", name: "1", value: 2.05, trend: "same" },
-        { id: "ut2-x", name: "X", value: 3.35, trend: "same" },
-        { id: "ut2-2", name: "2", value: 3.65, trend: "same" }
-      ],
-      "O/U": [
-        { id: "ut2-o2.5", name: "Over 2.5", value: 1.95, trend: "same" },
-        { id: "ut2-u2.5", name: "Under 2.5", value: 1.82, trend: "same" }
-      ],
-      "DC": [
-        { id: "ut2-1x", name: "1X", value: 1.28, trend: "same" },
-        { id: "ut2-12", name: "12", value: 1.31, trend: "same" },
-        { id: "ut2-x2", name: "X2", value: 1.74, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-today-3",
-    gameId: "31849",
-    sport: "football",
-    league: "UEFA Europa League",
-    countryOrCategory: "Europe",
-    homeTeam: "Ajax Amsterdam",
-    awayTeam: "Be\u015Fikta\u015F",
-    startTime: "19:00",
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    isLive: false,
-    isHot: true,
-    marketsCount: 188,
-    markets: {
-      "1X2": [
-        { id: "ut3-1", name: "1", value: 1.9, trend: "same" },
-        { id: "ut3-x", name: "X", value: 3.7, trend: "same" },
-        { id: "ut3-2", name: "2", value: 3.8, trend: "same" }
-      ],
-      "O/U": [
-        { id: "ut3-o2.5", name: "Over 2.5", value: 1.62, trend: "same" },
-        { id: "ut3-u2.5", name: "Under 2.5", value: 2.25, trend: "same" }
-      ],
-      "DC": [
-        { id: "ut3-1x", name: "1X", value: 1.25, trend: "same" },
-        { id: "ut3-12", name: "12", value: 1.26, trend: "same" },
-        { id: "ut3-x2", name: "X2", value: 1.85, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-today-4",
-    gameId: "63124",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Celta Vigo",
-    awayTeam: "Atletico Madrid",
-    startTime: "20:00",
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 388,
-    markets: {
-      "1X2": [
-        { id: "ut4-1", name: "1", value: 3.85, trend: "same" },
-        { id: "ut4-x", name: "X", value: 3.4, trend: "same" },
-        { id: "ut4-2", name: "2", value: 1.95, trend: "same" }
-      ],
-      "O/U": [
-        { id: "ut4-o2.5", name: "Over 2.5", value: 1.98, trend: "same" },
-        { id: "ut4-u2.5", name: "Under 2.5", value: 1.8, trend: "same" }
-      ],
-      "DC": [
-        { id: "ut4-1x", name: "1X", value: 1.8, trend: "same" },
-        { id: "ut4-12", name: "12", value: 1.3, trend: "same" },
-        { id: "ut4-x2", name: "X2", value: 1.24, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-today-5",
-    gameId: "65978",
-    sport: "football",
-    league: "Coppa Italia",
-    countryOrCategory: "Italy",
-    homeTeam: "Napoli",
-    awayTeam: "Palermo",
-    startTime: "19:00",
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    isLive: false,
-    isHot: false,
-    marketsCount: 165,
-    markets: {
-      "1X2": [
-        { id: "ut5-1", name: "1", value: 1.25, trend: "same" },
-        { id: "ut5-x", name: "X", value: 5.8, trend: "same" },
-        { id: "ut5-2", name: "2", value: 10.5, trend: "same" }
-      ],
-      "O/U": [
-        { id: "ut5-o2.5", name: "Over 2.5", value: 1.55, trend: "same" },
-        { id: "ut5-u2.5", name: "Under 2.5", value: 2.38, trend: "same" }
-      ],
-      "DC": [
-        { id: "ut5-1x", name: "1X", value: 1.04, trend: "same" },
-        { id: "ut5-12", name: "12", value: 1.12, trend: "same" },
-        { id: "ut5-x2", name: "X2", value: 3.75, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-today-6",
-    gameId: "77218",
-    sport: "basketball",
-    league: "NBA",
-    countryOrCategory: "USA",
-    homeTeam: "Denver Nuggets",
-    awayTeam: "Phoenix Suns",
-    startTime: "23:30",
-    date: "2026-09-24",
-    dateLabel: "Today 24/09",
-    isLive: false,
-    isHot: true,
-    marketsCount: 160,
-    markets: {
-      "1X2": [
-        { id: "ut6-1", name: "1", value: 1.55, trend: "same" },
-        { id: "ut6-x", name: "X", value: 15, trend: "same" },
-        { id: "ut6-2", name: "2", value: 2.45, trend: "same" }
-      ],
-      "O/U": [
-        { id: "ut6-o220", name: "Over 224.5", value: 1.9, trend: "same" },
-        { id: "ut6-u220", name: "Under 224.5", value: 1.9, trend: "same" }
-      ],
-      "Handicap": [
-        { id: "ut6-h1", name: "(-4.5) 1", value: 1.9, trend: "same" },
-        { id: "ut6-h2", name: "(+4.5) 2", value: 1.9, trend: "same" }
-      ]
-    }
-  },
-  // 2. FRIDAY 25/09 FIXTURES
-  {
-    id: "up-fri-1",
-    gameId: "82914",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "AC Milan",
-    awayTeam: "Lecce",
-    startTime: "18:45",
-    date: "2026-09-25",
-    dateLabel: "Friday 25/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 215,
-    markets: {
-      "1X2": [
-        { id: "uf1-1", name: "1", value: 1.35, trend: "same" },
-        { id: "uf1-x", name: "X", value: 4.9, trend: "same" },
-        { id: "uf1-2", name: "2", value: 8.5, trend: "same" }
-      ],
-      "O/U": [
-        { id: "uf1-o2.5", name: "Over 2.5", value: 1.65, trend: "same" },
-        { id: "uf1-u2.5", name: "Under 2.5", value: 2.2, trend: "same" }
-      ],
-      "DC": [
-        { id: "uf1-1x", name: "1X", value: 1.07, trend: "same" },
-        { id: "uf1-12", name: "12", value: 1.16, trend: "same" },
-        { id: "uf1-x2", name: "X2", value: 3.1, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-fri-2",
-    gameId: "49102",
-    sport: "football",
-    league: "Bundesliga",
-    countryOrCategory: "Germany",
-    homeTeam: "Borussia Dortmund",
-    awayTeam: "VfL Bochum",
-    startTime: "18:30",
-    date: "2026-09-25",
-    dateLabel: "Friday 25/09",
-    isLive: false,
-    isHot: true,
-    marketsCount: 228,
-    markets: {
-      "1X2": [
-        { id: "uf2-1", name: "1", value: 1.28, trend: "same" },
-        { id: "uf2-x", name: "X", value: 5.75, trend: "same" },
-        { id: "uf2-2", name: "2", value: 9.8, trend: "same" }
-      ],
-      "O/U": [
-        { id: "uf2-o3.5", name: "Over 3.5", value: 1.85, trend: "same" },
-        { id: "uf2-u3.5", name: "Under 3.5", value: 1.92, trend: "same" }
-      ],
-      "DC": [
-        { id: "uf2-1x", name: "1X", value: 1.05, trend: "same" },
-        { id: "uf2-12", name: "12", value: 1.12, trend: "same" },
-        { id: "uf2-x2", name: "X2", value: 3.55, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-fri-3",
-    gameId: "93012",
-    sport: "football",
-    league: "Ligue 1",
-    countryOrCategory: "France",
-    homeTeam: "Paris Saint-Germain",
-    awayTeam: "Rennes",
-    startTime: "19:00",
-    date: "2026-09-25",
-    dateLabel: "Friday 25/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 245,
-    markets: {
-      "1X2": [
-        { id: "uf3-1", name: "1", value: 1.48, trend: "same" },
-        { id: "uf3-x", name: "X", value: 4.6, trend: "same" },
-        { id: "uf3-2", name: "2", value: 6.2, trend: "same" }
-      ],
-      "O/U": [
-        { id: "uf3-o2.5", name: "Over 2.5", value: 1.58, trend: "same" },
-        { id: "uf3-u2.5", name: "Under 2.5", value: 2.3, trend: "same" }
-      ],
-      "DC": [
-        { id: "uf3-1x", name: "1X", value: 1.11, trend: "same" },
-        { id: "uf3-12", name: "12", value: 1.18, trend: "same" },
-        { id: "uf3-x2", name: "X2", value: 2.55, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-fri-4",
-    gameId: "58210",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Real Valladolid",
-    awayTeam: "RCD Mallorca",
-    startTime: "19:00",
-    date: "2026-09-25",
-    dateLabel: "Friday 25/09",
-    isLive: false,
-    marketsCount: 174,
-    markets: {
-      "1X2": [
-        { id: "uf4-1", name: "1", value: 2.65, trend: "same" },
-        { id: "uf4-x", name: "X", value: 3, trend: "same" },
-        { id: "uf4-2", name: "2", value: 2.9, trend: "same" }
-      ],
-      "O/U": [
-        { id: "uf4-o1.5", name: "Over 1.5", value: 1.48, trend: "same" },
-        { id: "uf4-u1.5", name: "Under 1.5", value: 2.55, trend: "same" }
-      ],
-      "DC": [
-        { id: "uf4-1x", name: "1X", value: 1.4, trend: "same" },
-        { id: "uf4-12", name: "12", value: 1.36, trend: "same" },
-        { id: "uf4-x2", name: "X2", value: 1.46, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-fri-5",
-    gameId: "44102",
-    sport: "basketball",
-    league: "NBA",
-    countryOrCategory: "USA",
-    homeTeam: "Milwaukee Bucks",
-    awayTeam: "Philadelphia 76ers",
-    startTime: "23:00",
-    date: "2026-09-25",
-    dateLabel: "Friday 25/09",
-    isLive: false,
-    isHot: true,
-    marketsCount: 155,
-    markets: {
-      "1X2": [
-        { id: "uf5-1", name: "1", value: 1.72, trend: "same" },
-        { id: "uf5-x", name: "X", value: 14.5, trend: "same" },
-        { id: "uf5-2", name: "2", value: 2.15, trend: "same" }
-      ],
-      "O/U": [
-        { id: "uf5-o228", name: "Over 228.5", value: 1.9, trend: "same" },
-        { id: "uf5-u228", name: "Under 228.5", value: 1.9, trend: "same" }
-      ]
-    }
-  },
-  // 3. SATURDAY 26/09 (Blockbuster Weekend Matchday)
-  {
-    id: "up-sat-1",
-    gameId: "19823",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Newcastle United",
-    awayTeam: "Manchester City",
-    startTime: "11:30 AM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 320,
-    markets: {
-      "1X2": [
-        { id: "us1-1", name: "1", value: 4.8, trend: "same" },
-        { id: "us1-x", name: "X", value: 4.2, trend: "same" },
-        { id: "us1-2", name: "2", value: 1.68, trend: "same" }
-      ],
-      "O/U": [
-        { id: "us1-o2.5", name: "Over 2.5", value: 1.6, trend: "same" },
-        { id: "us1-u2.5", name: "Under 2.5", value: 2.3, trend: "same" }
-      ],
-      "DC": [
-        { id: "us1-1x", name: "1X", value: 2.15, trend: "same" },
-        { id: "us1-12", name: "12", value: 1.22, trend: "same" },
-        { id: "us1-x2", name: "X2", value: 1.18, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sat-2",
-    gameId: "87055",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Arsenal FC",
-    awayTeam: "Leicester City",
-    startTime: "02:00 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 295,
-    markets: {
-      "1X2": [
-        { id: "us2-1", name: "1", value: 1.22, trend: "same" },
-        { id: "us2-x", name: "X", value: 6.8, trend: "same" },
-        { id: "us2-2", name: "2", value: 11.5, trend: "same" }
-      ],
-      "O/U": [
-        { id: "us2-o2.5", name: "Over 2.5", value: 1.45, trend: "same" },
-        { id: "us2-u2.5", name: "Under 2.5", value: 2.65, trend: "same" }
-      ],
-      "DC": [
-        { id: "us2-1x", name: "1X", value: 1.04, trend: "same" },
-        { id: "us2-12", name: "12", value: 1.1, trend: "same" },
-        { id: "us2-x2", name: "X2", value: 4.1, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sat-3",
-    gameId: "45446",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Chelsea FC",
-    awayTeam: "Brighton and Hove Albion",
-    startTime: "02:00 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 285,
-    markets: {
-      "1X2": [
-        { id: "us3-1", name: "1", value: 1.74, trend: "same" },
-        { id: "us3-x", name: "X", value: 4.05, trend: "same" },
-        { id: "us3-2", name: "2", value: 4.35, trend: "same" }
-      ],
-      "O/U": [
-        { id: "us3-o2.5", name: "Over 2.5", value: 1.55, trend: "same" },
-        { id: "us3-u2.5", name: "Under 2.5", value: 2.4, trend: "same" }
-      ],
-      "DC": [
-        { id: "us3-1x", name: "1X", value: 1.21, trend: "same" },
-        { id: "us3-12", name: "12", value: 1.23, trend: "same" },
-        { id: "us3-x2", name: "X2", value: 2.05, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sat-4",
-    gameId: "02601",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Brentford",
-    awayTeam: "West Ham United",
-    startTime: "02:00 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    marketsCount: 218,
-    markets: {
-      "1X2": [
-        { id: "us4-1", name: "1", value: 2.2, trend: "same" },
-        { id: "us4-x", name: "X", value: 3.55, trend: "same" },
-        { id: "us4-2", name: "2", value: 3.15, trend: "same" }
-      ],
-      "O/U": [
-        { id: "us4-o2.5", name: "Over 2.5", value: 1.72, trend: "same" },
-        { id: "us4-u2.5", name: "Under 2.5", value: 2.1, trend: "same" }
-      ],
-      "DC": [
-        { id: "us4-1x", name: "1X", value: 1.35, trend: "same" },
-        { id: "us4-12", name: "12", value: 1.28, trend: "same" },
-        { id: "us4-x2", name: "X2", value: 1.65, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sat-5",
-    gameId: "86567",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Everton",
-    awayTeam: "Crystal Palace",
-    startTime: "02:00 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    marketsCount: 210,
-    markets: {
-      "1X2": [
-        { id: "us5-1", name: "1", value: 2.7, trend: "same" },
-        { id: "us5-x", name: "X", value: 3.3, trend: "same" },
-        { id: "us5-2", name: "2", value: 2.65, trend: "same" }
-      ],
-      "O/U": [
-        { id: "us5-o2.5", name: "Over 2.5", value: 1.95, trend: "same" },
-        { id: "us5-u2.5", name: "Under 2.5", value: 1.82, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sat-6",
-    gameId: "28840",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Nottingham Forest",
-    awayTeam: "Fulham",
-    startTime: "02:00 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    marketsCount: 204,
-    markets: {
-      "1X2": [
-        { id: "us6-1", name: "1", value: 2.35, trend: "same" },
-        { id: "us6-x", name: "X", value: 3.35, trend: "same" },
-        { id: "us6-2", name: "2", value: 3.1, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sat-7",
-    gameId: "62328",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Wolverhampton Wanderers",
-    awayTeam: "Liverpool FC",
-    startTime: "04:30 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 310,
-    markets: {
-      "1X2": [
-        { id: "us7-1", name: "1", value: 7.2, trend: "same" },
-        { id: "us7-x", name: "X", value: 5.2, trend: "same" },
-        { id: "us7-2", name: "2", value: 1.38, trend: "same" }
-      ],
-      "O/U": [
-        { id: "us7-o2.5", name: "Over 2.5", value: 1.5, trend: "same" },
-        { id: "us7-u2.5", name: "Under 2.5", value: 2.55, trend: "same" }
-      ],
-      "DC": [
-        { id: "us7-1x", name: "1X", value: 3, trend: "same" },
-        { id: "us7-12", name: "12", value: 1.15, trend: "same" },
-        { id: "us7-x2", name: "X2", value: 1.09, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sat-8",
-    gameId: "99281",
-    sport: "football",
-    league: "Bundesliga",
-    countryOrCategory: "Germany",
-    homeTeam: "Bayern Munich",
-    awayTeam: "Bayer Leverkusen",
-    startTime: "04:30 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 350,
-    markets: {
-      "1X2": [
-        { id: "us8-1", name: "1", value: 1.7, trend: "same" },
-        { id: "us8-x", name: "X", value: 4.35, trend: "same" },
-        { id: "us8-2", name: "2", value: 4.3, trend: "same" }
-      ],
-      "O/U": [
-        { id: "us8-o3.5", name: "Over 3.5", value: 2.05, trend: "same" },
-        { id: "us8-u3.5", name: "Under 3.5", value: 1.75, trend: "same" }
-      ],
-      "DC": [
-        { id: "us8-1x", name: "1X", value: 1.22, trend: "same" },
-        { id: "us8-12", name: "12", value: 1.2, trend: "same" },
-        { id: "us8-x2", name: "X2", value: 2.1, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sat-9",
-    gameId: "80633",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "CA Osasuna",
-    awayTeam: "FC Barcelona",
-    startTime: "07:00 PM",
-    date: "2026-09-26",
-    dateLabel: "Saturday 26/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 298,
-    markets: {
-      "1X2": [
-        { id: "us9-1", name: "1", value: 6, trend: "same" },
-        { id: "us9-x", name: "X", value: 4.5, trend: "same" },
-        { id: "us9-2", name: "2", value: 1.5, trend: "same" }
-      ],
-      "O/U": [
-        { id: "us9-o2.5", name: "Over 2.5", value: 1.62, trend: "same" },
-        { id: "us9-u2.5", name: "Under 2.5", value: 2.25, trend: "same" }
-      ],
-      "DC": [
-        { id: "us9-1x", name: "1X", value: 2.55, trend: "same" },
-        { id: "us9-12", name: "12", value: 1.19, trend: "same" },
-        { id: "us9-x2", name: "X2", value: 1.12, trend: "same" }
-      ]
-    }
-  },
-  // 4. SUNDAY 27/09 FIXTURES
-  {
-    id: "up-sun-1",
-    gameId: "21421",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Ipswich Town",
-    awayTeam: "Aston Villa",
-    startTime: "01:00 PM",
-    date: "2026-09-27",
-    dateLabel: "Sunday 27/09",
-    isLive: false,
-    marketsCount: 220,
-    markets: {
-      "1X2": [
-        { id: "usu1-1", name: "1", value: 4.2, trend: "same" },
-        { id: "usu1-x", name: "X", value: 3.8, trend: "same" },
-        { id: "usu1-2", name: "2", value: 1.82, trend: "same" }
-      ],
-      "O/U": [
-        { id: "usu1-o2.5", name: "Over 2.5", value: 1.7, trend: "same" },
-        { id: "usu1-u2.5", name: "Under 2.5", value: 2.12, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sun-2",
-    gameId: "22924",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Manchester United",
-    awayTeam: "Tottenham Hotspur",
-    startTime: "03:30 PM",
-    date: "2026-09-27",
-    dateLabel: "Sunday 27/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 380,
-    markets: {
-      "1X2": [
-        { id: "usu2-1", name: "1", value: 2.3, trend: "same" },
-        { id: "usu2-x", name: "X", value: 3.75, trend: "same" },
-        { id: "usu2-2", name: "2", value: 2.9, trend: "same" }
-      ],
-      "O/U": [
-        { id: "usu2-o2.5", name: "Over 2.5", value: 1.52, trend: "same" },
-        { id: "usu2-u2.5", name: "Under 2.5", value: 2.45, trend: "same" }
-      ],
-      "DC": [
-        { id: "usu2-1x", name: "1X", value: 1.4, trend: "same" },
-        { id: "usu2-12", name: "12", value: 1.25, trend: "same" },
-        { id: "usu2-x2", name: "X2", value: 1.62, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sun-3",
-    gameId: "55124",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Atletico Madrid",
-    awayTeam: "Real Madrid",
-    startTime: "07:00 PM",
-    date: "2026-09-27",
-    dateLabel: "Sunday 27/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 420,
-    markets: {
-      "1X2": [
-        { id: "usu3-1", name: "1", value: 2.8, trend: "same" },
-        { id: "usu3-x", name: "X", value: 3.45, trend: "same" },
-        { id: "usu3-2", name: "2", value: 2.45, trend: "same" }
-      ],
-      "O/U": [
-        { id: "usu3-o2.5", name: "Over 2.5", value: 1.82, trend: "same" },
-        { id: "usu3-u2.5", name: "Under 2.5", value: 1.98, trend: "same" }
-      ],
-      "DC": [
-        { id: "usu3-1x", name: "1X", value: 1.55, trend: "same" },
-        { id: "usu3-12", name: "12", value: 1.3, trend: "same" },
-        { id: "usu3-x2", name: "X2", value: 1.42, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sun-4",
-    gameId: "38693",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Athletic Bilbao",
-    awayTeam: "Sevilla FC",
-    startTime: "02:15 PM",
-    date: "2026-09-27",
-    dateLabel: "Sunday 27/09",
-    isLive: false,
-    marketsCount: 215,
-    markets: {
-      "1X2": [
-        { id: "usu4-1", name: "1", value: 1.78, trend: "same" },
-        { id: "usu4-x", name: "X", value: 3.65, trend: "same" },
-        { id: "usu4-2", name: "2", value: 4.6, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-sun-5",
-    gameId: "34947",
-    sport: "football",
-    league: "Serie A",
-    countryOrCategory: "Italy",
-    homeTeam: "Napoli",
-    awayTeam: "Monza",
-    startTime: "06:45 PM",
-    date: "2026-09-27",
-    dateLabel: "Sunday 27/09",
-    isLive: false,
-    isHot: true,
-    marketsCount: 230,
-    markets: {
-      "1X2": [
-        { id: "usu5-1", name: "1", value: 1.38, trend: "same" },
-        { id: "usu5-x", name: "X", value: 4.8, trend: "same" },
-        { id: "usu5-2", name: "2", value: 8.2, trend: "same" }
-      ]
-    }
-  },
-  // 5. MONDAY 28/09 FIXTURES
-  {
-    id: "up-mon-1",
-    gameId: "56648",
-    sport: "football",
-    league: "Premier League",
-    countryOrCategory: "England",
-    homeTeam: "Bournemouth",
-    awayTeam: "Southampton",
-    startTime: "07:00 PM",
-    date: "2026-09-28",
-    dateLabel: "Monday 28/09",
-    isLive: false,
-    isHot: true,
-    hasLiveStream: true,
-    marketsCount: 260,
-    markets: {
-      "1X2": [
-        { id: "um1-1", name: "1", value: 1.75, trend: "same" },
-        { id: "um1-x", name: "X", value: 3.9, trend: "same" },
-        { id: "um1-2", name: "2", value: 4.4, trend: "same" }
-      ],
-      "O/U": [
-        { id: "um1-o2.5", name: "Over 2.5", value: 1.68, trend: "same" },
-        { id: "um1-u2.5", name: "Under 2.5", value: 2.15, trend: "same" }
-      ]
-    }
-  },
-  {
-    id: "up-mon-2",
-    gameId: "63768",
-    sport: "football",
-    league: "La Liga",
-    countryOrCategory: "Spain",
-    homeTeam: "Villarreal",
-    awayTeam: "Las Palmas",
-    startTime: "07:00 PM",
-    date: "2026-09-28",
-    dateLabel: "Monday 28/09",
-    isLive: false,
-    marketsCount: 225,
-    markets: {
-      "1X2": [
-        { id: "um2-1", name: "1", value: 1.48, trend: "same" },
-        { id: "um2-x", name: "X", value: 4.6, trend: "same" },
-        { id: "um2-2", name: "2", value: 6.2, trend: "same" }
-      ]
-    }
-  }
-];
+var INITIAL_MATCHES = REAL_UPCOMING_FIXTURES;
 var INITIAL_OPEN_BETS = [
   {
-    id: "bet-dortmund-7",
+    id: "bet-nations-1",
     ticketId: "SBGH-7819-2041",
     transactionId: "TX-GH-892184912",
     bookingCode: "DA2R3J",
     type: "Multiple",
-    date: "24/09 07:55",
+    date: "25/09 07:55",
     isLive: true,
     selections: [
       {
-        matchId: "live-dortmund",
-        gameId: "10924",
-        matchTitle: "Borussia Dortmund vs Werder ...",
-        marketName: "Over/Under",
-        selectionName: "Over 1.5",
-        odd: 1.32,
+        matchId: "live-alg-tun-u20",
+        gameId: "21094",
+        matchTitle: "Algeria U20 vs Tunisia U20",
+        marketName: "1X2",
+        selectionName: "Draw (X)",
+        odd: 1.85,
         isLive: true,
-        liveOdds: 1.25,
+        liveOdds: 1.85,
         liveOddsTrend: "same",
-        liveScore: "1:0",
-        liveTime: "68' H2",
+        liveScore: "1:1",
+        liveTime: "76' 2H",
         hasTracker: true,
         hasStats: true
       },
       {
-        matchId: "live-rayo",
-        gameId: "29811",
-        matchTitle: "Rayo Vallecano vs Athletic Bilbao",
-        marketName: "Over/Under",
-        selectionName: "Over 1.5",
-        odd: 1.26,
-        isLive: true,
-        liveOdds: 1.18,
-        liveOddsTrend: "down",
-        liveScore: "2:1",
-        liveTime: "83' H2",
+        matchId: "theodds-95d5c8d1489bc284b68dc332fa1cb854",
+        gameId: "95581",
+        matchTitle: "Italy vs Belgium",
+        marketName: "1X2",
+        selectionName: "Italy (1)",
+        odd: 2.27,
+        isLive: false,
+        liveOdds: 2.27,
+        liveOddsTrend: "same",
         hasTracker: true,
         hasStats: true
       }
     ],
     stake: 7,
-    totalOdds: 2357.6,
-    potentialWin: 16503.17,
+    totalOdds: 4.2,
+    potentialWin: 29.4,
     status: "open",
     cashoutAvailable: true,
     cashoutAmount: 7
   },
   {
-    id: "bet-austria-1",
+    id: "bet-france-1",
     ticketId: "SBGH-9812-3312",
     transactionId: "TX-GH-312984921",
     bookingCode: "DA2R1A",
-    type: "Multiple",
-    date: "24/09 07:56",
+    type: "Single",
+    date: "25/09 07:56",
     isLive: false,
     selections: [
       {
-        matchId: "pre-austria",
-        gameId: "18492",
-        matchTitle: "Austria vs Israel",
+        matchId: "theodds-2b7592be536420c10378dd7522466f6a",
+        gameId: "27592",
+        matchTitle: "Turkey vs France",
         marketName: "1X2",
-        selectionName: "Home",
-        odd: 1.22,
+        selectionName: "France (2)",
+        odd: 1.62,
         isLive: false,
         hasTracker: false,
         hasStats: true
       }
     ],
-    stake: 1,
-    totalOdds: 1.22,
-    potentialWin: 1.22,
+    stake: 5,
+    totalOdds: 1.62,
+    potentialWin: 8.1,
     status: "open",
     cashoutAvailable: true,
-    cashoutAmount: 0.82
+    cashoutAmount: 4.8
   }
 ];
 var INITIAL_BET_HISTORY = [
@@ -3033,36 +4964,27 @@ var INITIAL_BET_HISTORY = [
     isLive: false,
     selections: [
       {
-        matchId: "h-1",
-        gameId: "5501",
-        matchTitle: "Rayo Vallecano v Athletic Bilbao",
+        matchId: "theodds-d559e0b2cc9b79504ad6d3e221ea050f",
+        gameId: "55902",
+        matchTitle: "Armenia vs Latvia",
         marketName: "1X2",
-        selectionName: "Home",
+        selectionName: "Armenia (1)",
         odd: 1.85,
         isLive: false
       },
       {
-        matchId: "h-2",
-        gameId: "5502",
-        matchTitle: "Alaves v Atletico Madrid",
+        matchId: "theodds-56e89688e8dcce4889162404c8290f50",
+        gameId: "56898",
+        matchTitle: "Georgia vs Northern Ireland",
         marketName: "1X2",
-        selectionName: "Away",
-        odd: 1.65,
-        isLive: false
-      },
-      {
-        matchId: "h-3",
-        gameId: "5503",
-        matchTitle: "Real Madrid v Villarreal",
-        marketName: "1X2",
-        selectionName: "Home",
-        odd: 1.4,
+        selectionName: "Georgia (1)",
+        odd: 1.9,
         isLive: false
       }
     ],
     stake: 7,
-    totalOdds: 1,
-    potentialWin: 7,
+    totalOdds: 3.52,
+    potentialWin: 24.64,
     status: "won",
     cashoutAvailable: false
   }
@@ -5656,6 +7578,7 @@ var MatchModel = import_mongoose6.default.models.Match || import_mongoose6.defau
 
 // src/server/sports/theOddsApiService.ts
 var SUPPORTED_LEAGUES = [
+  { key: "soccer_uefa_nations_league", sport: "football", league: "UEFA Nations League", country: "Europe" },
   { key: "soccer_epl", sport: "football", league: "Premier League", country: "England" },
   { key: "soccer_spain_la_liga", sport: "football", league: "La Liga", country: "Spain" },
   { key: "soccer_italy_serie_a", sport: "football", league: "Serie A", country: "Italy" },
@@ -5663,10 +7586,12 @@ var SUPPORTED_LEAGUES = [
   { key: "soccer_france_ligue_one", sport: "football", league: "Ligue 1", country: "France" },
   { key: "soccer_uefa_champs_league", sport: "football", league: "UEFA Champions League", country: "Europe" },
   { key: "soccer_uefa_europa_league", sport: "football", league: "UEFA Europa League", country: "Europe" },
-  { key: "basketball_nba", sport: "basketball", league: "NBA", country: "USA" }
+  { key: "soccer_efl_champ", sport: "football", league: "Championship", country: "England" },
+  { key: "basketball_nba", sport: "basketball", league: "NBA", country: "USA" },
+  { key: "americanfootball_nfl", sport: "football", league: "NFL", country: "USA" }
 ];
 function getTheOddsApiKey() {
-  return (process.env.THE_ODDS_API_KEY || "").trim();
+  return (process.env.THE_ODDS_API_KEY || "cae042eb472e9a12bf139e8dc5369281").trim();
 }
 var TheOddsApiService = class {
   constructor() {
@@ -5675,18 +7600,22 @@ var TheOddsApiService = class {
     this.remainingCredits = 496;
     this.usedCredits = 4;
     this.requestsToday = 0;
-    this.dailyBudget = 14;
-    // 14 requests/day * 30 days = ~420 requests (safe under 500)
+    this.dailyBudget = 30;
+    // 30 requests/day
     this.currentUtcDay = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
     this.lastSyncedAt = null;
     this.lastManualSyncTime = 0;
-    this.manualSyncCooldownMs = 15 * 60 * 1e3;
-    // 15-minute cooldown to prevent user abuse
+    this.manualSyncCooldownMs = 30 * 1e3;
+    // 30-second cooldown
     this.isSyncing = false;
     this.backgroundIntervalId = null;
     this.init();
   }
   async init() {
+    for (const m of REAL_UPCOMING_FIXTURES) {
+      this.localMatches.set(m.id, m);
+    }
+    this.syncToGlobalDb();
     await this.hydrateFromMongo();
     this.startBackgroundSync();
   }
@@ -5768,10 +7697,10 @@ var TheOddsApiService = class {
     if (!apiKey) {
       return { allowed: false, reason: "The Odds API key is not configured" };
     }
-    if (this.remainingCredits <= 5) {
+    if (this.remainingCredits <= 0) {
       return {
         allowed: false,
-        reason: `Monthly credit buffer reached (${this.remainingCredits} credits remaining of 500)`
+        reason: `Monthly credits exhausted (${this.remainingCredits} credits remaining of 500)`
       };
     }
     if (this.requestsToday >= this.dailyBudget) {
@@ -5823,7 +7752,16 @@ var TheOddsApiService = class {
       dateStr = commenceDate.toISOString().split("T")[0];
       const weekday = commenceDate.toLocaleDateString("en-GB", { weekday: "long" });
       const dayMonth = commenceDate.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit" });
-      dateLabel = `${weekday} ${dayMonth}`;
+      const isToday = commenceDate.toDateString() === now.toDateString();
+      const tomorrow = new Date(now.getTime() + 864e5);
+      const isTomorrow = commenceDate.toDateString() === tomorrow.toDateString();
+      if (isToday) {
+        dateLabel = `Today ${dayMonth}`;
+      } else if (isTomorrow) {
+        dateLabel = `Tomorrow ${dayMonth}`;
+      } else {
+        dateLabel = `${weekday} ${dayMonth}`;
+      }
     }
     let odd1 = 2.1;
     let oddX = 3.3;
@@ -5972,26 +7910,35 @@ var TheOddsApiService = class {
    * Syncs top popular leagues in a single batch (EPL, La Liga, Serie A, Champions League)
    * Consumes only 3-4 API requests per sync cycle!
    */
-  async syncPopularLeagues() {
+  async syncPopularLeagues(sportFilter) {
     if (this.isSyncing) {
-      throw new Error("A sync operation is already in progress");
+      return { syncedCount: this.localMatches.size, leaguesSynced: ["in_progress"] };
     }
     this.isSyncing = true;
     const syncedLeagues = [];
     let totalMatches = 0;
     try {
-      const targetLeagues = SUPPORTED_LEAGUES.slice(0, 3);
+      let targetLeagues;
+      if (sportFilter && sportFilter.toLowerCase() === "basketball") {
+        targetLeagues = SUPPORTED_LEAGUES.filter((l) => l.sport === "basketball");
+      } else {
+        const footballLeagues = SUPPORTED_LEAGUES.filter((l) => l.sport === "football").slice(0, 3);
+        const basketballLeagues = SUPPORTED_LEAGUES.filter((l) => l.sport === "basketball").slice(0, 1);
+        targetLeagues = [...footballLeagues, ...basketballLeagues];
+      }
       for (const league of targetLeagues) {
         try {
           const matches = await this.syncLeague(league);
           totalMatches += matches.length;
           syncedLeagues.push(league.league);
-          await new Promise((r) => setTimeout(r, 800));
+          await new Promise((r) => setTimeout(r, 600));
         } catch (err) {
           console.warn(`[TheOddsAPI] Failed to sync ${league.league}:`, err.message);
         }
       }
-      this.lastManualSyncTime = Date.now();
+      if (totalMatches > 0) {
+        this.lastManualSyncTime = Date.now();
+      }
       return { syncedCount: totalMatches, leaguesSynced: syncedLeagues };
     } finally {
       this.isSyncing = false;
@@ -6003,7 +7950,7 @@ var TheOddsApiService = class {
   async triggerManualSync() {
     const now = Date.now();
     const elapsed = now - this.lastManualSyncTime;
-    if (elapsed < this.manualSyncCooldownMs) {
+    if (this.localMatches.size > 0 && elapsed < this.manualSyncCooldownMs) {
       const remainingSeconds = Math.ceil((this.manualSyncCooldownMs - elapsed) / 1e3);
       const remainingMins = Math.ceil(remainingSeconds / 60);
       return {
@@ -6032,7 +7979,7 @@ var TheOddsApiService = class {
       this.syncPopularLeagues().catch(
         (e) => console.warn("[TheOddsAPI] Initial background sync note:", e.message)
       );
-    }, 1e4);
+    }, 500);
     const THREE_HOURS_MS = 3 * 60 * 60 * 1e3;
     this.backgroundIntervalId = setInterval(() => {
       console.log("[TheOddsAPI] Running scheduled 3-hour background sync...");
@@ -6046,6 +7993,9 @@ var TheOddsApiService = class {
    * 0 external requests consumed!
    */
   getLocalMatches(filters = {}) {
+    if (this.localMatches.size === 0 && !this.isSyncing) {
+      this.syncPopularLeagues().catch((e) => console.warn("[TheOddsAPI AutoSync]", e.message));
+    }
     let matches = Array.from(this.localMatches.values());
     if (filters.sport) {
       const s = filters.sport.toLowerCase();
@@ -6115,14 +8065,22 @@ matchesRouter.get("/", async (req, res) => {
     }
   } catch {
   }
-  for (const m of db.matches) {
+  let theOddsMatches = theOddsApiService.getLocalMatches({ sport: activeSport });
+  if (theOddsMatches.length === 0) {
+    try {
+      await theOddsApiService.syncPopularLeagues(activeSport);
+      theOddsMatches = theOddsApiService.getLocalMatches({ sport: activeSport });
+    } catch (syncErr) {
+      console.warn("[Matches API Sync fallback]", syncErr?.message);
+    }
+  }
+  for (const m of theOddsMatches) {
     if (!seenIds.has(m.id)) {
       seenIds.add(m.id);
       result.push(m);
     }
   }
-  const theOddsMatches = theOddsApiService.getLocalMatches();
-  for (const m of theOddsMatches) {
+  for (const m of db.matches) {
     if (!seenIds.has(m.id)) {
       seenIds.add(m.id);
       result.push(m);

@@ -142,13 +142,13 @@ const ENDPOINTS: ApiEndpoint[] = [
     defaultBody: {
       selections: [
         {
-          matchId: 'live-ars-mci',
-          gameId: '84920',
-          matchTitle: 'Arsenal FC vs Manchester City',
+          matchId: 'theodds-95d5c8d1489bc284b68dc332fa1cb854',
+          gameId: '95581',
+          matchTitle: 'Italy vs Belgium',
           marketName: '1X2',
           selectionName: '1',
-          odd: 2.85,
-          isLive: true
+          odd: 2.27,
+          isLive: false
         }
       ]
     }

@@ -17,6 +17,20 @@ interface AuthModalProps {
   initialMode?: 'login' | 'join';
 }
 
+function sanitizeError(msg?: string | null): string | null {
+  if (!msg) return null;
+  if (
+    msg.includes('<!doctype') ||
+    msg.includes('<html') ||
+    msg.includes('<head>') ||
+    msg.includes('<div id="root">') ||
+    msg.includes('<!DOCTYPE')
+  ) {
+    return 'Unable to reach backend API. The app received an HTML page instead of JSON. Ensure connection to https://sportybet-sand.vercel.app.';
+  }
+  return msg;
+}
+
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'login' }) => {
   const { login, register, showToast } = useBetting();
   const [mode, setMode] = useState<'login' | 'join'>(initialMode);
@@ -25,7 +39,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [rawErrorMessage, setRawErrorMessage] = useState<string | null>(null);
+
+  const errorMessage = sanitizeError(rawErrorMessage);
+  const setErrorMessage = (msg: string | null) => setRawErrorMessage(sanitizeError(msg));
 
   // Server Settings State (for Android APK & dynamic connection)
   const [showServerConfig, setShowServerConfig] = useState(false);

@@ -3,6 +3,12 @@ import { Capacitor } from '@capacitor/core';
 export const STORAGE_KEY_API_URL = 'sportybet_backend_url';
 
 /**
+ * Hardcoded production backend for Android APK builds
+ * Ensures APK calls the live Vercel backend with MongoDB rather than capacitor://localhost
+ */
+export const DEFAULT_PRODUCTION_BACKEND = 'https://sportybet-sand.vercel.app';
+
+/**
  * Checks if running inside native Android/iOS Capacitor shell
  */
 export function isNativePlatform(): boolean {
@@ -40,7 +46,7 @@ export function normalizeApiUrl(rawUrl: string): string {
  * 1. Saved custom URL from localStorage (allows fixing APK without rebuilding)
  * 2. Build-time environment variable VITE_API_URL
  * 3. If running on Web: relative '/api' (routes to current web origin)
- * 4. If running on Native Android/iOS: origin or user-configured URL
+ * 4. If running on Native Android/iOS: hardcoded live Vercel production backend
  */
 export function getApiBaseUrl(): string {
   // 1. Saved custom URL from localStorage
@@ -62,13 +68,13 @@ export function getApiBaseUrl(): string {
     return '/api';
   }
 
-  // 4. Native Capacitor: check if opened from a remote web origin
+  // 4. Native Capacitor: check if opened from a remote web origin that isn't localhost
   if (typeof window !== 'undefined' && window.location.origin && window.location.origin.startsWith('http') && !window.location.origin.includes('localhost')) {
     return normalizeApiUrl(window.location.origin);
   }
 
-  // Native default: return relative '/api'
-  return '/api';
+  // 5. Native APK default: live Vercel production backend (https://sportybet-sand.vercel.app/api)
+  return normalizeApiUrl(DEFAULT_PRODUCTION_BACKEND);
 }
 
 /**

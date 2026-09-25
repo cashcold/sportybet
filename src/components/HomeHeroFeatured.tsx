@@ -182,27 +182,26 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
     sportMatches.find(m => m.isLive) ||
     sportMatches[0] ||
     matches[0] || {
-      id: 'feat-cur-1',
-      gameId: '84920',
+      id: 'theodds-95d5c8d1489bc284b68dc332fa1cb854',
+      gameId: '95581',
       sport: 'football',
-      league: 'Premier League',
-      countryOrCategory: 'England',
-      homeTeam: 'Arsenal FC',
-      awayTeam: 'Manchester City',
-      homeScore: 1,
-      awayScore: 1,
-      minute: "68' 2H",
-      period: '2H',
-      isLive: true,
-      startTime: 'Live',
+      league: 'UEFA Nations League',
+      countryOrCategory: 'Europe',
+      homeTeam: 'Italy',
+      awayTeam: 'Belgium',
+      startTime: '18:45',
+      date: '2026-09-25',
+      dateLabel: 'Today 25/09',
+      commenceTime: '2026-09-25T18:45:00Z',
+      isLive: false,
       isHot: true,
       hasLiveStream: true,
-      marketsCount: 142,
+      marketsCount: 100,
       markets: {
         '1X2': [
-          { id: 'f1-1', name: '1', value: 2.85, trend: 'same' },
-          { id: 'f1-X', name: 'X', value: 2.30, trend: 'same' },
-          { id: 'f1-2', name: '2', value: 3.10, trend: 'up' }
+          { id: 'o-95d5c8d1489bc284b68dc332fa1cb854-1', name: '1', value: 2.27, trend: 'same' },
+          { id: 'o-95d5c8d1489bc284b68dc332fa1cb854-X', name: 'X', value: 3.64, trend: 'same' },
+          { id: 'o-95d5c8d1489bc284b68dc332fa1cb854-2', name: '2', value: 3.16, trend: 'same' }
         ]
       }
     };

@@ -2,6 +2,7 @@ import { Match } from '../../types';
 import { db } from '../db';
 import { MatchModel } from '../models/MatchModel';
 import { isDbConnected, connectToDatabase } from '../mongodb';
+import { REAL_UPCOMING_FIXTURES } from '../../data/realFixtures';
 
 export interface TheOddsQuotaStatus {
   provider: string;
@@ -27,6 +28,7 @@ export interface TheOddsSportDef {
 }
 
 export const SUPPORTED_LEAGUES: TheOddsSportDef[] = [
+  { key: 'soccer_uefa_nations_league', sport: 'football', league: 'UEFA Nations League', country: 'Europe' },
   { key: 'soccer_epl', sport: 'football', league: 'Premier League', country: 'England' },
   { key: 'soccer_spain_la_liga', sport: 'football', league: 'La Liga', country: 'Spain' },
   { key: 'soccer_italy_serie_a', sport: 'football', league: 'Serie A', country: 'Italy' },
@@ -49,11 +51,11 @@ class TheOddsApiService {
   private remainingCredits = 496;
   private usedCredits = 4;
   private requestsToday = 0;
-  private dailyBudget = 14; // 14 requests/day * 30 days = ~420 requests (safe under 500)
+  private dailyBudget = 30; // 30 requests/day
   private currentUtcDay = new Date().toISOString().split('T')[0];
   private lastSyncedAt: Date | null = null;
   private lastManualSyncTime = 0;
-  private manualSyncCooldownMs = 15 * 60 * 1000; // 15-minute cooldown to prevent user abuse
+  private manualSyncCooldownMs = 30 * 1000; // 30-second cooldown
   private isSyncing = false;
   private backgroundIntervalId: NodeJS.Timeout | null = null;
 
@@ -62,6 +64,12 @@ class TheOddsApiService {
   }
 
   private async init() {
+    // Pre-populate memory with real fixtures from The Odds API & today's schedule
+    for (const m of REAL_UPCOMING_FIXTURES) {
+      this.localMatches.set(m.id, m);
+    }
+    this.syncToGlobalDb();
+
     // 1. Load any previously saved matches from MongoDB Atlas on startup
     await this.hydrateFromMongo();
 
@@ -157,10 +165,10 @@ class TheOddsApiService {
       return { allowed: false, reason: 'The Odds API key is not configured' };
     }
 
-    if (this.remainingCredits <= 5) {
+    if (this.remainingCredits <= 0) {
       return {
         allowed: false,
-        reason: `Monthly credit buffer reached (${this.remainingCredits} credits remaining of 500)`
+        reason: `Monthly credits exhausted (${this.remainingCredits} credits remaining of 500)`
       };
     }
 

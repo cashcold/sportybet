@@ -70,18 +70,35 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const hasCorruptedMinutes = parsed.some(
-            (m: any) => m.minute && (String(m.minute).includes('NaN') || String(m.minute).includes(':NaN'))
+          const hasFakeMatches = parsed.some(
+            (m: any) =>
+              m.id === 'live-ars-mci' ||
+              m.id === 'live-rma-bar' ||
+              m.id === 'live-liv-che' ||
+              m.id === 'live-bay-dor' ||
+              m.id === 'up-sat-tot-qar' ||
+              m.id === 'up-fri-1' ||
+              m.id === 'unl-ned-ger' ||
+              m.id === 'afcon-cam-com' ||
+              m.id === 'unl-nor-den' ||
+              (m.homeTeam === 'Arsenal FC' && m.awayTeam === 'Manchester City')
           );
-          if (!hasCorruptedMinutes) {
-            return parsed;
-          }
-          return parsed.map((m: any) => {
-            if (m.minute && (String(m.minute).includes('NaN') || String(m.minute).includes(':NaN'))) {
-              return { ...m, minute: m.period === '1H' ? "32' 1H" : "68' 2H" };
+          if (!hasFakeMatches) {
+            const hasCorruptedMinutes = parsed.some(
+              (m: any) => m.minute && (String(m.minute).includes('NaN') || String(m.minute).includes(':NaN'))
+            );
+            if (!hasCorruptedMinutes) {
+              return parsed;
             }
-            return m;
-          });
+            return parsed.map((m: any) => {
+              if (m.minute && (String(m.minute).includes('NaN') || String(m.minute).includes(':NaN'))) {
+                return { ...m, minute: m.period === '1H' ? "32' 1H" : "68' 2H" };
+              }
+              return m;
+            });
+          } else {
+            localStorage.removeItem('sportybet_matches');
+          }
         }
       } catch {}
     }

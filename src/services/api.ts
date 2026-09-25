@@ -9,10 +9,46 @@ function getAuthHeader(): Record<string, string> {
   };
 }
 
+/**
+ * Safely parses response as JSON, detecting when an HTML page was returned (e.g. 404 SPA fallback or offline webview)
+ */
+async function parseJsonResponse<T = any>(res: Response, endpoint: string): Promise<T> {
+  const text = await res.text();
+  const trimmed = (text || '').trim();
+
+  const isHtml =
+    trimmed.startsWith('<!doctype') ||
+    trimmed.startsWith('<html') ||
+    trimmed.startsWith('<!DOCTYPE') ||
+    trimmed.includes('<div id="root">') ||
+    trimmed.includes('<head>');
+
+  if (isHtml) {
+    const targetUrl = resolveApiUrl(endpoint);
+    throw new Error(
+      `Server returned HTML instead of API JSON (HTTP ${res.status}). Target: ${targetUrl}. Please check backend server configuration.`
+    );
+  }
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    throw new Error(`Invalid JSON received from ${resolveApiUrl(endpoint)} (HTTP ${res.status})`);
+  }
+}
+
 function formatFetchError(err: any, endpoint: string): string {
   const msg = err?.message || 'Network request failed';
-  if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Network request failed') || err?.name === 'TypeError') {
-    return `Failed to connect to server at ${resolveApiUrl(endpoint)}. Please check your network or configure API URL in Settings.`;
+  if (msg.includes('<!doctype') || msg.includes('<html') || msg.includes('<!DOCTYPE')) {
+    return `Server returned HTML page instead of API response. Target: ${resolveApiUrl(endpoint)}`;
+  }
+  if (
+    msg.includes('Failed to fetch') ||
+    msg.includes('NetworkError') ||
+    msg.includes('Network request failed') ||
+    err?.name === 'TypeError'
+  ) {
+    return `Failed to connect to backend server at ${resolveApiUrl(endpoint)}. Please check internet connection or server settings.`;
   }
   return msg;
 }
@@ -28,13 +64,7 @@ export const api = {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone, password })
         });
-        let data: any = null;
-        const text = await res.text();
-        try {
-          data = JSON.parse(text);
-        } catch {
-          data = { success: false, error: text || `Server returned error (${res.status})` };
-        }
+        const data = await parseJsonResponse(res, endpoint);
         if (data.token) {
           localStorage.setItem('sportybet_auth_token', data.token);
         }
@@ -52,13 +82,7 @@ export const api = {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone, password, firstName, lastName })
         });
-        let data: any = null;
-        const text = await res.text();
-        try {
-          data = JSON.parse(text);
-        } catch {
-          data = { success: false, error: text || `Server returned error (${res.status})` };
-        }
+        const data = await parseJsonResponse(res, endpoint);
         if (data.token) {
           localStorage.setItem('sportybet_auth_token', data.token);
         }
@@ -74,7 +98,7 @@ export const api = {
         const res = await fetch(resolveApiUrl(endpoint), {
           headers: getAuthHeader()
         });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -88,7 +112,7 @@ export const api = {
           headers: getAuthHeader(),
           body: JSON.stringify(updates)
         });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -101,7 +125,7 @@ export const api = {
           method: 'POST',
           headers: getAuthHeader()
         });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -130,7 +154,7 @@ export const api = {
         const res = await fetch(resolveApiUrl(endpoint), {
           headers: getAuthHeader()
         });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -144,7 +168,7 @@ export const api = {
           headers: getAuthHeader(),
           body: JSON.stringify({ amount, provider, accountNumber })
         });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -158,7 +182,7 @@ export const api = {
           headers: getAuthHeader(),
           body: JSON.stringify({ amount, provider, accountNumber })
         });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -170,7 +194,7 @@ export const api = {
         const res = await fetch(resolveApiUrl(endpoint), {
           headers: getAuthHeader()
         });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -187,7 +211,7 @@ export const api = {
           headers: getAuthHeader(),
           body: JSON.stringify({ selections, stake, type })
         });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -199,7 +223,7 @@ export const api = {
         const res = await fetch(resolveApiUrl(endpoint), {
           headers: getAuthHeader()
         });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -211,7 +235,7 @@ export const api = {
         const res = await fetch(resolveApiUrl(endpoint), {
           headers: getAuthHeader()
         });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -225,7 +249,7 @@ export const api = {
           headers: getAuthHeader(),
           body: JSON.stringify({ betId })
         });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -239,7 +263,7 @@ export const api = {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ selections })
         });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -249,7 +273,7 @@ export const api = {
       const endpoint = `/bets/booking-code/${encodeURIComponent(code)}`;
       try {
         const res = await fetch(resolveApiUrl(endpoint));
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -268,7 +292,7 @@ export const api = {
       const endpoint = `/matches?${query.toString()}`;
       try {
         const res = await fetch(resolveApiUrl(endpoint));
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -278,7 +302,7 @@ export const api = {
       const endpoint = `/matches/${encodeURIComponent(id)}`;
       try {
         const res = await fetch(resolveApiUrl(endpoint));
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -291,7 +315,7 @@ export const api = {
       const endpoint = '/sports/usage';
       try {
         const res = await fetch(resolveApiUrl(endpoint));
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, stats: [], error: formatFetchError(err, endpoint) };
       }
@@ -301,7 +325,7 @@ export const api = {
       const endpoint = `/sports/${encodeURIComponent(sport)}/status`;
       try {
         const res = await fetch(resolveApiUrl(endpoint));
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -320,7 +344,7 @@ export const api = {
       const endpoint = `/sports/${encodeURIComponent(sport)}/live`;
       try {
         const res = await fetch(resolveApiUrl(endpoint));
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, data: [], error: formatFetchError(err, endpoint) };
       }
@@ -347,7 +371,7 @@ export const api = {
       const endpoint = `/sports/${encodeURIComponent(sport)}/fixtures?${query.toString()}`;
       try {
         const res = await fetch(resolveApiUrl(endpoint));
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, data: [], error: formatFetchError(err, endpoint) };
       }
@@ -359,7 +383,7 @@ export const api = {
         const res = await fetch(resolveApiUrl(endpoint), {
           method: 'POST'
         });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch {
         return { success: false };
       }
@@ -381,7 +405,7 @@ export const api = {
       const endpoint = `/sports/the-odds/matches?${query.toString()}`;
       try {
         const res = await fetch(resolveApiUrl(endpoint));
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, matches: [], error: formatFetchError(err, endpoint) };
       }
@@ -396,7 +420,7 @@ export const api = {
       const endpoint = '/sports/the-odds/sync';
       try {
         const res = await fetch(resolveApiUrl(endpoint), { method: 'POST' });
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, message: formatFetchError(err, endpoint) };
       }
@@ -406,7 +430,7 @@ export const api = {
       const endpoint = '/sports/the-odds/status';
       try {
         const res = await fetch(resolveApiUrl(endpoint));
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
@@ -419,7 +443,7 @@ export const api = {
       const endpoint = '/api';
       try {
         const res = await fetch(resolveApiUrl(endpoint));
-        return await res.json();
+        return await parseJsonResponse(res, endpoint);
       } catch (err: any) {
         return { status: 'offline', error: formatFetchError(err, endpoint) };
       }
