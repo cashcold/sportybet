@@ -40,13 +40,10 @@ class Database {
     // 1. Initialize matches
     this.matches = JSON.parse(JSON.stringify(INITIAL_MATCHES));
 
-    // 2. Initialize default demo user (Charles Asumah) for demo testing
+    // 2. Initialize default demo user store
     const demoUser: UserProfile = JSON.parse(JSON.stringify(DEMO_USER));
     const demoPhone = demoUser.phone || '0204891235';
     this.users.set(demoPhone, demoUser);
-    this.users.set('20******5', demoUser);
-    this.users.set('0204891235', demoUser);
-    this.userSessions.set('demo-token-sportybet-charles', demoPhone);
 
     // 3. Initialize default bets for demo account
     this.openBets.set(demoPhone, JSON.parse(JSON.stringify(INITIAL_OPEN_BETS)));

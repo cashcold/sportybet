@@ -11,7 +11,8 @@ import {
   INITIAL_MATCHES,
   INITIAL_OPEN_BETS,
   INITIAL_BET_HISTORY,
-  INITIAL_USER
+  INITIAL_USER,
+  GUEST_USER
 } from '../data/mockData';
 import { api } from '../services/api';
 import { resolveApiUrl } from '../config/apiConfig';
@@ -61,6 +62,40 @@ interface BettingContextType {
   isQuotaProtected: boolean;
 }
 
+function normalizeMatchDates(rawMatches: Match[]): Match[] {
+  const now = new Date();
+  const todayYMD = now.toISOString().split('T')[0];
+  const tomorrow = new Date(now.getTime() + 86400000);
+  const tomorrowYMD = tomorrow.toISOString().split('T')[0];
+  const todayDayMonth = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+  const tomorrowDayMonth = tomorrow.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+
+  return rawMatches.map((m, idx) => {
+    if (m.isLive) {
+      return {
+        ...m,
+        date: todayYMD,
+        dateLabel: 'Live',
+        startTime: 'Live',
+        commenceTime: now.toISOString()
+      };
+    }
+
+    const isTomorrow = idx % 2 === 1;
+    const matchDateYMD = isTomorrow ? tomorrowYMD : todayYMD;
+    const matchDayMonth = isTomorrow ? tomorrowDayMonth : todayDayMonth;
+    const matchDateLabel = isTomorrow ? `Tomorrow ${matchDayMonth}` : `Today ${matchDayMonth}`;
+
+    const isPast = !m.date || m.date < todayYMD;
+    return {
+      ...m,
+      date: isPast ? matchDateYMD : (m.date || matchDateYMD),
+      dateLabel: isPast ? matchDateLabel : (m.dateLabel || matchDateLabel),
+      commenceTime: isPast ? `${matchDateYMD}T19:00:00Z` : (m.commenceTime || `${matchDateYMD}T19:00:00Z`)
+    };
+  });
+}
+
 const BettingContext = createContext<BettingContextType | undefined>(undefined);
 
 export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -80,31 +115,17 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               m.id === 'up-fri-1' ||
               m.id === 'unl-ned-ger' ||
               m.id === 'afcon-cam-com' ||
-              m.id === 'unl-nor-den' ||
-              (m.homeTeam === 'Arsenal FC' && m.awayTeam === 'Manchester City') ||
-              (m.awayTeam === 'Leeds United' && m.league?.includes('Premier')) ||
-              (m.homeTeam === 'Sunderland' && m.league?.includes('Premier'))
+              m.id === 'unl-nor-den'
           );
           if (!hasFakeMatches) {
-            const hasCorruptedMinutes = parsed.some(
-              (m: any) => m.minute && (String(m.minute).includes('NaN') || String(m.minute).includes(':NaN'))
-            );
-            if (!hasCorruptedMinutes) {
-              return parsed;
-            }
-            return parsed.map((m: any) => {
-              if (m.minute && (String(m.minute).includes('NaN') || String(m.minute).includes(':NaN'))) {
-                return { ...m, minute: m.period === '1H' ? "32' 1H" : "68' 2H" };
-              }
-              return m;
-            });
+            return normalizeMatchDates(parsed);
           } else {
             localStorage.removeItem('sportybet_matches');
           }
         }
       } catch {}
     }
-    return INITIAL_MATCHES;
+    return normalizeMatchDates(INITIAL_MATCHES);
   });
 
   const [betslip, setBetslip] = useState<BetSelection[]>(() => {
@@ -152,25 +173,28 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const [user, setUser] = useState<UserProfile>(() => {
     const saved = localStorage.getItem('sportybet_user');
-    if (saved) {
+    const token = localStorage.getItem('sportybet_auth_token');
+
+    // Clean up any legacy Charles Asumah session so app does not auto-open into Charles Asumah
+    if (token === 'demo-token-sportybet-charles' || (saved && (saved.includes('charles_asumah') || saved.includes('CHARLES')))) {
+      localStorage.removeItem('sportybet_user');
+      localStorage.removeItem('sportybet_auth_token');
+      localStorage.removeItem('sportybet_open_bets');
+      localStorage.removeItem('sportybet_bet_history');
+      return GUEST_USER;
+    }
+
+    if (saved && token) {
       try {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.isLoggedIn) {
-          if (parsed.balance === 0 || parsed.balance === undefined || parsed.currency !== 'GHC' || parsed.balance >= 9000000) {
-            parsed.balance = 5000.00;
-            parsed.currency = 'GHC';
-            localStorage.setItem('sportybet_user', JSON.stringify(parsed));
-          }
           return parsed;
         }
       } catch {
-        return INITIAL_USER;
+        return GUEST_USER;
       }
     }
-    if (!localStorage.getItem('sportybet_auth_token')) {
-      localStorage.setItem('sportybet_auth_token', 'demo-token-sportybet-charles');
-    }
-    return INITIAL_USER;
+    return GUEST_USER;
   });
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('sports');
@@ -293,7 +317,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             return mSport !== activeSport.toLowerCase();
           });
 
-          const updated = [...combinedForSport, ...otherSports];
+          const updated = normalizeMatchDates([...combinedForSport, ...otherSports]);
           try {
             localStorage.setItem('sportybet_matches', JSON.stringify(updated));
           } catch {}
@@ -757,9 +781,8 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch (err: any) {
       //
     }
-    const isCharles = phoneNumber === '0204891235' || phoneNumber === '20******5';
     setUser({
-      username: isCharles ? 'charles_asumah' : `user_${phoneNumber.slice(-4)}`,
+      username: `user_${phoneNumber.slice(-4)}`,
       balance: 5000.00,
       currency: 'GHC',
       loyaltyTier: 'Tier 1',
@@ -768,8 +791,8 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       dailyStreak: 5,
       unreadNotifications: 1,
       phone: phoneNumber,
-      firstName: isCharles ? 'CHARLES' : 'USER',
-      lastName: isCharles ? 'ASUMAH' : phoneNumber.slice(-4),
+      firstName: 'USER',
+      lastName: phoneNumber.slice(-4),
       dateOfBirth: '15/05/1998',
       location: 'Ghana',
       email: '',

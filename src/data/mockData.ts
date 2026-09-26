@@ -230,7 +230,7 @@ export const DEMO_USER: UserProfile = {
   isLoggedIn: true
 };
 
-export const INITIAL_USER: UserProfile = DEMO_USER;
+export const INITIAL_USER: UserProfile = GUEST_USER;
 
 export const SPORTS_LIST = [
   { id: 'popular', name: 'Popular', icon: 'Flame', count: 420 },

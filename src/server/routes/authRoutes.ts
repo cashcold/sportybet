@@ -19,8 +19,8 @@ function formatUserProfile(doc: any): UserProfile {
     dailyStreak: typeof doc.dailyStreak === 'number' ? doc.dailyStreak : 5,
     unreadNotifications: typeof doc.unreadNotifications === 'number' ? doc.unreadNotifications : 1,
     phone: doc.phone,
-    firstName: doc.firstName || 'CHARLES',
-    lastName: doc.lastName || 'ASUMAH',
+    firstName: doc.firstName || '',
+    lastName: doc.lastName || '',
     dateOfBirth: doc.dateOfBirth || '15/05/1998',
     location: doc.location || 'Ghana',
     email: doc.email || '',
@@ -198,14 +198,13 @@ authRouter.post('/login', async (req: Request, res: Response) => {
           await userDoc.save();
         } else {
           // Auto-create on first login for instant seamless access
-          const isCharles = cleanPhone === '20******5' || cleanPhone === '0204891235' || cleanPhone === '204891235';
-          const defaultFirstName = isCharles ? 'CHARLES' : 'USER';
-          const defaultLastName = isCharles ? 'ASUMAH' : cleanPhone.slice(-4);
+          const defaultFirstName = 'USER';
+          const defaultLastName = cleanPhone.slice(-4);
           const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
           userDoc = await UserModel.create({
             phone: cleanPhone,
             password: hashedPassword,
-            username: isCharles ? 'charles_asumah' : `user_${cleanPhone.slice(-4)}`,
+            username: `user_${cleanPhone.slice(-4)}`,
             firstName: defaultFirstName,
             lastName: defaultLastName,
             dateOfBirth: '15/05/1998',

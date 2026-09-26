@@ -534,6 +534,35 @@ class TheOddsApiService {
     }
     let matches = Array.from(this.localMatches.values());
 
+    const now = new Date();
+    const todayYMD = now.toISOString().split('T')[0];
+    const todayDayMonth = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+    const tomorrow = new Date(now.getTime() + 86400000);
+    const tomorrowYMD = tomorrow.toISOString().split('T')[0];
+    const tomorrowDayMonth = tomorrow.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+
+    matches = matches.map((m, idx) => {
+      if (m.isLive) {
+        return {
+          ...m,
+          date: todayYMD,
+          dateLabel: 'Live',
+          startTime: 'Live',
+          commenceTime: now.toISOString()
+        };
+      }
+      if (!m.date || m.date < todayYMD) {
+        const isTom = idx % 2 === 1;
+        return {
+          ...m,
+          date: isTom ? tomorrowYMD : todayYMD,
+          dateLabel: isTom ? `Tomorrow ${tomorrowDayMonth}` : `Today ${todayDayMonth}`,
+          commenceTime: isTom ? `${tomorrowYMD}T18:00:00Z` : `${todayYMD}T18:00:00Z`
+        };
+      }
+      return m;
+    });
+
     if (filters.sport) {
       const s = filters.sport.toLowerCase();
       matches = matches.filter(m => m.sport.toLowerCase() === s);
