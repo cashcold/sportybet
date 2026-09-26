@@ -13,7 +13,8 @@ import {
   Trophy,
   ChevronRight,
   Ticket,
-  ArrowRight
+  ArrowRight,
+  Bookmark
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useBetting } from '../context/BettingContext';
@@ -29,6 +30,7 @@ export const OpenBetsView: React.FC = () => {
     showToast,
     setIsBetslipOpen,
     addSelection,
+    loadBookingCode,
     setActiveTab: setNavTab
   } = useBetting();
 
@@ -36,6 +38,25 @@ export const OpenBetsView: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'cashout' | 'live'>('cashout');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'join'>('login');
+  const [recommendedCodesOpen, setRecommendedCodesOpen] = useState(false);
+
+  // Recommended booking codes for Ghana football (matches screenshot)
+  const recommendedCodes = [
+    { code: 'CXA7PN', folds: 6, odds: 12.83, title: 'Weekend European Accumulator' },
+    { code: 'CKBBGF', folds: 10, odds: 33.13, title: 'Mega Nations League Multi' },
+    { code: 'BC8821', folds: 5, odds: 8.45, title: 'Safe Goals & Over 1.5 Banker' },
+    { code: 'GH7719', folds: 8, odds: 24.50, title: 'African Giants & EPL Combo' }
+  ];
+
+  const handleLoadRecommendedCode = async (code: string) => {
+    const success = await loadBookingCode(code);
+    if (success) {
+      setIsBetslipOpen(true);
+      showToast(`Loaded ${code} into your betslip`);
+    } else {
+      showToast(`Booking code ${code} loaded`);
+    }
+  };
 
   // Cashout drawer state (Screenshot 7 & 8)
   const [cashoutDrawerBet, setCashoutDrawerBet] = useState<PlacedBet | null>(null);
@@ -96,139 +117,120 @@ export const OpenBetsView: React.FC = () => {
   };
 
   return (
-    <div className="pb-24 bg-[#121922] text-white min-h-screen">
-      {/* =================================================================== */}
-      {/* 1. TOP BAR (Screenshots 6, 7, 8, 9)                                */}
-      {/* How to Cashout? | Avatar | GHS Balance in bright gold               */}
-      {/* =================================================================== */}
-      <div className="px-3.5 py-2.5 bg-[#141d27] border-b border-[#212b38] flex items-center justify-between">
-        <button
-          onClick={() => showToast('Cashout lets you lock in wins or minimize losses early!')}
-          className="flex items-center space-x-1.5 text-xs text-neutral-300 hover:text-white font-medium"
-        >
-          <HelpCircle className="w-4 h-4 text-neutral-400 stroke-[2.2]" />
-          <span>How to Cashout?</span>
-        </button>
+    <div className="pb-16 bg-[#131922] text-white min-h-[calc(100vh-52px)] flex flex-col justify-between select-none">
+      <div className="flex-1 flex flex-col">
+        {/* =================================================================== */}
+        {/* 1. TOP BAR (Matches uploaded screenshot)                            */}
+        {/* How to Cashout? | Register | Login                                  */}
+        {/* =================================================================== */}
+        <div className="px-4 py-3 bg-[#1e2632] flex items-center justify-between border-b border-[#293342]">
+          <button
+            onClick={() => showToast('Cashout lets you take an early payout on your bets before matches end!')}
+            className="flex items-center space-x-1.5 text-neutral-200 hover:text-white transition-colors cursor-pointer"
+          >
+            <HelpCircle className="w-4 h-4 text-neutral-400 stroke-[2.2]" />
+            <span className="text-[13px] font-normal text-white">How to Cashout?</span>
+          </button>
 
-        {/* Profile Avatar + GHS Balance OR Log In / Join buttons */}
-        {user.isLoggedIn ? (
-          <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 rounded-full overflow-hidden border border-white/20 bg-neutral-800">
-              <img
-                src={user.avatarUrl || '/user_beach_avatar.jpg'}
-                alt="User"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
-              />
+          {/* Profile Avatar + GHS Balance OR Register | Login (screenshot style) */}
+          {user.isLoggedIn ? (
+            <div className="flex items-center space-x-2">
+              <div className="w-6 h-6 rounded-full overflow-hidden border border-white/20 bg-neutral-800">
+                <img
+                  src={user.avatarUrl || '/user_beach_avatar.jpg'}
+                  alt="User"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              </div>
+              <span className="text-xs font-black text-[#ffde00] tracking-wide">
+                {user.currency} {user.balance.toFixed(2)}
+              </span>
             </div>
-            <span className="text-xs font-black text-[#ffde00] tracking-wide">
-              {user.currency} {user.balance.toFixed(2)}
-            </span>
+          ) : (
+            <div className="flex items-center space-x-2 text-[14px]">
+              <button
+                onClick={() => {
+                  setAuthMode('join');
+                  setAuthModalOpen(true);
+                }}
+                className="text-white hover:text-neutral-200 transition-colors cursor-pointer font-medium"
+              >
+                Register
+              </button>
+              <span className="text-neutral-500 font-normal">|</span>
+              <button
+                onClick={() => {
+                  setAuthMode('login');
+                  setAuthModalOpen(true);
+                }}
+                className="text-white hover:text-neutral-200 transition-colors cursor-pointer font-medium"
+              >
+                Login
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* =================================================================== */}
+        {/* 2. SEGMENTED TABS: Open Bets | Bet History (Matches screenshot)      */}
+        {/* =================================================================== */}
+        <div className="flex text-[15px] font-bold">
+          <button
+            onClick={() => setActiveTab('open')}
+            className={`flex-1 py-3 text-center transition-colors cursor-pointer ${
+              activeTab === 'open'
+                ? 'bg-[#151c24] text-white font-black'
+                : 'bg-[#434d5b] text-[#8e9aa9] hover:text-white'
+            }`}
+          >
+            Open Bets {user.isLoggedIn && activeOpenBets.length > 0 ? `(${activeOpenBets.length})` : ''}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('history')}
+            className={`flex-1 py-3 text-center transition-colors cursor-pointer ${
+              activeTab === 'history'
+                ? 'bg-[#151c24] text-white font-black'
+                : 'bg-[#434d5b] text-[#8e9aa9] hover:text-white'
+            }`}
+          >
+            Bet History
+          </button>
+        </div>
+
+        {/* =================================================================== */}
+        {/* 3. MAIN CONTENT: GUEST PROMPT (Exact match to uploaded screenshot)   */}
+        {/* =================================================================== */}
+        {!user.isLoggedIn ? (
+          <div className="flex-1 flex flex-col items-center justify-center px-4 py-28 text-center select-none">
+            <p className="text-white text-[16px] leading-[1.6] font-normal max-w-sm">
+              {activeTab === 'open' ? (
+                <>
+                  Please Log In to see your Open Bets<br />
+                  and Cashout Bets
+                </>
+              ) : (
+                <>
+                  Please Log In to see your Bet History<br />
+                  and Settled Bets
+                </>
+              )}
+            </p>
+
+            <button
+              onClick={() => {
+                setAuthMode('login');
+                setAuthModalOpen(true);
+              }}
+              className="mt-6 px-8 py-1.5 rounded-[4px] border border-[#00df59] bg-transparent text-[#00df59] text-[15px] font-medium hover:bg-[#00df59]/10 active:scale-95 transition-all cursor-pointer"
+            >
+              Login
+            </button>
           </div>
         ) : (
-          <div className="flex items-center space-x-1.5">
-            <button
-              onClick={() => {
-                setAuthMode('login');
-                setAuthModalOpen(true);
-              }}
-              className="px-2.5 py-1 text-xs font-black bg-[#00a826] hover:bg-[#009221] active:scale-95 text-white rounded-[4px] shadow-sm transition-all uppercase"
-            >
-              Log In
-            </button>
-            <button
-              onClick={() => {
-                setAuthMode('join');
-                setAuthModalOpen(true);
-              }}
-              className="px-2.5 py-1 text-xs font-bold border border-white/30 text-white hover:bg-white/10 active:scale-95 rounded-[4px] transition-all uppercase"
-            >
-              Register
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* =================================================================== */}
-      {/* 2. SEGMENTED TABS: Open Bets (0) | Bet History                     */}
-      {/* =================================================================== */}
-      <div className="flex bg-[#141d27] text-xs font-bold border-b border-[#212b38]">
-        <button
-          onClick={() => setActiveTab('open')}
-          className={`flex-1 py-3 text-center transition-colors ${
-            activeTab === 'open'
-              ? 'bg-[#222d3d] text-white font-black'
-              : 'bg-[#4c5768] text-neutral-300 hover:text-white'
-          }`}
-        >
-          Open Bets ({activeOpenBets.length})
-        </button>
-
-        <button
-          onClick={() => setActiveTab('history')}
-          className={`flex-1 py-3 text-center transition-colors ${
-            activeTab === 'history'
-              ? 'bg-[#222d3d] text-white font-black'
-              : 'bg-[#4c5768] text-neutral-300 hover:text-white'
-          }`}
-        >
-          Bet History
-        </button>
-      </div>
-
-      {/* =================================================================== */}
-      {/* 3. MAIN CONTENT: GUEST PROMPT OR AUTHENTICATED TABS                */}
-      {/* =================================================================== */}
-      {!user.isLoggedIn ? (
-        <div className="px-4 py-12 flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-16 rounded-full bg-[#1b2533] border border-[#2b3a4f] flex items-center justify-center mb-4 text-[#00df59] shadow-lg">
-            <Ticket className="w-8 h-8" />
-          </div>
-          <h3 className="text-base font-black text-white uppercase tracking-wide mb-1.5">
-            {activeTab === 'open' ? 'Log In to View Open Bets' : 'Log In to View Bet History'}
-          </h3>
-          <p className="text-xs text-neutral-400 max-w-xs leading-relaxed mb-6">
-            {activeTab === 'open'
-              ? 'Log in to track your active slips, view live score updates, and use Real-Time Cashout.'
-              : 'Log in to view your settled bets, winning tickets, and account transaction receipts.'}
-          </p>
-
-          <div className="w-full max-w-xs space-y-2.5">
-            <button
-              onClick={() => {
-                setAuthMode('login');
-                setAuthModalOpen(true);
-              }}
-              className="w-full py-3 bg-[#00a826] hover:bg-[#009221] active:scale-[0.99] text-white font-black text-xs rounded-[4px] uppercase tracking-wider shadow-lg transition-all"
-            >
-              Log In
-            </button>
-            <button
-              onClick={() => {
-                setAuthMode('join');
-                setAuthModalOpen(true);
-              }}
-              className="w-full py-3 bg-[#24303f] hover:bg-[#2c3b4e] active:scale-[0.99] text-white font-bold text-xs rounded-[4px] uppercase tracking-wider border border-[#37485e] transition-all"
-            >
-              Join Now / Register
-            </button>
-          </div>
-
-          {/* Value highlights */}
-          <div className="w-full max-w-xs mt-8 pt-6 border-t border-[#1e2a39] grid grid-cols-2 gap-3 text-left">
-            <div className="bg-[#17202c] p-3 rounded border border-[#223042]">
-              <div className="text-[#ffde00] font-black text-xs mb-1">⚡ Cashout</div>
-              <div className="text-[11px] text-neutral-400 leading-snug">Lock in profits anytime before full-time</div>
-            </div>
-            <div className="bg-[#17202c] p-3 rounded border border-[#223042]">
-              <div className="text-[#00df59] font-black text-xs mb-1">🔄 Rebet</div>
-              <div className="text-[11px] text-neutral-400 leading-snug">Reload selections into your betslip with 1 tap</div>
-            </div>
-          </div>
-        </div>
-      ) : (
         <>
           {/* =================================================================== */}
           {/* VIEW A: OPEN BETS (Screenshot 6)                                    */}
@@ -510,6 +512,69 @@ export const OpenBetsView: React.FC = () => {
       )}
     </>
   )}
+      </div>
+
+      {/* =================================================================== */}
+      {/* 4. RECOMMENDED FOOTBALL CODES (Exact match to uploaded screenshot)  */}
+      {/* =================================================================== */}
+      <div className="mt-auto border-t border-[#1c2532] bg-[#101720]">
+        <button
+          onClick={() => setRecommendedCodesOpen(!recommendedCodesOpen)}
+          className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-[#151f2b] transition-colors cursor-pointer"
+        >
+          <div className="flex items-center space-x-3 text-left">
+            <div className="w-8 h-8 rounded bg-emerald-500/15 flex items-center justify-center shrink-0">
+              <Bookmark className="w-4 h-4 text-[#00df59] fill-[#00df59]" />
+            </div>
+            <div>
+              <div className="text-[14px] font-bold text-white leading-tight">
+                Recommended Football Codes
+              </div>
+              <div className="text-[12px] text-neutral-400 mt-0.5 leading-tight">
+                Save the effort of building it from scratch
+              </div>
+            </div>
+          </div>
+          <ChevronDown
+            className={`w-5 h-5 text-neutral-400 transition-transform duration-200 ${
+              recommendedCodesOpen ? 'rotate-180' : ''
+            }`}
+          />
+        </button>
+
+        {recommendedCodesOpen && (
+          <div className="px-4 pb-4 space-y-2 bg-[#0d131a] border-t border-[#1a232f] pt-3">
+            {recommendedCodes.map((codeItem) => (
+              <div
+                key={codeItem.code}
+                className="p-3 bg-[#151f2b] rounded border border-[#222e3e] flex items-center justify-between"
+              >
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-white font-mono font-black text-sm tracking-wide">
+                      {codeItem.code}
+                    </span>
+                    <span className="text-[11px] px-1.5 py-0.5 rounded bg-white/10 text-neutral-300 font-semibold">
+                      {codeItem.folds} Folds
+                    </span>
+                  </div>
+                  <div className="text-xs text-neutral-400 mt-1">
+                    Odds: <span className="text-[#00df59] font-bold">{codeItem.odds.toFixed(2)}</span>
+                    <span className="mx-1 text-neutral-600">•</span>
+                    <span className="text-neutral-400">{codeItem.title}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleLoadRecommendedCode(codeItem.code)}
+                  className="px-3 py-1.5 bg-[#00df59] hover:bg-[#00c54e] text-black font-black text-xs rounded transition-colors active:scale-95 cursor-pointer shrink-0 ml-2"
+                >
+                  Load Code
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* =================================================================== */}
       {/* DRAWER 1: CASHOUT SLIDER (Screenshot 7)                             */}
