@@ -106,8 +106,12 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   });
 
   const [betslip, setBetslip] = useState<BetSelection[]>(() => {
-    const saved = localStorage.getItem('sportybet_betslip');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('sportybet_betslip');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
 
   const [openBets, setOpenBets] = useState<PlacedBet[]>(() => {

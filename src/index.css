@@ -25,6 +25,35 @@
   animation: aviatorRotate 16s linear infinite;
 }
 
+@keyframes tickerSlide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-ticker-slide {
+  display: flex;
+  width: max-content;
+  animation: tickerSlide 160s linear infinite;
+  will-change: transform;
+}
+
+.animate-ticker-slide.speed-slow {
+  animation-duration: 210s;
+}
+
+.animate-ticker-slide.speed-normal {
+  animation-duration: 140s;
+}
+
+.animate-ticker-slide:hover,
+.animate-ticker-slide.paused {
+  animation-play-state: paused;
+}
+
 body {
   font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: #0d1218;

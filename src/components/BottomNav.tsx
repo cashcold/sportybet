@@ -14,7 +14,7 @@ export const BottomNav: React.FC = () => {
         title="Sports"
       >
         <div className="relative flex items-center justify-center">
-          {/* Exact Telstar Soccer Ball Icon from Screenshot 2 */}
+          {/* Exact Telstar Soccer Ball Icon from Video */}
           <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="9.5" fill="#ffffff" stroke="#121922" strokeWidth="0.5" />
             {/* Center Pentagon */}
@@ -33,7 +33,10 @@ export const BottomNav: React.FC = () => {
           </svg>
         </div>
 
-        {/* Note: Screenshot 2 has NO text under the soccer ball, just the active red bar */}
+        <span className={`text-[10px] mt-0.5 tracking-tight ${activeTab === 'sports' ? 'font-bold text-white' : 'text-[#8e9cae]'}`}>
+          Sports
+        </span>
+
         {activeTab === 'sports' && (
           <span className="absolute bottom-0 w-8 h-[3px] bg-[#de1a22] rounded-t-sm" />
         )}

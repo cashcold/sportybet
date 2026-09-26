@@ -10,6 +10,524 @@ import bcrypt from "bcryptjs";
 
 // src/data/realFixtures.ts
 var REAL_UPCOMING_FIXTURES = [
+  // Exact Live Matches from Video (00:05 - 00:08)
+  {
+    "id": "live-rosengard-hassleholms",
+    "gameId": "28101",
+    "sport": "football",
+    "league": "Ettan",
+    "countryOrCategory": "Sweden",
+    "homeTeam": "FC Rosengard 1917",
+    "awayTeam": "Hassleholms IF",
+    "homeScore": 0,
+    "awayScore": 0,
+    "minute": "44:50 H1",
+    "period": "1H",
+    "isLive": true,
+    "isHot": true,
+    "hasLiveStream": true,
+    "date": "2026-09-26",
+    "dateLabel": "Live",
+    "startTime": "Live",
+    "commenceTime": "2026-09-26T12:00:00Z",
+    "marketsCount": 48,
+    "markets": {
+      "1X2": [
+        { "id": "ros-1", "name": "1", "value": 2.05, "trend": "up" },
+        { "id": "ros-x", "name": "X", "value": 2.75, "trend": "up" },
+        { "id": "ros-2", "name": "2", "value": 4.1, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "ros-o", "name": "Over 1.5", "value": 1.45, "trend": "same" },
+        { "id": "ros-u", "name": "Under 1.5", "value": 2.55, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "ros-1x", "name": "1X", "value": 1.22, "trend": "same" },
+        { "id": "ros-12", "name": "12", "value": 1.38, "trend": "same" },
+        { "id": "ros-x2", "name": "X2", "value": 1.68, "trend": "same" }
+      ]
+    }
+  },
+  {
+    "id": "live-trollhattan-tvaakers",
+    "gameId": "28102",
+    "sport": "football",
+    "league": "Ettan",
+    "countryOrCategory": "Sweden",
+    "homeTeam": "FC Trollhattan",
+    "awayTeam": "Tvaakers IF",
+    "homeScore": 1,
+    "awayScore": 1,
+    "minute": "45:00+ H1",
+    "period": "1H",
+    "isLive": true,
+    "isHot": true,
+    "hasLiveStream": false,
+    "date": "2026-09-26",
+    "dateLabel": "Live",
+    "startTime": "Live",
+    "commenceTime": "2026-09-26T12:00:00Z",
+    "marketsCount": 26,
+    "markets": {
+      "1X2": [
+        { "id": "troll-1", "name": "1", "value": 1.66, "trend": "same" },
+        { "id": "troll-x", "name": "X", "value": 3.25, "trend": "same" },
+        { "id": "troll-2", "name": "2", "value": 5.3, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "troll-o", "name": "Over 2.5", "value": 1.8, "trend": "same" },
+        { "id": "troll-u", "name": "Under 2.5", "value": 1.95, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "troll-1x", "name": "1X", "value": 1.15, "trend": "same" },
+        { "id": "troll-12", "name": "12", "value": 1.28, "trend": "same" },
+        { "id": "troll-x2", "name": "X2", "value": 2.1, "trend": "same" }
+      ]
+    }
+  },
+  {
+    "id": "live-helges-gute",
+    "gameId": "28103",
+    "sport": "football",
+    "league": "Division 2",
+    "countryOrCategory": "Sweden",
+    "homeTeam": "Helges IF",
+    "awayTeam": "FC Gute",
+    "homeScore": 0,
+    "awayScore": 0,
+    "minute": "56:41 H2",
+    "period": "2H",
+    "isLive": true,
+    "isHot": false,
+    "hasLiveStream": false,
+    "date": "2026-09-26",
+    "dateLabel": "Live",
+    "startTime": "Live",
+    "commenceTime": "2026-09-26T11:45:00Z",
+    "marketsCount": 27,
+    "markets": {
+      "1X2": [
+        { "id": "helg-1", "name": "1", "value": 3, "trend": "same" },
+        { "id": "helg-x", "name": "X", "value": 2.45, "trend": "same" },
+        { "id": "helg-2", "name": "2", "value": 2.75, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "helg-o", "name": "Over 0.5", "value": 1.55, "trend": "same" },
+        { "id": "helg-u", "name": "Under 0.5", "value": 2.3, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "helg-1x", "name": "1X", "value": 1.4, "trend": "same" },
+        { "id": "helg-12", "name": "12", "value": 1.48, "trend": "same" },
+        { "id": "helg-x2", "name": "X2", "value": 1.35, "trend": "same" }
+      ]
+    }
+  },
+  {
+    "id": "live-jonsereds-hestrafors",
+    "gameId": "28104",
+    "sport": "football",
+    "league": "Division 2",
+    "countryOrCategory": "Sweden",
+    "homeTeam": "Jonsereds IF",
+    "awayTeam": "Hestrafors IF",
+    "homeScore": 0,
+    "awayScore": 1,
+    "minute": "45:00 HT",
+    "period": "HT",
+    "isLive": true,
+    "isHot": false,
+    "hasLiveStream": false,
+    "date": "2026-09-26",
+    "dateLabel": "Live",
+    "startTime": "Live",
+    "commenceTime": "2026-09-26T12:00:00Z",
+    "marketsCount": 46,
+    "markets": {
+      "1X2": [
+        { "id": "jon-1", "name": "1", "value": 9.5, "trend": "same" },
+        { "id": "jon-x", "name": "X", "value": 3.85, "trend": "same" },
+        { "id": "jon-2", "name": "2", "value": 1.35, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "jon-o", "name": "Over 2.5", "value": 1.7, "trend": "same" },
+        { "id": "jon-u", "name": "Under 2.5", "value": 2.05, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "jon-1x", "name": "1X", "value": 2.95, "trend": "same" },
+        { "id": "jon-12", "name": "12", "value": 1.22, "trend": "same" },
+        { "id": "jon-x2", "name": "X2", "value": 1.05, "trend": "same" }
+      ]
+    }
+  },
+  {
+    "id": "live-viggbyholms-korsnas",
+    "gameId": "28105",
+    "sport": "football",
+    "league": "Division 2",
+    "countryOrCategory": "Sweden",
+    "homeTeam": "Viggbyholms IK FF",
+    "awayTeam": "Korsnas IF FK",
+    "homeScore": 2,
+    "awayScore": 0,
+    "minute": "44:29 H1",
+    "period": "1H",
+    "isLive": true,
+    "isHot": false,
+    "hasLiveStream": false,
+    "date": "2026-09-26",
+    "dateLabel": "Live",
+    "startTime": "Live",
+    "commenceTime": "2026-09-26T12:00:00Z",
+    "marketsCount": 41,
+    "markets": {
+      "1X2": [
+        { "id": "vig-1", "name": "1", "value": 2.05, "trend": "same" },
+        { "id": "vig-x", "name": "X", "value": 3, "trend": "same" },
+        { "id": "vig-2", "name": "2", "value": 3.55, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "vig-o", "name": "Over 2.5", "value": 1.65, "trend": "same" },
+        { "id": "vig-u", "name": "Under 2.5", "value": 2.15, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "vig-1x", "name": "1X", "value": 1.25, "trend": "same" },
+        { "id": "vig-12", "name": "12", "value": 1.32, "trend": "same" },
+        { "id": "vig-x2", "name": "X2", "value": 1.7, "trend": "same" }
+      ]
+    }
+  },
+  // Exact Featured Hero Match from Video (00:02 - 00:05)
+  {
+    "id": "theodds-eng-esp-nations",
+    "gameId": "23891",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "International",
+    "homeTeam": "England",
+    "awayTeam": "Spain",
+    "startTime": "18:45",
+    "date": "2026-09-26",
+    "dateLabel": "18:45 | Today",
+    "commenceTime": "2026-09-26T18:45:00Z",
+    "isLive": false,
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 128,
+    "markets": {
+      "1X2": [
+        { "id": "o-eng-esp-1", "name": "1", "value": 3.45, "trend": "same" },
+        { "id": "o-eng-esp-x", "name": "X", "value": 3.62, "trend": "same" },
+        { "id": "o-eng-esp-2", "name": "2", "value": 2.2, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "o-eng-esp-o", "name": "Over 2.5", "value": 1.95, "trend": "same" },
+        { "id": "o-eng-esp-u", "name": "Under 2.5", "value": 1.85, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "o-eng-esp-1x", "name": "1X", "value": 1.65, "trend": "same" },
+        { "id": "o-eng-esp-12", "name": "12", "value": 1.28, "trend": "same" },
+        { "id": "o-eng-esp-x2", "name": "X2", "value": 1.32, "trend": "same" }
+      ]
+    }
+  },
+  // Exact Upcoming Matches from Video (00:08 - 00:15) Date: 26/09 Saturday
+  {
+    "id": "theodds-slo-sco-23360",
+    "gameId": "23360",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "International",
+    "homeTeam": "Slovenia",
+    "awayTeam": "Scotland",
+    "startTime": "13:00",
+    "date": "2026-09-26",
+    "dateLabel": "26/09 Saturday",
+    "commenceTime": "2026-09-26T13:00:00Z",
+    "isLive": false,
+    "isHot": true,
+    "hasLiveStream": false,
+    "marketsCount": 1032,
+    "markets": {
+      "1X2": [
+        { "id": "slo-1", "name": "1", "value": 2.7, "trend": "same" },
+        { "id": "slo-x", "name": "X", "value": 3.21, "trend": "same" },
+        { "id": "slo-2", "name": "2", "value": 2.95, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "slo-o", "name": "Over 2.5", "value": 2.25, "trend": "same" },
+        { "id": "slo-u", "name": "Under 2.5", "value": 1.65, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "slo-1x", "name": "1X", "value": 1.42, "trend": "same" },
+        { "id": "slo-12", "name": "12", "value": 1.35, "trend": "same" },
+        { "id": "slo-x2", "name": "X2", "value": 1.48, "trend": "same" }
+      ]
+    }
+  },
+  {
+    "id": "theodds-rsa-gui-44509",
+    "gameId": "44509",
+    "sport": "football",
+    "league": "Africa Cup of Nations Qualifiers",
+    "countryOrCategory": "International",
+    "homeTeam": "South Africa",
+    "awayTeam": "Guinea",
+    "startTime": "13:00",
+    "date": "2026-09-26",
+    "dateLabel": "26/09 Saturday",
+    "commenceTime": "2026-09-26T13:00:00Z",
+    "isLive": false,
+    "isHot": true,
+    "hasLiveStream": false,
+    "marketsCount": 224,
+    "markets": {
+      "1X2": [
+        { "id": "rsa-1", "name": "1", "value": 1.83, "trend": "same" },
+        { "id": "rsa-x", "name": "X", "value": 3.33, "trend": "same" },
+        { "id": "rsa-2", "name": "2", "value": 4.9, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "rsa-o", "name": "Over 2.5", "value": 2.1, "trend": "same" },
+        { "id": "rsa-u", "name": "Under 2.5", "value": 1.72, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "rsa-1x", "name": "1X", "value": 1.18, "trend": "same" },
+        { "id": "rsa-12", "name": "12", "value": 1.3, "trend": "same" },
+        { "id": "rsa-x2", "name": "X2", "value": 1.95, "trend": "same" }
+      ]
+    }
+  },
+  {
+    "id": "theodds-bul-lux-32627",
+    "gameId": "32627",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "International",
+    "homeTeam": "Bulgaria",
+    "awayTeam": "Luxembourg",
+    "startTime": "16:00",
+    "date": "2026-09-26",
+    "dateLabel": "26/09 Saturday",
+    "commenceTime": "2026-09-26T16:00:00Z",
+    "isLive": false,
+    "isHot": true,
+    "hasLiveStream": false,
+    "marketsCount": 987,
+    "markets": {
+      "1X2": [
+        { "id": "bul-1", "name": "1", "value": 2.48, "trend": "same" },
+        { "id": "bul-x", "name": "X", "value": 3.02, "trend": "same" },
+        { "id": "bul-2", "name": "2", "value": 3.5, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "bul-o", "name": "Over 2.5", "value": 2.35, "trend": "same" },
+        { "id": "bul-u", "name": "Under 2.5", "value": 1.6, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "bul-1x", "name": "1X", "value": 1.32, "trend": "same" },
+        { "id": "bul-12", "name": "12", "value": 1.36, "trend": "same" },
+        { "id": "bul-x2", "name": "X2", "value": 1.55, "trend": "same" }
+      ]
+    }
+  },
+  {
+    "id": "theodds-ice-est-35142",
+    "gameId": "35142",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "International",
+    "homeTeam": "Iceland",
+    "awayTeam": "Estonia",
+    "startTime": "16:00",
+    "date": "2026-09-26",
+    "dateLabel": "26/09 Saturday",
+    "commenceTime": "2026-09-26T16:00:00Z",
+    "isLive": false,
+    "isHot": true,
+    "hasLiveStream": false,
+    "marketsCount": 982,
+    "markets": {
+      "1X2": [
+        { "id": "ice-1", "name": "1", "value": 1.31, "trend": "same" },
+        { "id": "ice-x", "name": "X", "value": 6.02, "trend": "same" },
+        { "id": "ice-2", "name": "2", "value": 11.04, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "ice-o", "name": "Over 2.5", "value": 1.75, "trend": "same" },
+        { "id": "ice-u", "name": "Under 2.5", "value": 2.05, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "ice-1x", "name": "1X", "value": 1.05, "trend": "same" },
+        { "id": "ice-12", "name": "12", "value": 1.12, "trend": "same" },
+        { "id": "ice-x2", "name": "X2", "value": 3.4, "trend": "same" }
+      ]
+    }
+  },
+  {
+    "id": "theodds-sm-fin-41629",
+    "gameId": "41629",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "International",
+    "homeTeam": "San Marino",
+    "awayTeam": "Finland",
+    "startTime": "16:00",
+    "date": "2026-09-26",
+    "dateLabel": "26/09 Saturday",
+    "commenceTime": "2026-09-26T16:00:00Z",
+    "isLive": false,
+    "isHot": true,
+    "hasLiveStream": false,
+    "marketsCount": 957,
+    "markets": {
+      "1X2": [
+        { "id": "sm-1", "name": "1", "value": 39.12, "trend": "same" },
+        { "id": "sm-x", "name": "X", "value": 12.01, "trend": "same" },
+        { "id": "sm-2", "name": "2", "value": 1.1, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "sm-o", "name": "Over 2.5", "value": 1.5, "trend": "same" },
+        { "id": "sm-u", "name": "Under 2.5", "value": 2.55, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "sm-1x", "name": "1X", "value": 7.5, "trend": "same" },
+        { "id": "sm-12", "name": "12", "value": 1.04, "trend": "same" },
+        { "id": "sm-x2", "name": "X2", "value": 1.01, "trend": "same" }
+      ]
+    }
+  },
+  {
+    "id": "theodds-far-kaz-45505",
+    "gameId": "45505",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "International",
+    "homeTeam": "Faroe Islands",
+    "awayTeam": "Kazakhstan",
+    "startTime": "16:00",
+    "date": "2026-09-26",
+    "dateLabel": "26/09 Saturday",
+    "commenceTime": "2026-09-26T16:00:00Z",
+    "isLive": false,
+    "isHot": true,
+    "hasLiveStream": false,
+    "marketsCount": 985,
+    "markets": {
+      "1X2": [
+        { "id": "far-1", "name": "1", "value": 2.37, "trend": "same" },
+        { "id": "far-x", "name": "X", "value": 3.35, "trend": "same" },
+        { "id": "far-2", "name": "2", "value": 3.33, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "far-o", "name": "Over 2.5", "value": 2.15, "trend": "same" },
+        { "id": "far-u", "name": "Under 2.5", "value": 1.7, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "far-1x", "name": "1X", "value": 1.35, "trend": "same" },
+        { "id": "far-12", "name": "12", "value": 1.33, "trend": "same" },
+        { "id": "far-x2", "name": "X2", "value": 1.58, "trend": "same" }
+      ]
+    }
+  },
+  {
+    "id": "theodds-alb-bel-23888",
+    "gameId": "23888",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "International",
+    "homeTeam": "Albania",
+    "awayTeam": "Belarus",
+    "startTime": "18:45",
+    "date": "2026-09-26",
+    "dateLabel": "26/09 Saturday",
+    "commenceTime": "2026-09-26T18:45:00Z",
+    "isLive": false,
+    "isHot": true,
+    "hasLiveStream": false,
+    "marketsCount": 984,
+    "markets": {
+      "1X2": [
+        { "id": "alb-1", "name": "1", "value": 1.65, "trend": "same" },
+        { "id": "alb-x", "name": "X", "value": 3.97, "trend": "same" },
+        { "id": "alb-2", "name": "2", "value": 6.14, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "alb-o", "name": "Over 2.5", "value": 1.95, "trend": "same" },
+        { "id": "alb-u", "name": "Under 2.5", "value": 1.85, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "alb-1x", "name": "1X", "value": 1.14, "trend": "same" },
+        { "id": "alb-12", "name": "12", "value": 1.25, "trend": "same" },
+        { "id": "alb-x2", "name": "X2", "value": 2.25, "trend": "same" }
+      ]
+    }
+  },
+  {
+    "id": "theodds-cze-cro-44737",
+    "gameId": "44737",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "International",
+    "homeTeam": "Czechia",
+    "awayTeam": "Croatia",
+    "startTime": "18:45",
+    "date": "2026-09-26",
+    "dateLabel": "26/09 Saturday",
+    "commenceTime": "2026-09-26T18:45:00Z",
+    "isLive": false,
+    "isHot": true,
+    "hasLiveStream": false,
+    "marketsCount": 1260,
+    "markets": {
+      "1X2": [
+        { "id": "cze-1", "name": "1", "value": 3.69, "trend": "same" },
+        { "id": "cze-x", "name": "X", "value": 3.64, "trend": "same" },
+        { "id": "cze-2", "name": "2", "value": 2.11, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "cze-o", "name": "Over 2.5", "value": 1.85, "trend": "same" },
+        { "id": "cze-u", "name": "Under 2.5", "value": 1.95, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "cze-1x", "name": "1X", "value": 1.72, "trend": "same" },
+        { "id": "cze-12", "name": "12", "value": 1.28, "trend": "same" },
+        { "id": "cze-x2", "name": "X2", "value": 1.3, "trend": "same" }
+      ]
+    }
+  },
+  {
+    "id": "theodds-svk-mda-41932",
+    "gameId": "41932",
+    "sport": "football",
+    "league": "UEFA Nations League",
+    "countryOrCategory": "International",
+    "homeTeam": "Slovakia",
+    "awayTeam": "Moldova",
+    "startTime": "18:45",
+    "date": "2026-09-26",
+    "dateLabel": "26/09 Saturday",
+    "commenceTime": "2026-09-26T18:45:00Z",
+    "isLive": false,
+    "isHot": true,
+    "hasLiveStream": false,
+    "marketsCount": 989,
+    "markets": {
+      "1X2": [
+        { "id": "svk-1", "name": "1", "value": 1.16, "trend": "same" },
+        { "id": "svk-x", "name": "X", "value": 8.7, "trend": "same" },
+        { "id": "svk-2", "name": "2", "value": 22.05, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "svk-o", "name": "Over 2.5", "value": 1.45, "trend": "same" },
+        { "id": "svk-u", "name": "Under 2.5", "value": 2.7, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "svk-1x", "name": "1X", "value": 1.02, "trend": "same" },
+        { "id": "svk-12", "name": "12", "value": 1.07, "trend": "same" },
+        { "id": "svk-x2", "name": "X2", "value": 5.4, "trend": "same" }
+      ]
+    }
+  },
   {
     "id": "live-alg-tun-u20",
     "gameId": "21094",

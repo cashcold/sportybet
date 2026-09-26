@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { BettingProvider, useBetting } from './context/BettingContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
 import { SportsView } from './components/SportsView';
@@ -62,8 +63,10 @@ const MainContent: React.FC = () => {
 
 export default function App() {
   return (
-    <BettingProvider>
-      <MainContent />
-    </BettingProvider>
+    <ErrorBoundary>
+      <BettingProvider>
+        <MainContent />
+      </BettingProvider>
+    </ErrorBoundary>
   );
 }

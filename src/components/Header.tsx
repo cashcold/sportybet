@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, RotateCcw } from 'lucide-react';
 import { useBetting } from '../context/BettingContext';
 import { AuthModal } from './AuthModal';
 import { SportyBetLogo } from './SportyBetLogo';
 
 export const Header: React.FC = () => {
-  const { user, setIsSearchOpen, setActiveTab } = useBetting();
+  const { user, setIsSearchOpen, setActiveTab, showToast } = useBetting();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'join'>('login');
+  const [isRefreshingBalance, setIsRefreshingBalance] = useState(false);
+
+  const handleRefreshBalance = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsRefreshingBalance(true);
+    setTimeout(() => {
+      setIsRefreshingBalance(false);
+      showToast('Balance updated');
+    }, 600);
+  };
 
   const openAuth = (mode: 'login' | 'join') => {
     setAuthMode(mode);
@@ -67,6 +77,13 @@ export const Header: React.FC = () => {
                 </div>
                 <span className="font-bold text-xs text-white tracking-tight whitespace-nowrap">
                   {user.currency} {user.balance.toFixed(2)}
+                </span>
+                <span
+                  onClick={handleRefreshBalance}
+                  className="ml-1 p-0.5 hover:bg-white/20 rounded-full transition-colors cursor-pointer"
+                  title="Refresh Balance"
+                >
+                  <RotateCcw className={`w-3 h-3 text-white/90 ${isRefreshingBalance ? 'animate-spin' : ''}`} />
                 </span>
               </button>
             </div>

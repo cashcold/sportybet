@@ -6,6 +6,11 @@ import { OddButton } from './OddButton';
 import { MatchDetailsModal } from './MatchDetailsModal';
 import { HomeHeroFeatured } from './HomeHeroFeatured';
 import { CodeHubModal } from './CodeHubModal';
+import { AllLiveView } from './AllLiveView';
+import { PopularLeaguesList } from './PopularLeaguesList';
+import { GrandPrizeWinners } from './GrandPrizeWinners';
+import { SportyBetFooter } from './SportyBetFooter';
+import { SportyBetSpinner } from './SportyBetSpinner';
 
 export const SportsView: React.FC = () => {
   const {
@@ -28,6 +33,16 @@ export const SportsView: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCodeHubOpen, setIsCodeHubOpen] = useState(false);
   const [codeHubTab, setCodeHubTab] = useState<'load' | 'popular'>('load');
+  const [isAllLiveOpen, setIsAllLiveOpen] = useState(false);
+  const [isAllLiveLoading, setIsAllLiveLoading] = useState(false);
+
+  const handleOpenAllLive = () => {
+    setIsAllLiveLoading(true);
+    setIsAllLiveOpen(true);
+    setTimeout(() => {
+      setIsAllLiveLoading(false);
+    }, 450);
+  };
 
   const handleManualSync = async () => {
     setIsRefreshing(true);
@@ -160,6 +175,17 @@ export const SportsView: React.FC = () => {
     return sortedGroups.map(g => ({ label: g.label, matches: g.matches }));
   }, [allUpcomingForSport, sportsSubTab]);
 
+  if (isAllLiveOpen) {
+    if (isAllLiveLoading) {
+      return (
+        <div className="min-h-screen bg-[#141a22] flex flex-col items-center justify-center">
+          <SportyBetSpinner text="Loading Live Events..." size="lg" />
+        </div>
+      );
+    }
+    return <AllLiveView onBack={() => setIsAllLiveOpen(false)} />;
+  }
+
   return (
     <div className="pb-24 bg-[#141a22] text-white min-h-screen">
       {/* ========================================================= */}
@@ -175,6 +201,7 @@ export const SportsView: React.FC = () => {
         onSelectTournament={(tourn) => {
           showToast(`Filtered: ${tourn}`);
         }}
+        onOpenAllLive={handleOpenAllLive}
       />
 
       {/* ========================================================= */}
@@ -373,13 +400,13 @@ export const SportsView: React.FC = () => {
           )}
         </div>
 
-        {/* All Live Events link */}
+        {/* All Live Events link (00:07 in video) */}
         <div className="px-3 py-2.5 bg-[#161d26] text-right border-t border-[#202936]">
           <button
-            onClick={() => {}}
-            className="text-[12px] text-[#00df59] font-semibold hover:underline inline-flex items-center space-x-1"
+            onClick={handleOpenAllLive}
+            className="text-[12px] text-[#00df59] font-bold hover:underline inline-flex items-center space-x-1 cursor-pointer"
           >
-            <span>All Live Events 191</span>
+            <span>All Live Events {liveMatches.length || 257}</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -611,6 +638,15 @@ export const SportsView: React.FC = () => {
           )}
         </div>
       </section>
+
+      {/* Popular Leagues List (00:12 - 00:15 in video) */}
+      <PopularLeaguesList />
+
+      {/* Grand Prize Winners Carousel (00:15 - 00:23 in video) */}
+      <GrandPrizeWinners />
+
+      {/* Authentic SportyBet Footer (00:15 - 00:24 in video) */}
+      <SportyBetFooter />
 
       {/* Full Market Details Modal */}
       <MatchDetailsModal

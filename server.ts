@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import fs from 'fs';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import express from 'express';
@@ -14,18 +15,23 @@ async function startServer() {
   } catch (err: any) {
     console.warn('[MongoDB Startup Notice]', err?.message || err);
   }
-  // Mount Vite middleware in development
-  if (process.env.NODE_ENV !== 'production') {
+
+  const distPath = path.join(process.cwd(), 'dist');
+  const indexPath = path.join(distPath, 'index.html');
+  const hasDist = fs.existsSync(indexPath);
+
+  // Mount Vite middleware in development or when dist bundle is missing
+  if (process.env.NODE_ENV !== 'production' || !hasDist) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api')) return next();
+      res.sendFile(indexPath);
     });
   }
 

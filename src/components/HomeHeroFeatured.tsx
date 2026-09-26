@@ -28,20 +28,44 @@ interface HomeHeroFeaturedProps {
   onOpenBookingCode: () => void;
   onOpenAviator: () => void;
   onSelectTournament: (name: string) => void;
+  onOpenAllLive?: () => void;
 }
 
 export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
   onOpenBookingCode,
   onOpenAviator,
-  onSelectTournament
+  onSelectTournament,
+  onOpenAllLive
 }) => {
   const { toggleSelection, betslip, showToast, setActiveTab, matches, selectedSport } = useBetting();
-  const [activeTournamentTab, setActiveTournamentTab] = useState("Premier League");
+  const [activeTournamentTab, setActiveTournamentTab] = useState("TODAY'S FOOTBALL");
   const [activeFeaturedTab, setActiveFeaturedTab] = useState<'Matches' | 'Games' | 'Codes' | 'Virtuals'>('Matches');
   const [selectedPromo, setSelectedPromo] = useState<PromoFeatureItem | null>(null);
 
-  // Exact 11 cards sequence from user screenshots starting from Lucky Numbers to 24/7 Basketball
+  // Exact cards sequence from video (00:00 - 00:03)
   const featuredCards: PromoFeatureItem[] = [
+    {
+      id: 'eng_vs_esp',
+      title: 'ENG vs ESP',
+      lines: ['ENG vs ESP'],
+      image: luckynumbersImg,
+      posterImage: '/luckynumbers.jpg',
+      tagline: 'UEFA Nations League Blockbuster',
+      description: 'England takes on European champions Spain! Place your bets on the blockbuster showdown with boosted odds.',
+      actionText: 'Bet Now',
+      actionType: 'modal'
+    },
+    {
+      id: 'aviator_missions',
+      title: 'Aviator Missions',
+      lines: ['Aviator', 'Missions'],
+      image: aviatorImg,
+      posterImage: '/Aviator.jpg',
+      tagline: 'Complete daily flight missions',
+      description: 'Fly high with the red airplane! Cash out before the aircraft flies away to secure up to 10,000x multiplier payouts!',
+      actionText: 'Play Now',
+      actionType: 'aviator'
+    },
     {
       id: 'lucky_numbers',
       title: 'Lucky Numbers',
@@ -54,17 +78,6 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       actionType: 'lottery'
     },
     {
-      id: 'aviator',
-      title: 'Aviator',
-      lines: ['Aviator'],
-      image: aviatorImg,
-      posterImage: '/Aviator.jpg',
-      tagline: 'Next-gen crash game',
-      description: 'Fly high with the red airplane! Cash out before the aircraft flies away to secure up to 10,000x multiplier payouts!',
-      actionText: 'Play Now',
-      actionType: 'aviator'
-    },
-    {
       id: 'jackpot',
       title: 'Jackpot',
       lines: ['Jackpot'],
@@ -73,6 +86,18 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       tagline: 'Sporty 12 Jackpot',
       description: 'Predict 12 matches correctly to win the guaranteed GHS 150,000 jackpot prize with weekly consolations!',
       actionText: 'Bet Now',
+      actionType: 'modal'
+    },
+    {
+      id: 'intl_challenge',
+      title: "Int'l Challenge",
+      lines: ["Int'l Challenge"],
+      badge: "UP TO GHS 1,500",
+      image: tadaHalloweenImg,
+      posterImage: '/tada_halloween.jpg',
+      tagline: "Predict International football and win up to GHS 1,500!",
+      description: 'Compete in the International matches challenge leaderboard. Top predictors share weekly cash prizes!',
+      actionText: 'Join Challenge',
       actionType: 'modal'
     },
     {
@@ -173,45 +198,17 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
     }
   };
 
-  // Dynamic featured live match derived from current sports feed
-  const sportMatches = matches.filter(
-    m => (m.sport || 'football').toLowerCase() === (selectedSport || 'football').toLowerCase()
-  );
+  // Featured hero match derived from video (England vs Spain UEFA Nations League)
   const featuredMatch: Match =
-    sportMatches.find(m => m.isLive && m.isHot) ||
-    sportMatches.find(m => m.isLive) ||
-    sportMatches[0] ||
-    matches[0] || {
-      id: 'theodds-95d5c8d1489bc284b68dc332fa1cb854',
-      gameId: '95581',
-      sport: 'football',
-      league: 'UEFA Nations League',
-      countryOrCategory: 'Europe',
-      homeTeam: 'Italy',
-      awayTeam: 'Belgium',
-      startTime: '18:45',
-      date: '2026-09-25',
-      dateLabel: 'Today 25/09',
-      commenceTime: '2026-09-25T18:45:00Z',
-      isLive: false,
-      isHot: true,
-      hasLiveStream: true,
-      marketsCount: 100,
-      markets: {
-        '1X2': [
-          { id: 'o-95d5c8d1489bc284b68dc332fa1cb854-1', name: '1', value: 2.27, trend: 'same' },
-          { id: 'o-95d5c8d1489bc284b68dc332fa1cb854-X', name: 'X', value: 3.64, trend: 'same' },
-          { id: 'o-95d5c8d1489bc284b68dc332fa1cb854-2', name: '2', value: 3.16, trend: 'same' }
-        ]
-      }
-    };
+    matches.find(m => m.id === 'theodds-eng-esp-nations') ||
+    matches.find(m => m.homeTeam === 'England' && m.awayTeam === 'Spain') ||
+    matches[0];
 
   const tournamentFilters = [
-    "Brasileiro Serie B",
     "TODAY'S FOOTBALL",
     "FOOTBALL IN NEXT 3 HOURS",
     "AFCON QUALIFIERS",
-    "UEFA LEAGUES"
+    "UEFA NATIONS LEAGUE"
   ];
 
   const quickNavItems = [
@@ -240,16 +237,23 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       id: 'live',
       label: 'Live',
       icon: (
-        <svg className="w-7 h-7 text-white" viewBox="0 0 28 28" fill="none">
-          {/* TV Antenna / Handle */}
-          <path d="M10 5l4 3 4-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-          {/* TV Screen */}
-          <rect x="3" y="8" width="22" height="15" rx="2.5" stroke="currentColor" strokeWidth="2" />
-          {/* Play triangle inside */}
-          <polygon points="12,12 18,15.5 12,19" fill="currentColor" />
-        </svg>
+        <div className="relative">
+          <svg className="w-7 h-7 text-white" viewBox="0 0 28 28" fill="none">
+            {/* TV Antenna / Handle */}
+            <path d="M10 5l4 3 4-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            {/* TV Screen */}
+            <rect x="3" y="8" width="22" height="15" rx="2.5" stroke="currentColor" strokeWidth="2" />
+            {/* Play triangle inside */}
+            <polygon points="12,12 18,15.5 12,19" fill="currentColor" />
+          </svg>
+          {/* Red live dot from video */}
+          <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+          </span>
+        </div>
       ),
-      action: () => showToast('Filtered to Live Events')
+      action: onOpenAllLive || (() => showToast('Opening All Live Events'))
     },
     {
       id: 'load_code',
@@ -461,13 +465,13 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       </div>
 
       {/* =================================================================== */}
-      {/* 5. TOURNAMENT CAPSULE PILL */}
+      {/* 5. TOURNAMENT CAPSULE PILL (00:02 in video)                         */}
       {/* =================================================================== */}
       <div className="px-3 pb-2">
         <div className="bg-[#1b2532] border border-[#273444] rounded-full px-3 py-1.5 flex items-center justify-between shadow-sm">
           <div className="flex items-center space-x-2 text-xs font-bold text-neutral-200 truncate">
-            <span>⚽</span>
-            <span className="truncate">{featuredMatch.league || 'Premier League'}</span>
+            <span>🏆</span>
+            <span className="truncate">UEFA Nations League</span>
           </div>
 
           <div className="flex items-center space-x-1.5 shrink-0 ml-2">
@@ -482,90 +486,80 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       </div>
 
       {/* =================================================================== */}
-      {/* 6. BIG FEATURED MATCH CARD */}
+      {/* 6. BIG FEATURED MATCH CARD (00:02 - 00:05 in video)                 */}
       {/* =================================================================== */}
       <div className="px-3 pb-3">
         <div className="bg-[#16202c] border border-[#232e3d] rounded-md p-3 shadow-md">
-          {/* Card Top: HOT 🔥, STV, Tournament Link, Stats Icon */}
+          {/* Card Top: POPULAR 🔥, Tournament Link, Stats Icon */}
           <div className="flex items-center justify-between text-xs pb-2 border-b border-[#1f2936]">
             <div className="flex items-center space-x-2 truncate">
-              {/* HOT Badge */}
+              {/* POPULAR Badge from video */}
               <span className="bg-[#de1a22] text-white text-[10px] font-black px-1.5 py-0.5 rounded flex items-center space-x-0.5">
-                <span>HOT</span>
+                <span>POPULAR</span>
                 <span>🔥</span>
               </span>
 
-              {/* STV Live Stream Badge */}
-              <span className="bg-[#b3141b] text-white text-[9px] font-black px-1 py-0.2 rounded tracking-tighter">
-                STV
-              </span>
-
               {/* Tournament link */}
-              <span className="text-[#00df59] underline font-semibold text-[11px] truncate">
-                {featuredMatch.sport ? featuredMatch.sport.toUpperCase() : 'FOOTBALL'} - {featuredMatch.countryOrCategory} - {featuredMatch.league}
+              <span className="text-[#00df59] underline font-semibold text-[11px] truncate flex items-center gap-1">
+                <span>Football - International - UEFA Nations League</span>
+                <span>&gt;</span>
               </span>
             </div>
 
             <button
-              onClick={() => showToast(`Opening ${featuredMatch.homeTeam} vs ${featuredMatch.awayTeam} Statistics`)}
+              onClick={() => showToast(`Opening England vs Spain Statistics`)}
               className="text-neutral-400 hover:text-white shrink-0 ml-1"
             >
               <BarChart2 className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          {/* Teams, Score and Live Clock */}
+          {/* Teams, Score and Time */}
           <div className="grid grid-cols-3 items-center py-3 text-center">
-            {/* Home Team */}
+            {/* England */}
             <div className="flex flex-col items-center space-y-1">
-              <div className="w-10 h-10 rounded-full bg-white/10 border border-amber-400/50 flex items-center justify-center shadow-inner relative">
-                <span className="text-sm font-bold text-amber-300">
-                  {featuredMatch.homeTeam.slice(0, 3).toUpperCase()}
-                </span>
+              <div className="w-10 h-10 rounded-full bg-white border border-neutral-300 flex items-center justify-center shadow-inner relative overflow-hidden">
+                {/* England St George Cross flag */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-full h-2 bg-red-600 absolute" />
+                  <div className="h-full w-2 bg-red-600 absolute" />
+                </div>
               </div>
               <span className="text-xs font-bold text-neutral-200 leading-tight">
-                {featuredMatch.homeTeam}
+                England
               </span>
             </div>
 
-            {/* Center: Score + Live badge + 1X2 */}
+            {/* Center: 18:45 | Today and 1X2 */}
             <div className="flex flex-col items-center space-y-1">
-              <span className="text-xl font-black text-white tracking-wider">
-                {featuredMatch.isLive ? `${featuredMatch.homeScore ?? 0} - ${featuredMatch.awayScore ?? 0}` : (featuredMatch.startTime || '18:00')}
+              <span className="text-sm font-bold text-neutral-300 tracking-wide">
+                18:45 | Today
               </span>
 
-              <div className="flex items-center space-x-1.5">
-                <span className="bg-[#00a826] text-white text-[10px] font-extrabold px-1.5 py-0.2 rounded-sm">
-                  {featuredMatch.isLive ? 'Live' : 'Starts'}
-                </span>
-                <span className="text-[11px] font-bold text-neutral-300">
-                  {featuredMatch.minute && !featuredMatch.minute.includes('NaN')
-                    ? featuredMatch.minute
-                    : (featuredMatch.isLive ? "68' 2H" : featuredMatch.startTime || '18:00')}
-                </span>
-              </div>
-
-              <span className="text-xs font-black text-[#00df59] pt-0.5">
+              <span className="text-xs font-black text-[#00df59] pt-0.5 tracking-wider">
                 1X2
               </span>
             </div>
 
-            {/* Away Team */}
+            {/* Spain */}
             <div className="flex flex-col items-center space-y-1">
-              <div className="w-10 h-10 rounded-full bg-blue-950 border border-blue-400/50 flex items-center justify-center shadow-inner">
-                <span className="text-sm font-bold text-blue-300">
-                  {featuredMatch.awayTeam.slice(0, 3).toUpperCase()}
-                </span>
+              <div className="w-10 h-10 rounded-full bg-red-600 border border-neutral-700 flex items-center justify-center shadow-inner relative overflow-hidden">
+                {/* Spain Red-Gold-Red flag */}
+                <div className="w-full h-4 bg-amber-400" />
               </div>
               <span className="text-xs font-bold text-neutral-200 leading-tight">
-                {featuredMatch.awayTeam}
+                Spain
               </span>
             </div>
           </div>
 
-          {/* Bottom Odds Row (1, X, 2) in green text matching screenshot */}
+          {/* Bottom Odds Row (1: 3.45, X: 3.62, 2: 2.20) */}
           <div className="grid grid-cols-3 gap-2 pt-1">
-            {(featuredMatch.markets['1X2'] || []).map(odd => {
+            {(featuredMatch.markets['1X2'] || [
+              { id: 'o1', name: '1', value: 3.45 },
+              { id: 'ox', name: 'X', value: 3.62 },
+              { id: 'o2', name: '2', value: 2.20 },
+            ]).map(odd => {
               const isSelected = betslip.some(
                 s => s.matchId === featuredMatch.id && s.marketName === '1X2' && s.selectionName === odd.name
               );
@@ -573,7 +567,7 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
                 <button
                   key={odd.id}
                   onClick={() => toggleSelection(featuredMatch, '1X2', odd)}
-                  className={`py-2 px-2.5 rounded-[3px] border flex items-center justify-between text-xs font-black transition-all ${
+                  className={`py-2 px-2.5 rounded-[3px] border flex items-center justify-between text-xs font-black transition-all cursor-pointer ${
                     isSelected
                       ? 'bg-[#00df59] text-black border-[#00df59]'
                       : 'bg-[#1b2532] text-[#00df59] border-[#253242] hover:bg-[#232f3f]'
