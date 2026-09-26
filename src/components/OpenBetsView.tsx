@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   HelpCircle,
   RefreshCw,
@@ -6,6 +6,7 @@ import {
   Share2,
   LayoutGrid,
   ChevronDown,
+  ChevronUp,
   X,
   Check,
   Calendar,
@@ -14,7 +15,13 @@ import {
   ChevronRight,
   Ticket,
   ArrowRight,
-  Bookmark
+  Bookmark,
+  Copy,
+  Tv,
+  Activity,
+  Sliders,
+  Sparkles,
+  Clock
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useBetting } from '../context/BettingContext';
@@ -60,7 +67,7 @@ export const OpenBetsView: React.FC = () => {
 
   // Cashout drawer state (Screenshot 7 & 8)
   const [cashoutDrawerBet, setCashoutDrawerBet] = useState<PlacedBet | null>(null);
-  const [cashoutSliderValue, setCashoutSliderValue] = useState<number>(7.0);
+  const [cashoutSliderValue, setCashoutSliderValue] = useState<number>(4750.0);
   const [cashoutTab, setCashoutTab] = useState<'now' | 'auto'>('now');
   const [cashoutSucceededBet, setCashoutSucceededBet] = useState<{
     bet: PlacedBet;
@@ -68,9 +75,50 @@ export const OpenBetsView: React.FC = () => {
   } | null>(null);
   const [cashedOutBetIds, setCashedOutBetIds] = useState<Record<string, boolean>>({});
 
-  // Scoped to logged-in user: guests have 0 open bets
-  const activeOpenBets = user.isLoggedIn ? openBets : [];
-  const activeBetHistory = user.isLoggedIn ? betHistory : [];
+  // Accordion state: toggle open bet details dropdown (collapsed by default, only drops down on click)
+  const [expandedBetIds, setExpandedBetIds] = useState<Record<string, boolean>>({});
+
+  const toggleExpandBet = (betId: string) => {
+    setExpandedBetIds((prev) => ({
+      ...prev,
+      [betId]: !prev[betId]
+    }));
+  };
+
+  // Live Match Simulation (SIM) state matching SportyBet video
+  const [simulatingBet, setSimulatingBet] = useState<PlacedBet | null>(null);
+  const [simMatchData, setSimMatchData] = useState<{
+    homeTeam: string;
+    awayTeam: string;
+    homeScore: number;
+    awayScore: number;
+    minute: number;
+    action: string;
+    possessionHome: number;
+    shotsHome: number;
+    shotsAway: number;
+    cornersHome: number;
+    cornersAway: number;
+  }>({
+    homeTeam: 'England',
+    awayTeam: 'Spain',
+    homeScore: 1,
+    awayScore: 1,
+    minute: 68,
+    action: 'Dangerous Attack: Spain on the counter attack near the penalty box',
+    possessionHome: 49,
+    shotsHome: 4,
+    shotsAway: 5,
+    cornersHome: 3,
+    cornersAway: 4
+  });
+
+  // Edit Bet modal state
+  const [editingBet, setEditingBet] = useState<PlacedBet | null>(null);
+
+  // Active bets scoped to logged-in user or available tickets
+  const activeOpenBets = user.isLoggedIn ? openBets : (openBets.length > 0 ? openBets : []);
+  const activeBetHistory = user.isLoggedIn ? betHistory : (betHistory.length > 0 ? betHistory : []);
 
   const filteredOpenBets = activeOpenBets.filter((bet) => {
     if (filter === 'cashout') return bet.cashoutAvailable;
@@ -78,9 +126,57 @@ export const OpenBetsView: React.FC = () => {
     return true;
   });
 
+  // Ticker for Live Simulation
+  useEffect(() => {
+    if (!simulatingBet) return;
+    const actions = [
+      'Dangerous Attack: Spain advancing towards the penalty box',
+      'England defending resolutely: Stones makes a key interception',
+      'Corner kick awarded to Spain after deflection',
+      'Kane breaks forward on a quick transition for England',
+      'Dangerous free kick awarded to England 28m from goal',
+      'Shot on target! Pickford makes a diving reflex save',
+      'Spain controlling possession in the middle third',
+      'England counter attack through Saka on the right wing'
+    ];
+    let step = 0;
+    const interval = setInterval(() => {
+      step = (step + 1) % actions.length;
+      setSimMatchData((prev) => ({
+        ...prev,
+        minute: Math.min(94, prev.minute + (step % 2 === 0 ? 1 : 0)),
+        action: actions[step],
+        possessionHome: 48 + Math.floor(Math.random() * 4),
+        shotsHome: prev.shotsHome + (step === 3 ? 1 : 0),
+        shotsAway: prev.shotsAway + (step === 5 ? 1 : 0)
+      }));
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [simulatingBet]);
+
+  const handleOpenSim = (bet: PlacedBet, matchTitle?: string) => {
+    const title = matchTitle || bet.selections[0]?.matchTitle || 'England vs Spain';
+    const parts = title.split(' vs ');
+    setSimMatchData({
+      homeTeam: parts[0] || 'England',
+      awayTeam: parts[1] || 'Spain',
+      homeScore: 1,
+      awayScore: 1,
+      minute: 68,
+      action: 'Dangerous Attack: Spain on the counter attack near the penalty box',
+      possessionHome: 49,
+      shotsHome: 4,
+      shotsAway: 5,
+      cornersHome: 3,
+      cornersAway: 4
+    });
+    setSimulatingBet(bet);
+  };
+
   const handleOpenCashoutDrawer = (bet: PlacedBet) => {
     if (cashedOutBetIds[bet.id]) return;
-    const maxVal = bet.cashoutAmount || 7.0;
+    const maxVal = bet.cashoutAmount || 4750.0;
     setCashoutSliderValue(maxVal);
     setCashoutDrawerBet(bet);
   };
@@ -305,39 +401,59 @@ export const OpenBetsView: React.FC = () => {
             ) : (
               filteredOpenBets.map((bet) => {
                 const isCashed = cashedOutBetIds[bet.id];
-                const cashoutVal = bet.cashoutAmount || 7.0;
+                const cashoutVal = bet.cashoutAmount || (bet.stake === 6 ? 6.05 : bet.stake === 7 ? 0.88 : 4750.0);
+                const isExpanded = !!expandedBetIds[bet.id];
 
                 return (
                   <div
                     key={bet.id}
-                    className="bg-[#18222f] border border-[#243243] rounded-md overflow-hidden shadow"
+                    className="bg-[#17212d] border border-[#243243] rounded-md overflow-hidden shadow-lg transition-all duration-200"
                   >
-                    {/* Header: Multiple | Rebet | SIM | Edit Bet */}
-                    <div className="px-3 py-2 bg-[#151e29] border-b border-[#232f3e] flex items-center justify-between text-xs">
-                      <span className="font-black text-white text-sm">
-                        {bet.type}
-                      </span>
+                    {/* Top Row: Left = Multiple [Live], Right = Rebet | SIM | Edit Bet */}
+                    <div className="px-3.5 pt-3 pb-2 flex items-center justify-between text-xs select-none">
+                      <div
+                        onClick={() => toggleExpandBet(bet.id)}
+                        className="flex items-center space-x-2 cursor-pointer"
+                      >
+                        <span className="font-bold text-white text-[15px] tracking-wide">
+                          {bet.type}
+                        </span>
+                        {bet.isLive && (
+                          <span className="bg-[#1b432a] text-[#00df59] font-bold text-[11px] px-1.5 py-0.5 rounded">
+                            Live
+                          </span>
+                        )}
+                      </div>
 
-                      <div className="flex items-center space-x-3 font-bold text-[#00df59]">
+                      <div className="flex items-center space-x-3.5 font-bold text-[#00df59] text-[13px]">
                         <button
-                          onClick={() => handleRebet(bet)}
-                          className="flex items-center space-x-1 hover:text-emerald-300"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRebet(bet);
+                          }}
+                          className="flex items-center space-x-1 hover:text-emerald-300 transition-colors cursor-pointer"
                         >
                           <RefreshCw className="w-3.5 h-3.5" />
                           <span>Rebet</span>
                         </button>
 
                         <button
-                          onClick={() => showToast('Match Simulation active')}
-                          className="flex items-center space-x-1 hover:text-emerald-300"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenSim(bet);
+                          }}
+                          className="flex items-center space-x-1 hover:text-emerald-300 transition-colors cursor-pointer"
                         >
                           <Play className="w-3.5 h-3.5 fill-current" />
                           <span>SIM</span>
                         </button>
 
                         <button
-                          onClick={() => showToast('Edit Bet selections')}
-                          className="flex items-center space-x-1 hover:text-emerald-300"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingBet(bet);
+                          }}
+                          className="flex items-center space-x-1 hover:text-emerald-300 transition-colors cursor-pointer"
                         >
                           <Share2 className="w-3.5 h-3.5" />
                           <span>Edit Bet</span>
@@ -345,39 +461,219 @@ export const OpenBetsView: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Match & Stake Row */}
-                    <div className="p-3 flex items-center justify-between">
-                      <div className="space-y-1">
-                        <div className="text-xs font-bold text-white">
-                          {bet.selections[0]?.matchTitle || 'Match'}
+                    {/* Collapsed State: Match Title & Stake on Left | Compact Green Cashout Button on Right */}
+                    {!isExpanded && (
+                      <div
+                        onClick={() => toggleExpandBet(bet.id)}
+                        className="px-3.5 pb-3.5 pt-1 flex items-center justify-between cursor-pointer hover:bg-[#1a2634] transition-colors"
+                      >
+                        {/* Left: Match Title & Stake */}
+                        <div className="space-y-1 pr-3 flex-1 min-w-0">
+                          <div className="text-[14px] font-bold text-white truncate">
+                            {bet.selections[0]?.matchTitle || 'Match'}
+                          </div>
+                          <div className="text-xs text-neutral-400">
+                            <span>Stake </span>
+                            <strong className="font-bold text-white">{bet.stake.toFixed(2)}</strong>
+                          </div>
                         </div>
-                        <div className="text-xs text-neutral-300">
-                          <span>Stake </span>
-                          <strong className="font-black text-white">{bet.stake.toFixed(2)}</strong>
+
+                        {/* Right: Cashout Button (2 Lines: Cashout / GHS X.XX) */}
+                        <div onClick={(e) => e.stopPropagation()} className="shrink-0">
+                          {isCashed ? (
+                            <div className="bg-[#243346] text-neutral-400 px-4 py-2.5 rounded text-xs font-bold text-center">
+                              Cashout succeeded!
+                            </div>
+                          ) : bet.cashoutAvailable ? (
+                            <button
+                              onClick={() => handleOpenCashoutDrawer(bet)}
+                              className="bg-[#00c853] hover:bg-[#00b34a] active:scale-95 text-white px-5 py-2 rounded font-bold text-xs flex flex-col items-center justify-center shadow transition-all cursor-pointer min-w-[110px]"
+                            >
+                              <span className="leading-tight text-xs font-bold">Cashout</span>
+                              <span className="leading-tight text-xs font-black">
+                                GHS {cashoutVal.toFixed(2)}
+                              </span>
+                            </button>
+                          ) : (
+                            <div className="bg-[#202c3c] text-neutral-500 px-3 py-2 rounded text-xs font-bold">
+                              Cashout Unavailable
+                            </div>
+                          )}
                         </div>
                       </div>
+                    )}
 
-                      {/* Cashout Button (Bright Green, Two Lines) */}
-                      {isCashed ? (
-                        <div className="bg-[#2a3748] text-neutral-400 px-4 py-2 rounded text-xs font-bold text-center cursor-not-allowed">
-                          Cashout succeeded!
+                    {/* DROPPED-DOWN MATCH DETAILS (When clicked, shows full match list, Stake/Pot.Win & Cashout at Bottom) */}
+                    {isExpanded && (
+                      <div className="border-t border-[#232f3e] bg-[#16202c] animate-in slide-in-from-top-2 duration-200">
+                        <div className="divide-y divide-[#202b3a]">
+                          {bet.selections.map((sel, idx) => {
+                            const isMatchLive = sel.isLive ?? bet.isLive;
+                            const matchTimeStr = sel.liveTime || "16' H1";
+                            const matchScoreStr = sel.liveScore || "0:1";
+
+                            return (
+                              <div
+                                key={idx}
+                                className="px-3.5 py-3 flex items-start space-x-3.5"
+                              >
+                                {/* Left Icon: (▶) for Live, (🕒) for scheduled */}
+                                <div className="pt-0.5 shrink-0">
+                                  {isMatchLive ? (
+                                    <div className="w-6 h-6 rounded-full border border-neutral-300 flex items-center justify-center text-white">
+                                      <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
+                                    </div>
+                                  ) : (
+                                    <div className="w-6 h-6 rounded-full border border-neutral-400 flex items-center justify-center text-neutral-400">
+                                      <Clock className="w-3.5 h-3.5" />
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Right Content */}
+                                <div className="flex-1 min-w-0 space-y-1">
+                                  {/* Line 1: ⚽ Pick @ Odd  Market */}
+                                  <div className="flex items-center justify-between text-xs">
+                                    <div className="flex items-center space-x-1.5 font-bold text-white text-[14px]">
+                                      <span className="text-sm">⚽</span>
+                                      <span>{sel.selectionName} @ {sel.odd.toFixed(2)}</span>
+                                      <span className="text-neutral-400 text-xs font-normal ml-1">
+                                        {sel.marketName || '1X2'}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {/* Line 2 (if Live): Live Odds pill + odd value + arrow */}
+                                  {isMatchLive && (
+                                    <div className="flex items-center space-x-2 text-xs">
+                                      <span className="bg-[#263344] text-neutral-300 px-1.5 py-0.5 rounded text-[11px] font-semibold">
+                                        Live Odds
+                                      </span>
+                                      <span className="font-bold text-white text-xs">
+                                        {(sel.liveOdds || sel.odd).toFixed(2)}
+                                      </span>
+                                      {sel.liveOddsTrend === 'up' && (
+                                        <span className="text-[#00df59] font-black text-sm">↑</span>
+                                      )}
+                                      {sel.liveOddsTrend === 'down' && (
+                                        <span className="text-[#ff4444] font-black text-sm">↓</span>
+                                      )}
+                                    </div>
+                                  )}
+
+                                  {/* Line 3: Match Title (Underlined link style) */}
+                                  <div>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleOpenSim(bet, sel.matchTitle);
+                                      }}
+                                      className="text-white text-xs font-medium underline hover:text-[#5ba4e5] text-left cursor-pointer"
+                                    >
+                                      {sel.matchTitle}
+                                    </button>
+                                  </div>
+
+                                  {/* Line 4: Live Score/Time on left, and 3 icons on right */}
+                                  {isMatchLive ? (
+                                    <div className="flex items-center justify-between text-xs pt-0.5">
+                                      <div className="text-[#00df59] font-bold text-xs">
+                                        <span>{matchTimeStr} | {matchScoreStr}</span>
+                                      </div>
+
+                                      {/* 3 icons: 🎮 (purple) 🎦 (yellow) 📈 (cyan) */}
+                                      <div className="flex items-center space-x-3.5 text-base">
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleOpenSim(bet, sel.matchTitle);
+                                          }}
+                                          className="hover:scale-110 transition-transform cursor-pointer"
+                                          title="Interactive Match Tracker"
+                                        >
+                                          🎮
+                                        </button>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            showToast(`Live video stream active for ${sel.matchTitle}`);
+                                          }}
+                                          className="hover:scale-110 transition-transform cursor-pointer text-amber-400"
+                                          title="Live Stream"
+                                        >
+                                          🎦
+                                        </button>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            showToast(`Match stats loaded for ${sel.matchTitle}`);
+                                          }}
+                                          className="hover:scale-110 transition-transform cursor-pointer text-cyan-400"
+                                          title="Statistics"
+                                        >
+                                          📈
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="text-neutral-400 text-xs pt-0.5">
+                                      <span>{sel.liveTime || '26/09 20:30'}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                      ) : bet.cashoutAvailable ? (
-                        <button
-                          onClick={() => handleOpenCashoutDrawer(bet)}
-                          className="bg-[#00a826] hover:bg-[#009221] active:scale-95 text-white px-5 py-2 rounded flex flex-col items-center justify-center font-bold text-xs shadow-md transition-transform"
-                        >
-                          <span className="leading-tight">Cashout</span>
-                          <span className="font-black leading-tight">
-                            GHS {cashoutVal.toFixed(2)}
-                          </span>
-                        </button>
-                      ) : (
-                        <div className="bg-[#243040] text-neutral-500 px-3 py-2 rounded text-xs font-bold">
-                          Cashout Unavailable
+
+                        {/* Bottom inside dropdown: Hide Match Details ▲, Stake / Pot. Win, and Full-Width Cashout Button */}
+                        <div className="bg-[#17212d] border-t border-[#202b3a] p-3.5 space-y-2.5">
+                          <div className="flex justify-end">
+                            <button
+                              onClick={() => toggleExpandBet(bet.id)}
+                              className="text-[#00df59] text-xs font-bold flex items-center space-x-1 hover:underline cursor-pointer"
+                            >
+                              <span>Hide Match Details</span>
+                              <span className="text-[10px]">▲</span>
+                            </button>
+                          </div>
+
+                          <div className="flex justify-between items-center text-xs">
+                            <div className="space-y-1 text-neutral-400 text-xs">
+                              <div>Stake</div>
+                              <div>Pot. Win</div>
+                            </div>
+                            <div className="space-y-1 text-right font-black text-white text-xs">
+                              <div>{bet.stake.toFixed(2)}</div>
+                              <div>{bet.potentialWin.toFixed(2)}</div>
+                            </div>
+                          </div>
+
+                          {/* Full-width Vibrant Green Cashout Button at the very bottom (Matches Screenshot 2) */}
+                          <div className="pt-1">
+                            {isCashed ? (
+                              <div className="w-full py-3 bg-[#243346] text-neutral-400 text-center font-bold text-xs rounded-md">
+                                Cashout succeeded!
+                              </div>
+                            ) : bet.cashoutAvailable ? (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOpenCashoutDrawer(bet);
+                                }}
+                                className="w-full py-3 bg-[#00c853] hover:bg-[#00b34a] active:scale-98 text-white font-black text-sm rounded-md shadow flex items-center justify-center transition-all cursor-pointer"
+                              >
+                                <span>Cashout GHS {cashoutVal.toFixed(2)}</span>
+                              </button>
+                            ) : (
+                              <div className="w-full py-2.5 bg-[#202c3c] text-neutral-500 text-center font-bold text-xs rounded-md">
+                                Cashout Unavailable
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 );
               })
@@ -707,6 +1003,203 @@ export const OpenBetsView: React.FC = () => {
               className="w-full py-3 bg-[#00a826] hover:bg-[#009221] active:scale-98 text-white font-black text-xs rounded shadow uppercase tracking-wide transition-all"
             >
               Rebet remaining matches
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* =================================================================== */}
+      {/* DRAWER 3: MATCH SIMULATION MODAL (SportyBet Live Pitch Tracker)     */}
+      {/* =================================================================== */}
+      {simulatingBet && (
+        <div className="fixed inset-0 z-50 bg-black/85 flex items-end justify-center animate-in fade-in">
+          <div className="w-full max-w-md bg-[#16202c] rounded-t-2xl p-4 space-y-3.5 shadow-2xl border-t border-[#29394d] animate-in slide-in-from-bottom duration-200">
+            {/* Header: Match Title, Clock, Close */}
+            <div className="flex items-center justify-between border-b border-[#243346] pb-2 text-xs">
+              <div className="flex items-center space-x-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#00df59] animate-ping" />
+                <span className="font-black text-white text-sm">
+                  {simMatchData.homeTeam} vs {simMatchData.awayTeam}
+                </span>
+                <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-[#00df59] text-[10px] font-black uppercase">
+                  SIM • In-Play
+                </span>
+              </div>
+              <button
+                onClick={() => setSimulatingBet(null)}
+                className="w-7 h-7 rounded-full bg-[#253243] flex items-center justify-center text-neutral-300 hover:text-white cursor-pointer"
+              >
+                <X className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </div>
+
+            {/* Scoreboard */}
+            <div className="bg-[#111822] rounded-lg p-3 border border-[#202d3e] flex items-center justify-between text-center">
+              <div className="w-2/5 text-left">
+                <div className="font-black text-white text-base truncate">{simMatchData.homeTeam}</div>
+                <div className="text-[11px] text-neutral-400">Kane 34'</div>
+              </div>
+              <div className="w-1/5">
+                <div className="text-2xl font-black text-[#00df59] tracking-wider">
+                  {simMatchData.homeScore} - {simMatchData.awayScore}
+                </div>
+                <div className="text-[10px] font-bold text-neutral-300 bg-[#1c2837] px-1.5 py-0.5 rounded-full inline-block mt-0.5">
+                  {simMatchData.minute}' 2H
+                </div>
+              </div>
+              <div className="w-2/5 text-right">
+                <div className="font-black text-white text-base truncate">{simMatchData.awayTeam}</div>
+                <div className="text-[11px] text-neutral-400">Morata 51'</div>
+              </div>
+            </div>
+
+            {/* 2D Animated Football Pitch */}
+            <div className="relative h-32 rounded-lg bg-gradient-to-b from-[#1b5e20] to-[#144717] border border-[#2e7d32] overflow-hidden p-2 flex flex-col justify-between shadow-inner">
+              {/* Pitch markings */}
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 border-t border-white/25" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border border-white/25" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-8 border-b border-x border-white/20" />
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-8 border-t border-x border-white/20" />
+
+              {/* Action Banner */}
+              <div className="relative z-10 flex items-center justify-center">
+                <span className="px-2.5 py-1 bg-black/60 backdrop-blur rounded text-[11px] font-bold text-white shadow flex items-center space-x-1.5 border border-white/10">
+                  <Activity className="w-3.5 h-3.5 text-[#00df59] animate-spin" />
+                  <span>{simMatchData.action}</span>
+                </span>
+              </div>
+
+              {/* Animated ball on pitch */}
+              <div className="relative z-10 flex items-center justify-center my-auto">
+                <div className="w-3 h-3 rounded-full bg-white shadow-lg animate-bounce ring-2 ring-emerald-400" />
+              </div>
+
+              {/* Possession bar */}
+              <div className="relative z-10 space-y-1">
+                <div className="flex justify-between text-[10px] text-white/90 font-bold px-1">
+                  <span>{simMatchData.homeTeam} {simMatchData.possessionHome}%</span>
+                  <span>Possession</span>
+                  <span>{100 - simMatchData.possessionHome}% {simMatchData.awayTeam}</span>
+                </div>
+                <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden flex">
+                  <div
+                    className="bg-[#00df59] h-full transition-all duration-500"
+                    style={{ width: `${simMatchData.possessionHome}%` }}
+                  />
+                  <div
+                    className="bg-[#ff4444] h-full transition-all duration-500"
+                    style={{ width: `${100 - simMatchData.possessionHome}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* In-Play Match Stats */}
+            <div className="grid grid-cols-4 gap-1.5 text-center text-xs bg-[#111822] p-2 rounded-lg border border-[#202d3e]">
+              <div>
+                <span className="text-[10px] text-neutral-400 block">Shots</span>
+                <span className="font-bold text-white">{simMatchData.shotsHome} - {simMatchData.shotsAway}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-neutral-400 block">Corners</span>
+                <span className="font-bold text-white">{simMatchData.cornersHome} - {simMatchData.cornersAway}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-neutral-400 block">Fouls</span>
+                <span className="font-bold text-white">8 - 9</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-neutral-400 block">Yellows</span>
+                <span className="font-bold text-white">1 - 2</span>
+              </div>
+            </div>
+
+            {/* Bet Pick Status */}
+            <div className="bg-[#121c27] p-2.5 rounded-lg border border-emerald-900/50 flex items-center justify-between text-xs">
+              <div>
+                <span className="text-neutral-400 text-[10px] block">Your Pick</span>
+                <span className="font-bold text-white">Draw (X) @ 3.20</span>
+              </div>
+              <div className="text-right">
+                <span className="text-[#00df59] font-black text-xs flex items-center space-x-1">
+                  <Check className="w-3.5 h-3.5 inline" />
+                  <span>Winning (1-1)</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Quick Cashout inside SIM Modal */}
+            {simulatingBet.cashoutAvailable && (
+              <button
+                onClick={() => {
+                  const bet = simulatingBet;
+                  setSimulatingBet(null);
+                  handleOpenCashoutDrawer(bet);
+                }}
+                className="w-full py-2.5 bg-[#00a826] hover:bg-[#009221] active:scale-98 text-white font-black text-xs rounded uppercase tracking-wider shadow transition-all cursor-pointer flex items-center justify-center space-x-1.5"
+              >
+                <span>Cashout GHS {(simulatingBet.cashoutAmount || 4750.0).toFixed(2)}</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* =================================================================== */}
+      {/* DRAWER 4: EDIT BET MODAL                                            */}
+      {/* =================================================================== */}
+      {editingBet && (
+        <div className="fixed inset-0 z-50 bg-black/85 flex items-end justify-center animate-in fade-in">
+          <div className="w-full max-w-md bg-[#16202c] rounded-t-2xl p-4 space-y-3.5 shadow-2xl border-t border-[#29394d] animate-in slide-in-from-bottom duration-200">
+            <div className="flex items-center justify-between border-b border-[#243346] pb-2 text-xs">
+              <div className="flex items-center space-x-2">
+                <Share2 className="w-4 h-4 text-[#00df59]" />
+                <span className="font-black text-white text-sm">
+                  Edit Bet ({editingBet.type})
+                </span>
+              </div>
+              <button
+                onClick={() => setEditingBet(null)}
+                className="w-7 h-7 rounded-full bg-[#253243] flex items-center justify-center text-neutral-300 hover:text-white cursor-pointer"
+              >
+                <X className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </div>
+
+            <p className="text-xs text-neutral-300">
+              You can adjust selections or reallocate stake while matches are still in-play:
+            </p>
+
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {editingBet.selections.map((sel, idx) => (
+                <div
+                  key={idx}
+                  className="p-2.5 bg-[#101720] rounded border border-[#212f40] flex items-center justify-between text-xs"
+                >
+                  <div>
+                    <span className="font-bold text-white block">{sel.matchTitle}</span>
+                    <span className="text-[11px] text-neutral-400">
+                      {sel.marketName}: <strong className="text-[#00df59]">{sel.selectionName}</strong>
+                    </span>
+                  </div>
+                  <span className="font-mono font-bold text-white">@{sel.odd.toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-[#121c27] p-2.5 rounded text-xs flex justify-between">
+              <span className="text-neutral-400">Total Stake:</span>
+              <strong className="text-white font-mono">GHS {editingBet.stake.toFixed(2)}</strong>
+            </div>
+
+            <button
+              onClick={() => {
+                setEditingBet(null);
+                showToast('Ticket selections saved & updated');
+              }}
+              className="w-full py-2.5 bg-[#00a826] hover:bg-[#009221] active:scale-98 text-white font-black text-xs rounded uppercase tracking-wider shadow transition-all cursor-pointer"
+            >
+              Save & Update Ticket
             </button>
           </div>
         </div>

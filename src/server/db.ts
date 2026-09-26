@@ -46,6 +46,7 @@ class Database {
     this.users.set(demoPhone, demoUser);
     this.users.set('20******5', demoUser);
     this.users.set('0204891235', demoUser);
+    this.userSessions.set('demo-token-sportybet-charles', demoPhone);
 
     // 3. Initialize default bets for demo account
     this.openBets.set(demoPhone, JSON.parse(JSON.stringify(INITIAL_OPEN_BETS)));

@@ -3763,15 +3763,15 @@ export const REAL_UPCOMING_FIXTURES: Match[] = [
     "league": "Premier League",
     "countryOrCategory": "England",
     "homeTeam": "Arsenal",
-    "awayTeam": "Leeds United",
+    "awayTeam": "Leicester City",
     "isLive": false,
     "startTime": "11:30",
-    "date": "2026-10-10",
-    "dateLabel": "Sat 10/10",
-    "commenceTime": "2026-10-10T11:30:00Z",
+    "date": "2026-09-26",
+    "dateLabel": "Today 26/09",
+    "commenceTime": "2026-09-26T11:30:00Z",
     "isHot": true,
     "hasLiveStream": true,
-    "marketsCount": 155,
+    "marketsCount": 218,
     "markets": {
       "1X2": [
         {
@@ -3839,12 +3839,12 @@ export const REAL_UPCOMING_FIXTURES: Match[] = [
     "awayTeam": "Brentford",
     "isLive": false,
     "startTime": "14:00",
-    "date": "2026-10-10",
-    "dateLabel": "Sat 10/10",
-    "commenceTime": "2026-10-10T14:00:00Z",
+    "date": "2026-09-26",
+    "dateLabel": "Today 26/09",
+    "commenceTime": "2026-09-26T14:00:00Z",
     "isHot": true,
     "hasLiveStream": true,
-    "marketsCount": 155,
+    "marketsCount": 218,
     "markets": {
       "1X2": [
         {
@@ -3912,12 +3912,12 @@ export const REAL_UPCOMING_FIXTURES: Match[] = [
     "awayTeam": "Bournemouth",
     "isLive": false,
     "startTime": "14:00",
-    "date": "2026-10-10",
-    "dateLabel": "Sat 10/10",
-    "commenceTime": "2026-10-10T14:00:00Z",
+    "date": "2026-09-26",
+    "dateLabel": "Today 26/09",
+    "commenceTime": "2026-09-26T14:00:00Z",
     "isHot": true,
     "hasLiveStream": true,
-    "marketsCount": 155,
+    "marketsCount": 218,
     "markets": {
       "1X2": [
         {
@@ -3981,16 +3981,16 @@ export const REAL_UPCOMING_FIXTURES: Match[] = [
     "sport": "football",
     "league": "Premier League",
     "countryOrCategory": "England",
-    "homeTeam": "Sunderland",
-    "awayTeam": "Brighton and Hove Albion",
+    "homeTeam": "Newcastle United",
+    "awayTeam": "Manchester City",
     "isLive": false,
     "startTime": "14:00",
-    "date": "2026-10-10",
-    "dateLabel": "Sat 10/10",
-    "commenceTime": "2026-10-10T14:00:00Z",
+    "date": "2026-09-26",
+    "dateLabel": "Today 26/09",
+    "commenceTime": "2026-09-26T14:00:00Z",
     "isHot": true,
     "hasLiveStream": true,
-    "marketsCount": 155,
+    "marketsCount": 218,
     "markets": {
       "1X2": [
         {
@@ -4058,12 +4058,12 @@ export const REAL_UPCOMING_FIXTURES: Match[] = [
     "awayTeam": "Fulham",
     "isLive": false,
     "startTime": "14:00",
-    "date": "2026-10-10",
-    "dateLabel": "Sat 10/10",
-    "commenceTime": "2026-10-10T14:00:00Z",
+    "date": "2026-09-26",
+    "dateLabel": "Today 26/09",
+    "commenceTime": "2026-09-26T14:00:00Z",
     "isHot": true,
     "hasLiveStream": true,
-    "marketsCount": 155,
+    "marketsCount": 218,
     "markets": {
       "1X2": [
         {
@@ -4131,12 +4131,12 @@ export const REAL_UPCOMING_FIXTURES: Match[] = [
     "awayTeam": "Tottenham Hotspur",
     "isLive": false,
     "startTime": "16:30",
-    "date": "2026-10-10",
-    "dateLabel": "Sat 10/10",
-    "commenceTime": "2026-10-10T16:30:00Z",
+    "date": "2026-09-26",
+    "dateLabel": "Today 26/09",
+    "commenceTime": "2026-09-26T16:30:00Z",
     "isHot": true,
     "hasLiveStream": true,
-    "marketsCount": 155,
+    "marketsCount": 218,
     "markets": {
       "1X2": [
         {
@@ -4858,7 +4858,7 @@ export const REAL_UPCOMING_FIXTURES: Match[] = [
     "league": "Premier League",
     "countryOrCategory": "England",
     "homeTeam": "Bournemouth",
-    "awayTeam": "Sunderland",
+    "awayTeam": "Southampton",
     "isLive": false,
     "startTime": "13:00",
     "date": "2026-10-18",
@@ -5003,8 +5003,8 @@ export const REAL_UPCOMING_FIXTURES: Match[] = [
     "sport": "football",
     "league": "Premier League",
     "countryOrCategory": "England",
-    "homeTeam": "Leeds United",
-    "awayTeam": "Manchester United",
+    "homeTeam": "Everton",
+    "awayTeam": "Crystal Palace",
     "isLive": false,
     "startTime": "13:00",
     "date": "2026-10-18",

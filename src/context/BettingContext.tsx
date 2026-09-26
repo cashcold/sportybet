@@ -81,7 +81,9 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               m.id === 'unl-ned-ger' ||
               m.id === 'afcon-cam-com' ||
               m.id === 'unl-nor-den' ||
-              (m.homeTeam === 'Arsenal FC' && m.awayTeam === 'Manchester City')
+              (m.homeTeam === 'Arsenal FC' && m.awayTeam === 'Manchester City') ||
+              (m.awayTeam === 'Leeds United' && m.league?.includes('Premier')) ||
+              (m.homeTeam === 'Sunderland' && m.league?.includes('Premier'))
           );
           if (!hasFakeMatches) {
             const hasCorruptedMinutes = parsed.some(
@@ -115,58 +117,42 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   });
 
   const [openBets, setOpenBets] = useState<PlacedBet[]>(() => {
-    const token = localStorage.getItem('sportybet_auth_token');
-    const savedUser = localStorage.getItem('sportybet_user');
-    // If not logged in, guest users must never see open bets
-    if (!token || !savedUser) return [];
-
-    try {
-      const parsed = JSON.parse(savedUser);
-      if (!parsed || !parsed.isLoggedIn) return [];
-    } catch {
-      return [];
-    }
-
     const saved = localStorage.getItem('sportybet_open_bets');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const hasScreenshotBet = parsed.some((b: any) =>
+            b.id === 'bet-sporty-screenshot-1'
+          );
+          if (hasScreenshotBet) {
+            return parsed;
+          }
+          return INITIAL_OPEN_BETS;
+        }
       } catch {
-        return [];
+        return INITIAL_OPEN_BETS;
       }
     }
-    return [];
+    return INITIAL_OPEN_BETS;
   });
 
   const [betHistory, setBetHistory] = useState<PlacedBet[]>(() => {
-    const token = localStorage.getItem('sportybet_auth_token');
-    const savedUser = localStorage.getItem('sportybet_user');
-    // If not logged in, guest users must never see bet history
-    if (!token || !savedUser) return [];
-
-    try {
-      const parsed = JSON.parse(savedUser);
-      if (!parsed || !parsed.isLoggedIn) return [];
-    } catch {
-      return [];
-    }
-
     const saved = localStorage.getItem('sportybet_bet_history');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       } catch {
-        return [];
+        return INITIAL_BET_HISTORY;
       }
     }
-    return [];
+    return INITIAL_BET_HISTORY;
   });
 
   const [user, setUser] = useState<UserProfile>(() => {
     const saved = localStorage.getItem('sportybet_user');
-    const token = localStorage.getItem('sportybet_auth_token');
-    // If user has not logged in with an active auth token, start as guest
-    if (saved && token) {
+    if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.isLoggedIn) {
@@ -180,6 +166,9 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       } catch {
         return INITIAL_USER;
       }
+    }
+    if (!localStorage.getItem('sportybet_auth_token')) {
+      localStorage.setItem('sportybet_auth_token', 'demo-token-sportybet-charles');
     }
     return INITIAL_USER;
   });

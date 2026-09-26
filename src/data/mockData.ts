@@ -7,77 +7,148 @@ export const INITIAL_MATCHES: Match[] = REAL_UPCOMING_FIXTURES;
 // Open Bets initial state: Real fixtures
 export const INITIAL_OPEN_BETS: PlacedBet[] = [
   {
-    id: 'bet-nations-1',
-    ticketId: 'SBGH-7819-2041',
-    transactionId: 'TX-GH-892184912',
-    bookingCode: 'DA2R3J',
+    id: 'bet-sporty-screenshot-1',
+    ticketId: 'SBGH-4819-2094',
+    transactionId: 'TX-GH-481920941',
+    bookingCode: 'CXA7PN',
     type: 'Multiple',
-    date: '25/09 07:55',
+    date: '26/09 19:04',
     isLive: true,
     selections: [
       {
-        matchId: 'live-alg-tun-u20',
-        gameId: '21094',
-        matchTitle: 'Algeria U20 vs Tunisia U20',
+        matchId: 'live-alb-blr',
+        gameId: '28101',
+        matchTitle: 'Albania vs Belarus',
         marketName: '1X2',
-        selectionName: 'Draw (X)',
-        odd: 1.85,
+        selectionName: 'Home',
+        odd: 1.69,
         isLive: true,
-        liveOdds: 1.85,
-        liveOddsTrend: 'same',
-        liveScore: '1:1',
-        liveTime: "76' 2H",
+        liveOdds: 2.10,
+        liveOddsTrend: 'up',
+        liveScore: '0:0',
+        liveTime: "14' H1",
+        hasStream: true,
         hasTracker: true,
         hasStats: true
       },
       {
-        matchId: 'theodds-95d5c8d1489bc284b68dc332fa1cb854',
-        gameId: '95581',
-        matchTitle: 'Italy vs Belgium',
+        matchId: 'live-cze-cro',
+        gameId: '28102',
+        matchTitle: 'Czechia vs Croatia',
         marketName: '1X2',
-        selectionName: 'Italy (1)',
-        odd: 2.27,
-        isLive: false,
-        liveOdds: 2.27,
-        liveOddsTrend: 'same',
+        selectionName: 'Away',
+        odd: 2.05,
+        isLive: true,
+        liveOdds: 1.95,
+        liveOddsTrend: 'down',
+        liveScore: '0:0',
+        liveTime: "18' H1",
+        hasStream: true,
         hasTracker: true,
         hasStats: true
-      }
-    ],
-    stake: 7.00,
-    totalOdds: 4.20,
-    potentialWin: 29.40,
-    status: 'open',
-    cashoutAvailable: true,
-    cashoutAmount: 7.00
-  },
-  {
-    id: 'bet-france-1',
-    ticketId: 'SBGH-9812-3312',
-    transactionId: 'TX-GH-312984921',
-    bookingCode: 'DA2R1A',
-    type: 'Single',
-    date: '25/09 07:56',
-    isLive: false,
-    selections: [
+      },
       {
-        matchId: 'theodds-2b7592be536420c10378dd7522466f6a',
-        gameId: '27592',
-        matchTitle: 'Turkey vs France',
+        matchId: 'theodds-eng-esp-nations',
+        gameId: '29810',
+        matchTitle: 'England vs Spain',
         marketName: '1X2',
-        selectionName: 'France (2)',
-        odd: 1.62,
+        selectionName: 'Away',
+        odd: 2.27,
+        isLive: true,
+        liveOdds: 1.52,
+        liveOddsTrend: 'down',
+        liveScore: '0:1',
+        liveTime: "16' H1",
+        hasStream: true,
+        hasTracker: true,
+        hasStats: true
+      },
+      {
+        matchId: 'up-usa-per',
+        gameId: '48192',
+        matchTitle: 'USA vs Peru',
+        marketName: '1X2',
+        selectionName: 'Home',
+        odd: 1.43,
         isLive: false,
+        liveOdds: 1.43,
+        liveOddsTrend: 'same',
+        liveTime: '26/09 20:30',
+        hasStream: false,
+        hasTracker: false,
+        hasStats: true
+      },
+      {
+        matchId: 'up-can-chi',
+        gameId: '48193',
+        matchTitle: 'Canada vs Chile',
+        marketName: 'GG/NG',
+        selectionName: 'Yes',
+        odd: 1.90,
+        isLive: false,
+        liveOdds: 1.90,
+        liveOddsTrend: 'same',
+        liveTime: '26/09 23:00',
+        hasStream: false,
         hasTracker: false,
         hasStats: true
       }
     ],
-    stake: 5.00,
-    totalOdds: 1.62,
-    potentialWin: 8.10,
+    stake: 6.00,
+    totalOdds: 22.65,
+    potentialWin: 135.90,
     status: 'open',
     cashoutAvailable: true,
-    cashoutAmount: 4.80
+    cashoutAmount: 6.05,
+    canRebet: true
+  },
+  {
+    id: 'bet-sporty-screenshot-2',
+    ticketId: 'SBGH-5912-3021',
+    transactionId: 'TX-GH-591230211',
+    bookingCode: 'BD9812',
+    type: 'Multiple',
+    date: '26/09 19:10',
+    isLive: false,
+    selections: [
+      {
+        matchId: 'live-bvb-wer',
+        gameId: '39101',
+        matchTitle: 'Borussia Dortmund vs Werder Bremen',
+        marketName: '1X2',
+        selectionName: 'Home',
+        odd: 1.55,
+        isLive: false,
+        liveOdds: 1.55,
+        liveOddsTrend: 'same',
+        liveTime: '26/09 18:30',
+        hasStream: true,
+        hasTracker: true,
+        hasStats: true
+      },
+      {
+        matchId: 'up-rbl-aug',
+        gameId: '39102',
+        matchTitle: 'RB Leipzig vs FC Augsburg',
+        marketName: '1X2',
+        selectionName: 'Home',
+        odd: 1.48,
+        isLive: false,
+        liveOdds: 1.48,
+        liveOddsTrend: 'same',
+        liveTime: '26/09 18:30',
+        hasStream: false,
+        hasTracker: false,
+        hasStats: true
+      }
+    ],
+    stake: 7.00,
+    totalOdds: 2.29,
+    potentialWin: 16.03,
+    status: 'open',
+    cashoutAvailable: true,
+    cashoutAmount: 0.88,
+    canRebet: true
   }
 ];
 
@@ -159,7 +230,7 @@ export const DEMO_USER: UserProfile = {
   isLoggedIn: true
 };
 
-export const INITIAL_USER: UserProfile = GUEST_USER;
+export const INITIAL_USER: UserProfile = DEMO_USER;
 
 export const SPORTS_LIST = [
   { id: 'popular', name: 'Popular', icon: 'Flame', count: 420 },
