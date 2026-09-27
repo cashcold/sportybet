@@ -1,25 +1,75 @@
 import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import { UserModel } from './models/UserModel';
+import { BetModel } from './models/BetModel';
+import { INITIAL_OPEN_BETS, INITIAL_BET_HISTORY, INITIAL_USER } from '../data/mockData';
 
-export function getMongoUri(): string {
-  return process.env.MONGODB_URI || '';
-}
-
-export const MONGODB_URI = process.env.MONGODB_URI || '';
-
+let customMongoUri: string = '';
+let memoryServerInstance: MongoMemoryServer | null = null;
 let isConnected = false;
 let connectionPromise: Promise<typeof mongoose | null> | null = null;
 
-// Ensure mongoose never buffers commands when offline
-mongoose.set('bufferCommands', false);
+export function getMongoUri(): string {
+  return customMongoUri || process.env.MONGODB_URI || '';
+}
+
+export function setCustomMongoUri(uri: string) {
+  customMongoUri = uri.trim();
+  isConnected = false;
+  connectionPromise = null;
+}
+
+export async function seedDefaultDatabase() {
+  try {
+    // 1. Seed User if not exists
+    const userCount = await UserModel.countDocuments();
+    if (userCount === 0) {
+      await UserModel.create({
+        phone: INITIAL_USER.phone || '20******5',
+        firstName: INITIAL_USER.firstName || 'Nana',
+        lastName: INITIAL_USER.lastName || 'Kojo',
+        balance: INITIAL_USER.balance || 5000.00,
+        currency: INITIAL_USER.currency || 'GHS',
+        loyaltyTier: INITIAL_USER.loyaltyTier || 'Gold VIP',
+        loyaltyProgress: INITIAL_USER.loyaltyProgress || 65,
+        sessionTokens: ['default_session_token_sportybet']
+      });
+      console.log('[MongoDB Seed] Initial User created in MongoDB.');
+    }
+
+    // 2. Seed Bets if not exists
+    const betCount = await BetModel.countDocuments();
+    if (betCount === 0) {
+      const allInitialBets = [...INITIAL_OPEN_BETS, ...INITIAL_BET_HISTORY];
+      for (const b of allInitialBets) {
+        await BetModel.create({
+          id: b.id,
+          ticketId: b.ticketId,
+          transactionId: b.transactionId || `TX-GH-${Math.floor(100000000 + Math.random() * 900000000)}`,
+          userPhone: '20******5',
+          type: b.type,
+          date: b.date,
+          isLive: b.isLive,
+          selections: b.selections,
+          stake: b.stake,
+          totalOdds: b.totalOdds,
+          potentialWin: b.potentialWin,
+          status: b.status,
+          cashoutAvailable: b.cashoutAvailable,
+          cashoutAmount: b.cashoutAmount || b.stake * 0.9,
+          bookingCode: b.bookingCode || 'BD9812',
+          canRebet: b.canRebet ?? true,
+          isAllGreen: b.isAllGreen || false
+        });
+      }
+      console.log(`[MongoDB Seed] ${allInitialBets.length} Initial Bet Slips created in MongoDB.`);
+    }
+  } catch (err: any) {
+    console.warn('[MongoDB Seed Notice]', err?.message || err);
+  }
+}
 
 export async function connectToDatabase(): Promise<typeof mongoose | null> {
-  const uri = getMongoUri();
-  if (!uri) {
-    // In-memory mode active (db.ts)
-    return null;
-  }
-
   if (isConnected && mongoose.connection.readyState === 1) {
     return mongoose;
   }
@@ -30,30 +80,41 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
 
   connectionPromise = (async () => {
     try {
-      console.log('[MongoDB] Connecting to SportyBet database...');
-      // 8s timeout to allow MongoDB Atlas DNS SRV and SSL/TLS handshake
-      const conn = await mongoose.connect(uri, {
-        serverSelectionTimeoutMS: 8000,
-        connectTimeoutMS: 8000,
-        bufferCommands: false,
+      let targetUri = getMongoUri();
+
+      // If no external MONGODB_URI is provided, launch real embedded MongoDB server
+      if (!targetUri) {
+        if (!memoryServerInstance) {
+          console.log('[MongoDB] Starting dedicated MongoDB database engine...');
+          memoryServerInstance = await MongoMemoryServer.create({
+            instance: {
+              dbName: 'sportybet_ghana'
+            }
+          });
+        }
+        targetUri = memoryServerInstance.getUri();
+        console.log('[MongoDB Engine] Local MongoDB Server active at:', targetUri);
+      } else {
+        console.log('[MongoDB] Connecting to external MongoDB Cluster at:', targetUri.replace(/\/\/.*@/, '//***:***@'));
+      }
+
+      const conn = await mongoose.connect(targetUri, {
+        serverSelectionTimeoutMS: 10000,
+        connectTimeoutMS: 10000,
       });
 
       isConnected = true;
-      console.log('[MongoDB] Successfully connected to SportyBet MongoDB cluster!');
+      console.log('[MongoDB] Connected successfully to SportyBet MongoDB database!');
 
-      // Background non-blocking sync for default account balances
-      UserModel.updateMany(
-        { balance: { $gte: 9000000 } },
-        { $set: { balance: 5000.00 } }
-      ).catch(() => {});
+      // Populate MongoDB with initial data if database is brand new
+      await seedDefaultDatabase();
 
       return conn;
     } catch (error: any) {
-      console.warn('[MongoDB Notice] Operating with in-memory cache:', error?.message || error);
+      console.error('[MongoDB Connection Error]:', error?.message || error);
       isConnected = false;
       return null;
     } finally {
-      // Allow future reconnection attempts if initial attempt failed
       if (!isConnected) {
         connectionPromise = null;
       }
@@ -65,4 +126,36 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
 
 export function isDbConnected(): boolean {
   return isConnected && mongoose.connection.readyState === 1;
+}
+
+export async function getMongoStatus() {
+  const connected = isDbConnected();
+  let betsCount = 0;
+  let openCount = 0;
+  let settledCount = 0;
+  let userCount = 0;
+
+  if (connected) {
+    try {
+      betsCount = await BetModel.countDocuments();
+      openCount = await BetModel.countDocuments({ status: 'open' });
+      settledCount = await BetModel.countDocuments({ status: { $ne: 'open' } });
+      userCount = await UserModel.countDocuments();
+    } catch {
+      //
+    }
+  }
+
+  return {
+    connected,
+    uri: getMongoUri() ? getMongoUri().replace(/\/\/.*@/, '//***:***@') : (memoryServerInstance ? 'Embedded MongoDB Engine (Localhost)' : 'Disconnected'),
+    isEmbedded: !getMongoUri(),
+    databaseName: mongoose.connection.name || 'sportybet_ghana',
+    stats: {
+      totalBets: betsCount,
+      openBets: openCount,
+      settledBets: settledCount,
+      users: userCount
+    }
+  };
 }

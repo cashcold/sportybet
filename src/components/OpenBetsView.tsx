@@ -378,28 +378,13 @@ export const OpenBetsView: React.FC = () => {
               </button>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => markAllBetsGreen(!isAllGreenTriggered)}
-                className={`px-2.5 py-1 rounded text-[11px] font-black flex items-center space-x-1.5 transition-all cursor-pointer shadow-sm active:scale-95 ${
-                  isAllGreenTriggered
-                    ? 'bg-[#00df59] text-black shadow-md'
-                    : 'bg-[#1b2633] text-[#00df59] border border-[#00df59]/40 hover:bg-[#233244]'
-                }`}
-                title="Admin: Trigger all bet slips to mark green"
-              >
-                <Zap className={`w-3 h-3 ${isAllGreenTriggered ? 'fill-black' : 'fill-[#00df59]'}`} />
-                <span>{isAllGreenTriggered ? 'Green: ON' : 'Trigger Green'}</span>
-              </button>
-
-              <button
-                onClick={() => showToast('Grid view toggle')}
-                className="p-1 text-neutral-400 hover:text-white cursor-pointer"
-                title="Grid View"
-              >
-                <LayoutGrid className="w-4 h-4 stroke-[2]" />
-              </button>
-            </div>
+            <button
+              onClick={() => showToast('Grid view toggle')}
+              className="p-1 text-neutral-400 hover:text-white cursor-pointer"
+              title="Grid View"
+            >
+              <LayoutGrid className="w-4 h-4 stroke-[2]" />
+            </button>
           </div>
 
           {/* Open Bets Cards List (Exact match to Screenshot 6) */}

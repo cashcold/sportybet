@@ -5,6 +5,7 @@ import { betRouter } from './routes/betRoutes';
 import { matchesRouter } from './routes/matchesRoutes';
 import { footballRouter } from './footballApi';
 import { sportsRouter } from './routes/sportsRoutes';
+import { adminRouter } from './routes/adminRoutes';
 
 export const app = express();
 
@@ -93,6 +94,7 @@ app.use('/api/football', footballRouter);
 app.use('/football', footballRouter);
 app.use('/api/sports', sportsRouter);
 app.use('/sports', sportsRouter);
+app.use('/api/admin', adminRouter);
 
 // Error middleware to handle database queries failing gracefully when MongoDB is offline
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

@@ -437,6 +437,109 @@ export const api = {
     }
   },
 
+  // --- ADMIN DIRECT MONGODB ENDPOINTS ---
+  admin: {
+    async getStatus(): Promise<{ success: boolean; connected?: boolean; uri?: string; isEmbedded?: boolean; databaseName?: string; stats?: any; error?: string }> {
+      const endpoint = '/api/admin/status';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint));
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    },
+
+    async setMongoUri(uri: string): Promise<{ success: boolean; message?: string; status?: any; error?: string }> {
+      const endpoint = '/api/admin/mongodb-uri';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uri })
+        });
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    },
+
+    async getAllBets(): Promise<{ success: boolean; bets?: PlacedBet[]; count?: number; error?: string }> {
+      const endpoint = '/api/admin/bets';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint));
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    },
+
+    async deleteBet(betId: string): Promise<{ success: boolean; message?: string; deletedId?: string; error?: string }> {
+      const endpoint = `/api/admin/bets/${betId}`;
+      try {
+        const res = await fetch(resolveApiUrl(endpoint), {
+          method: 'DELETE'
+        });
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    },
+
+    async markGreen(betId?: string): Promise<{ success: boolean; message?: string; updatedCount?: number; error?: string }> {
+      const endpoint = '/api/admin/bets/mark-green';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ betId })
+        });
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    },
+
+    async settleWon(betId?: string): Promise<{ success: boolean; message?: string; settledCount?: number; creditedAmount?: number; newBalance?: number; error?: string }> {
+      const endpoint = '/api/admin/bets/settle-won';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ betId })
+        });
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    },
+
+    async resetBets(): Promise<{ success: boolean; message?: string; bets?: PlacedBet[]; error?: string }> {
+      const endpoint = '/api/admin/bets/reset';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint), {
+          method: 'POST'
+        });
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    },
+
+    async updateBalance(balance?: number, addAmount?: number): Promise<{ success: boolean; message?: string; balance?: number; error?: string }> {
+      const endpoint = '/api/admin/wallet/balance';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ balance, addAmount })
+        });
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    }
+  },
+
   // --- SYSTEM INFO ---
   system: {
     async getStatus(): Promise<any> {

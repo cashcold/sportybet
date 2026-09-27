@@ -18,6 +18,9 @@ export interface IBet extends Document {
   cashoutAmount: number;
   bookingCode?: string;
   canRebet: boolean;
+  isAllGreen?: boolean;
+  settledAt?: string;
+  winningsPaid?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,7 +33,19 @@ const SelectionSubSchema = new Schema(
     marketName: { type: String, required: true },
     selectionName: { type: String, required: true },
     odd: { type: Number, required: true },
-    isLive: { type: Boolean, default: false }
+    isLive: { type: Boolean, default: false },
+    isWon: { type: Boolean, default: false },
+    predictionStatus: { type: String, default: 'pending' },
+    ftScore: { type: String },
+    outcome: { type: String },
+    gameDate: { type: String },
+    liveOdds: { type: Number },
+    liveOddsTrend: { type: String },
+    liveScore: { type: String },
+    liveTime: { type: String },
+    hasStream: { type: Boolean, default: false },
+    hasTracker: { type: Boolean, default: false },
+    hasStats: { type: Boolean, default: false }
   },
   { _id: false }
 );
@@ -56,7 +71,10 @@ const BetSchema = new Schema<IBet>(
     cashoutAvailable: { type: Boolean, default: true },
     cashoutAmount: { type: Number, default: 0 },
     bookingCode: { type: String, index: true },
-    canRebet: { type: Boolean, default: true }
+    canRebet: { type: Boolean, default: true },
+    isAllGreen: { type: Boolean, default: false },
+    settledAt: { type: String },
+    winningsPaid: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

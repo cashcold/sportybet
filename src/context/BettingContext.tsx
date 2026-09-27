@@ -66,6 +66,8 @@ interface BettingContextType {
   markAllBetsGreen: (settleAsWon?: boolean) => void;
   markSingleBetGreen: (betId: string, settleAsWon?: boolean) => void;
   resetBetsGreenState: () => void;
+  deleteBetFromMongo: (betId: string) => Promise<boolean>;
+  syncWithMongo: () => Promise<void>;
 }
 
 function normalizeMatchDates(rawMatches: Match[]): Match[] {
@@ -220,6 +222,56 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isAllGreenTriggered, setIsAllGreenTriggered] = useState<boolean>(() => {
     return localStorage.getItem('sportybet_all_green_mode') === 'true';
   });
+
+  // Direct Real-time MongoDB Sync Function
+  const syncWithMongo = async () => {
+    try {
+      const [openRes, historyRes, userRes] = await Promise.allSettled([
+        api.bets.getOpenBets(),
+        api.bets.getBetHistory(),
+        api.auth.getMe()
+      ]);
+
+      if (openRes.status === 'fulfilled' && openRes.value?.success && Array.isArray(openRes.value.bets)) {
+        setOpenBets(openRes.value.bets);
+      }
+      if (historyRes.status === 'fulfilled' && historyRes.value?.success && Array.isArray(historyRes.value.bets)) {
+        setBetHistory(historyRes.value.bets);
+      }
+      if (userRes.status === 'fulfilled' && userRes.value?.success && userRes.value.user) {
+        const remoteUser = userRes.value.user;
+        setUser(prev => ({
+          ...prev,
+          ...remoteUser,
+          balance: remoteUser.balance !== undefined ? remoteUser.balance : prev.balance
+        }));
+      }
+    } catch {
+      // MongoDB background sync non-blocking
+    }
+  };
+
+  // Real-time synchronization loop: fast 2.5s poll from MongoDB so admin changes reflect instantly
+  useEffect(() => {
+    syncWithMongo();
+
+    const intervalId = setInterval(() => {
+      syncWithMongo();
+    }, 2500);
+
+    const handleFocus = () => {
+      syncWithMongo();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('visibilitychange', handleFocus);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('visibilitychange', handleFocus);
+    };
+  }, []);
 
   // Query API-Sports usage metadata
   const refreshSportsUsage = async () => {
@@ -900,68 +952,84 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return fallbackCode;
   };
 
-  const markAllBetsGreen = (settleAsWon: boolean = false) => {
-    setIsAllGreenTriggered(true);
-    localStorage.setItem('sportybet_all_green_mode', 'true');
-
-    if (settleAsWon) {
-      let totalWonPayout = 0;
-      const settledBets = openBets.map(b => {
-        const green = markBetAsGreen(b, true);
-        totalWonPayout += green.potentialWin;
-        return green;
-      });
-
-      if (totalWonPayout > 0) {
-        setUser(prev => ({
-          ...prev,
-          balance: parseFloat((prev.balance + totalWonPayout).toFixed(2))
-        }));
-      }
-
-      setBetHistory(prev => [...settledBets, ...prev.map(b => markBetAsGreen(b, true))]);
-      setOpenBets([]);
-      localStorage.removeItem('sportybet_open_bets');
-      showToast(`🎉 All bet slips settled as WON! GHS ${totalWonPayout.toFixed(2)} credited to wallet!`);
-    } else {
-      setOpenBets(prev => prev.map(b => markBetAsGreen(b, false)));
-      setBetHistory(prev => prev.map(b => markBetAsGreen(b, false)));
-      showToast('🟢 All bet slip predictions marked GREEN (Correct)!');
-    }
-  };
-
-  const markSingleBetGreen = (betId: string, settleAsWon: boolean = false) => {
-    const betInOpen = openBets.find(b => b.id === betId);
-    if (betInOpen) {
-      if (settleAsWon) {
-        const green = markBetAsGreen(betInOpen, true);
-        setUser(prev => ({
-          ...prev,
-          balance: parseFloat((prev.balance + green.potentialWin).toFixed(2))
-        }));
-        setOpenBets(prev => prev.filter(b => b.id !== betId));
-        setBetHistory(prev => [green, ...prev]);
-        showToast(`🏆 Bet ${green.ticketId} settled as WON! GHS ${green.potentialWin.toFixed(2)} credited!`);
+  const deleteBetFromMongo = async (betId: string): Promise<boolean> => {
+    try {
+      const res = await api.admin.deleteBet(betId);
+      if (res.success) {
+        showToast(`Bet permanently deleted from MongoDB database!`);
+        await syncWithMongo();
+        return true;
       } else {
-        setOpenBets(prev => prev.map(b => b.id === betId ? markBetAsGreen(b, false) : b));
-        showToast(`🟢 Bet ${betInOpen.ticketId} marked GREEN!`);
+        showToast(res.error || 'Failed to delete bet from MongoDB');
+        return false;
       }
-      return;
-    }
-
-    const betInHistory = betHistory.find(b => b.id === betId);
-    if (betInHistory) {
-      setBetHistory(prev => prev.map(b => b.id === betId ? markBetAsGreen(b, true) : b));
-      showToast(`🟢 Bet ${betInHistory.ticketId} marked GREEN!`);
+    } catch (err: any) {
+      showToast(err?.message || 'Error deleting bet from MongoDB');
+      return false;
     }
   };
 
-  const resetBetsGreenState = () => {
-    setIsAllGreenTriggered(false);
-    localStorage.removeItem('sportybet_all_green_mode');
-    setOpenBets(INITIAL_OPEN_BETS);
-    setBetHistory(INITIAL_BET_HISTORY);
-    showToast('Reset bets to normal live / pending state');
+  const markAllBetsGreen = async (settleAsWon: boolean = false) => {
+    try {
+      if (settleAsWon) {
+        const res = await api.admin.settleWon();
+        if (res.success) {
+          setIsAllGreenTriggered(true);
+          showToast(`🎉 All bets settled as WON! GHS ${(res.creditedAmount || 0).toFixed(2)} credited in MongoDB!`);
+        } else {
+          showToast(res.error || 'Failed to settle bets in MongoDB');
+        }
+      } else {
+        const res = await api.admin.markGreen();
+        if (res.success) {
+          setIsAllGreenTriggered(true);
+          showToast(`🟢 All ${res.updatedCount || ''} bet slips marked GREEN in MongoDB!`);
+        } else {
+          showToast(res.error || 'Failed to mark bets green in MongoDB');
+        }
+      }
+      await syncWithMongo();
+    } catch {
+      showToast('Error updating bets in MongoDB');
+    }
+  };
+
+  const markSingleBetGreen = async (betId: string, settleAsWon: boolean = false) => {
+    try {
+      if (settleAsWon) {
+        const res = await api.admin.settleWon(betId);
+        if (res.success) {
+          showToast(`🏆 Bet settled as WON in MongoDB! GHS ${(res.creditedAmount || 0).toFixed(2)} credited!`);
+        } else {
+          showToast(res.error || 'Failed to settle bet in MongoDB');
+        }
+      } else {
+        const res = await api.admin.markGreen(betId);
+        if (res.success) {
+          showToast(`🟢 Bet predictions marked GREEN in MongoDB!`);
+        } else {
+          showToast(res.error || 'Failed to mark bet green in MongoDB');
+        }
+      }
+      await syncWithMongo();
+    } catch {
+      showToast('Error updating bet in MongoDB');
+    }
+  };
+
+  const resetBetsGreenState = async () => {
+    try {
+      const res = await api.admin.resetBets();
+      if (res.success) {
+        setIsAllGreenTriggered(false);
+        showToast('All bets reset in MongoDB database to standard live state');
+      } else {
+        showToast(res.error || 'Failed to reset bets in MongoDB');
+      }
+      await syncWithMongo();
+    } catch {
+      showToast('Error resetting bets in MongoDB');
+    }
   };
 
   const loadBookingCode = async (code: string): Promise<boolean> => {
@@ -1183,7 +1251,9 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setIsAllGreenTriggered,
         markAllBetsGreen,
         markSingleBetGreen,
-        resetBetsGreenState
+        resetBetsGreenState,
+        deleteBetFromMongo,
+        syncWithMongo
       }}
     >
       {children}

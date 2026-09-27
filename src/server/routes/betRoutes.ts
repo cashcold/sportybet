@@ -228,66 +228,54 @@ betRouter.post('/place', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/bets/open
+// GET /api/bets/open - Real-time MongoDB query
 betRouter.get('/open', async (req: Request, res: Response) => {
   try {
+    await connectToDatabase();
     const authHeader = req.headers.authorization;
     const cleanToken = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
 
-    if (!cleanToken) {
-      return res.json({ success: true, count: 0, bets: [] });
-    }
-
-    await connectToDatabase();
     let userPhone = '';
-
-    if (isDbConnected()) {
+    if (isDbConnected() && cleanToken) {
       const u = await UserModel.findOne({ sessionTokens: cleanToken });
       if (u) userPhone = u.phone;
     }
 
-    if (!userPhone) {
-      const cached = db.getUserByToken(authHeader);
-      if (cached && cached.phone) userPhone = cached.phone;
-    }
-
-    if (!userPhone) {
-      return res.json({ success: true, count: 0, bets: [] });
-    }
-
-    let bets: PlacedBet[] = [];
-
+    let mongoBets: any[] = [];
     if (isDbConnected()) {
-      // Find open bets matching phone or stripped phone
-      const phoneQueries = [userPhone];
-      if (userPhone.startsWith('0')) phoneQueries.push(userPhone.slice(1));
-      if (!userPhone.startsWith('0')) phoneQueries.push('0' + userPhone);
+      if (userPhone && userPhone !== '20******5') {
+        const phoneQueries = [userPhone];
+        if (userPhone.startsWith('0')) phoneQueries.push(userPhone.slice(1));
+        if (!userPhone.startsWith('0')) phoneQueries.push('0' + userPhone);
+        mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: 'open' }).sort({ createdAt: -1 });
+      }
 
-      const mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: 'open' }).sort({ createdAt: -1 });
-      if (mongoBets.length > 0) {
-        bets = mongoBets.map((doc: any) => ({
-          id: doc.id,
-          ticketId: doc.ticketId,
-          transactionId: doc.transactionId,
-          bookingCode: doc.bookingCode,
-          type: doc.type,
-          date: doc.date,
-          isLive: doc.isLive,
-          selections: doc.selections,
-          stake: doc.stake,
-          totalOdds: doc.totalOdds,
-          potentialWin: doc.potentialWin,
-          status: doc.status,
-          cashoutAvailable: doc.cashoutAvailable,
-          cashoutAmount: doc.cashoutAmount,
-          canRebet: doc.canRebet
-        }));
+      // If no custom user-specific bets, query general open bets from MongoDB
+      if (mongoBets.length === 0) {
+        mongoBets = await BetModel.find({ status: 'open' }).sort({ createdAt: -1 });
       }
     }
 
-    if (bets.length === 0) {
-      bets = db.openBets.get(userPhone) || [];
-    }
+    const bets: PlacedBet[] = mongoBets.map((doc: any) => ({
+      id: doc.id,
+      ticketId: doc.ticketId,
+      transactionId: doc.transactionId,
+      bookingCode: doc.bookingCode,
+      type: doc.type,
+      date: doc.date,
+      isLive: doc.isLive,
+      selections: doc.selections,
+      stake: doc.stake,
+      totalOdds: doc.totalOdds,
+      potentialWin: doc.potentialWin,
+      status: doc.status,
+      cashoutAvailable: doc.cashoutAvailable,
+      cashoutAmount: doc.cashoutAmount,
+      canRebet: doc.canRebet,
+      isAllGreen: doc.isAllGreen,
+      settledAt: doc.settledAt,
+      winningsPaid: doc.winningsPaid
+    }));
 
     return res.json({
       success: true,
@@ -300,65 +288,53 @@ betRouter.get('/open', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/bets/history
+// GET /api/bets/history - Real-time MongoDB query
 betRouter.get('/history', async (req: Request, res: Response) => {
   try {
+    await connectToDatabase();
     const authHeader = req.headers.authorization;
     const cleanToken = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
 
-    if (!cleanToken) {
-      return res.json({ success: true, count: 0, bets: [] });
-    }
-
-    await connectToDatabase();
     let userPhone = '';
-
-    if (isDbConnected()) {
+    if (isDbConnected() && cleanToken) {
       const u = await UserModel.findOne({ sessionTokens: cleanToken });
       if (u) userPhone = u.phone;
     }
 
-    if (!userPhone) {
-      const cached = db.getUserByToken(authHeader);
-      if (cached && cached.phone) userPhone = cached.phone;
-    }
-
-    if (!userPhone) {
-      return res.json({ success: true, count: 0, bets: [] });
-    }
-
-    let bets: PlacedBet[] = [];
-
+    let mongoBets: any[] = [];
     if (isDbConnected()) {
-      const phoneQueries = [userPhone];
-      if (userPhone.startsWith('0')) phoneQueries.push(userPhone.slice(1));
-      if (!userPhone.startsWith('0')) phoneQueries.push('0' + userPhone);
+      if (userPhone && userPhone !== '20******5') {
+        const phoneQueries = [userPhone];
+        if (userPhone.startsWith('0')) phoneQueries.push(userPhone.slice(1));
+        if (!userPhone.startsWith('0')) phoneQueries.push('0' + userPhone);
+        mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: { $ne: 'open' } }).sort({ createdAt: -1 });
+      }
 
-      const mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: { $ne: 'open' } }).sort({ createdAt: -1 });
-      if (mongoBets.length > 0) {
-        bets = mongoBets.map((doc: any) => ({
-          id: doc.id,
-          ticketId: doc.ticketId,
-          transactionId: doc.transactionId,
-          bookingCode: doc.bookingCode,
-          type: doc.type,
-          date: doc.date,
-          isLive: doc.isLive,
-          selections: doc.selections,
-          stake: doc.stake,
-          totalOdds: doc.totalOdds,
-          potentialWin: doc.potentialWin,
-          status: doc.status,
-          cashoutAvailable: doc.cashoutAvailable,
-          cashoutAmount: doc.cashoutAmount,
-          canRebet: doc.canRebet
-        }));
+      if (mongoBets.length === 0) {
+        mongoBets = await BetModel.find({ status: { $ne: 'open' } }).sort({ createdAt: -1 });
       }
     }
 
-    if (bets.length === 0) {
-      bets = db.betHistory.get(userPhone) || [];
-    }
+    const bets: PlacedBet[] = mongoBets.map((doc: any) => ({
+      id: doc.id,
+      ticketId: doc.ticketId,
+      transactionId: doc.transactionId,
+      bookingCode: doc.bookingCode,
+      type: doc.type,
+      date: doc.date,
+      isLive: doc.isLive,
+      selections: doc.selections,
+      stake: doc.stake,
+      totalOdds: doc.totalOdds,
+      potentialWin: doc.potentialWin,
+      status: doc.status,
+      cashoutAvailable: doc.cashoutAvailable,
+      cashoutAmount: doc.cashoutAmount,
+      canRebet: doc.canRebet,
+      isAllGreen: doc.isAllGreen,
+      settledAt: doc.settledAt,
+      winningsPaid: doc.winningsPaid
+    }));
 
     return res.json({
       success: true,

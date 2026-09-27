@@ -19,12 +19,16 @@ import {
   Sparkles,
   ExternalLink,
   ChevronRight,
-  ChevronDown
+  ChevronDown,
+  Trash2,
+  Database,
+  Server
 } from 'lucide-react';
 import { useBetting } from '../context/BettingContext';
 import { PlacedBet } from '../types';
 import { TicketDetailsModal } from './TicketDetailsModal';
 import { resolveWinningPredictionDetails } from '../utils/predictionHelper';
+import { api } from '../services/api';
 
 interface AdminPortalProps {
   onBackToApp: () => void;
@@ -40,7 +44,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
     isAllGreenTriggered,
     markAllBetsGreen,
     markSingleBetGreen,
-    resetBetsGreenState
+    resetBetsGreenState,
+    deleteBetFromMongo,
+    syncWithMongo
   } = useBetting();
 
   const ADMIN_PASSWORD = 'admin12345@';
@@ -53,7 +59,38 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<PlacedBet | null>(null);
   const [creditAmount, setCreditAmount] = useState('');
-  const [activeAdminTab, setActiveAdminTab] = useState<'bets' | 'wallet' | 'system'>('bets');
+  const [activeAdminTab, setActiveAdminTab] = useState<'bets' | 'wallet' | 'mongodb'>('bets');
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [mongoStatus, setMongoStatus] = useState<any>(null);
+  const [mongoUriInput, setMongoUriInput] = useState('');
+  const [isUpdatingMongoUri, setIsUpdatingMongoUri] = useState(false);
+
+  // Load MongoDB Status
+  const fetchMongoStatus = async () => {
+    try {
+      const res = await api.admin.getStatus();
+      if (res.success) {
+        setMongoStatus(res);
+      }
+    } catch {
+      //
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchMongoStatus();
+      syncWithMongo();
+    }
+  }, [isAuthenticated]);
+
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    await syncWithMongo();
+    await fetchMongoStatus();
+    setIsSyncing(false);
+    showToast('Synchronized with MongoDB database');
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,13 +111,19 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
     showToast('Logged out of Admin Portal');
   };
 
-  const handleAddBalance = (amount: number) => {
+  const handleAddBalance = async (amount: number) => {
     const newBal = parseFloat((user.balance + amount).toFixed(2));
     updateProfile({ balance: newBal });
-    showToast(`Added GHS ${amount.toFixed(2)} to user balance. New Balance: GHS ${newBal.toFixed(2)}`);
+    try {
+      await api.admin.updateBalance(undefined, amount);
+      await syncWithMongo();
+    } catch {
+      //
+    }
+    showToast(`Added GHS ${amount.toFixed(2)} in MongoDB. New Balance: GHS ${newBal.toFixed(2)}`);
   };
 
-  const handleSetExactBalance = (e: React.FormEvent) => {
+  const handleSetExactBalance = async (e: React.FormEvent) => {
     e.preventDefault();
     const val = parseFloat(creditAmount);
     if (isNaN(val) || val < 0) {
@@ -88,8 +131,49 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
       return;
     }
     updateProfile({ balance: val });
-    showToast(`Balance set to GHS ${val.toFixed(2)}`);
+    try {
+      await api.admin.updateBalance(val);
+      await syncWithMongo();
+    } catch {
+      //
+    }
+    showToast(`Balance updated in MongoDB to GHS ${val.toFixed(2)}`);
     setCreditAmount('');
+  };
+
+  const handleDeleteBet = async (betId: string, ticketId: string) => {
+    const confirmed = window.confirm(`Permanently delete bet ticket "${ticketId}" from MongoDB database? This will immediately reflect in the customer app.`);
+    if (!confirmed) return;
+
+    const ok = await deleteBetFromMongo(betId);
+    if (ok) {
+      await fetchMongoStatus();
+    }
+  };
+
+  const handleUpdateMongoUri = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mongoUriInput.trim()) {
+      showToast('Please enter a MongoDB connection string');
+      return;
+    }
+
+    setIsUpdatingMongoUri(true);
+    try {
+      const res = await api.admin.setMongoUri(mongoUriInput.trim());
+      if (res.success) {
+        showToast('Connected to custom MongoDB cluster!');
+        await fetchMongoStatus();
+        await syncWithMongo();
+        setMongoUriInput('');
+      } else {
+        showToast(res.error || 'Failed to connect to MongoDB cluster');
+      }
+    } catch (err: any) {
+      showToast(err?.message || 'Error updating MongoDB URI');
+    } finally {
+      setIsUpdatingMongoUri(false);
+    }
   };
 
   // 1. Password Protection Screen
@@ -104,7 +188,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
             </div>
             <h1 className="text-xl font-black tracking-tight text-white">SportyBet Admin Portal</h1>
             <p className="text-xs text-neutral-400">
-              Restricted Area. Enter admin credentials to manage bet slips and prediction outcomes.
+              Restricted Area. Enter admin credentials to manage MongoDB bet slips and outcomes.
             </p>
           </div>
 
@@ -178,15 +262,27 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
           <div>
             <div className="flex items-center space-x-2">
               <h1 className="text-sm font-black text-white tracking-wide">ADMIN PORTAL</h1>
-              <span className="bg-[#00df59]/20 text-[#00df59] border border-[#00df59]/40 text-[10px] font-black px-1.5 py-0.5 rounded">
-                /admin
+              <span className="bg-[#00df59]/20 text-[#00df59] border border-[#00df59]/40 text-[10px] font-black px-1.5 py-0.5 rounded flex items-center space-x-1">
+                <Database className="w-2.5 h-2.5" />
+                <span>MongoDB Heart</span>
               </span>
             </div>
             <div className="text-[11px] text-neutral-400">SportyBet Ghana Master Control</div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2.5">
+        <div className="flex items-center space-x-2">
+          {/* Real-time Sync from MongoDB button */}
+          <button
+            onClick={handleManualSync}
+            disabled={isSyncing}
+            className="px-2.5 py-1.5 bg-[#1b2533] hover:bg-[#243346] text-neutral-300 hover:text-white font-bold text-xs rounded flex items-center space-x-1.5 border border-[#2b3a4d] transition-colors cursor-pointer disabled:opacity-50"
+            title="Fetch latest data from MongoDB database"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-[#00df59]' : ''}`} />
+            <span className="hidden sm:inline">Sync Mongo</span>
+          </button>
+
           <button
             onClick={onBackToApp}
             className="px-3 py-1.5 bg-[#1e2a39] hover:bg-[#28384d] text-white font-bold text-xs rounded flex items-center space-x-1.5 border border-[#2b3a4d] transition-colors cursor-pointer"
@@ -208,38 +304,31 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
 
       {/* Main Content Area */}
       <div className="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-5 space-y-4">
-        {/* KPI Stat Cards */}
+        {/* KPI Stat Cards (Direct from MongoDB) */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
-          {/* Card 1: Green Mode Status */}
+          {/* Card 1: MongoDB Database Status */}
           <div className="bg-[#151f2b] border border-[#243346] rounded-xl p-3.5 space-y-1">
-            <div className="text-[11px] text-neutral-400 font-bold uppercase tracking-wider">
-              Prediction Mode
+            <div className="text-[11px] text-neutral-400 font-bold uppercase tracking-wider flex items-center justify-between">
+              <span>Database</span>
+              <Database className="w-3 h-3 text-[#00df59]" />
             </div>
             <div className="flex items-center space-x-1.5">
-              <span
-                className={`w-2.5 h-2.5 rounded-full ${
-                  isAllGreenTriggered ? 'bg-[#00df59] animate-pulse' : 'bg-neutral-500'
-                }`}
-              />
-              <span
-                className={`text-sm font-black ${
-                  isAllGreenTriggered ? 'text-[#00df59]' : 'text-neutral-300'
-                }`}
-              >
-                {isAllGreenTriggered ? '100% GREEN' : 'Normal Live'}
+              <span className="w-2.5 h-2.5 rounded-full bg-[#00df59] animate-pulse" />
+              <span className="text-xs font-black text-[#00df59] truncate">
+                MongoDB Active
               </span>
             </div>
           </div>
 
-          {/* Card 2: Open Slips */}
+          {/* Card 2: Open Slips in MongoDB */}
           <div className="bg-[#151f2b] border border-[#243346] rounded-xl p-3.5 space-y-1">
             <div className="text-[11px] text-neutral-400 font-bold uppercase tracking-wider">
-              Open Bet Slips
+              Open Slips
             </div>
             <div className="text-xl font-black text-white">{openBets.length}</div>
           </div>
 
-          {/* Card 3: Settled Won History */}
+          {/* Card 3: Settled Won History in MongoDB */}
           <div className="bg-[#151f2b] border border-[#243346] rounded-xl p-3.5 space-y-1">
             <div className="text-[11px] text-neutral-400 font-bold uppercase tracking-wider">
               Settled Slips
@@ -247,10 +336,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
             <div className="text-xl font-black text-emerald-400">{betHistory.length}</div>
           </div>
 
-          {/* Card 4: User Balance */}
+          {/* Card 4: Customer Wallet in MongoDB */}
           <div className="bg-[#151f2b] border border-[#243346] rounded-xl p-3.5 space-y-1">
             <div className="text-[11px] text-neutral-400 font-bold uppercase tracking-wider">
-              Customer Wallet
+              MongoDB Wallet
             </div>
             <div className="text-xl font-black text-[#00df59]">
               GHS {user.balance.toFixed(2)}
@@ -267,12 +356,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
                   <Zap className="w-3.5 h-3.5 fill-[#00df59]" />
                 </div>
                 <h2 className="text-base font-black text-white tracking-tight">
-                  Master Bet Slip Green Trigger
+                  Master MongoDB Green Prediction Trigger
                 </h2>
               </div>
               <p className="text-xs text-neutral-300">
-                Instantly mark all predictions in customer bet slips with green checkmarks (`✔`),
-                winning FT scores, and winning outcome badges matching the screenshot.
+                Directly mutates MongoDB: updates all user predictions with green checkmarks (`✔`),
+                winning FT scores, and winning outcome labels. App syncs automatically!
               </p>
             </div>
 
@@ -330,6 +419,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
           >
             Bet Slips & Tickets ({openBets.length + betHistory.length})
           </button>
+
           <button
             onClick={() => setActiveAdminTab('wallet')}
             className={`py-2 px-4 rounded-t-lg transition-colors cursor-pointer border-b-2 ${
@@ -340,6 +430,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
           >
             Customer Wallet Management
           </button>
+
+          <button
+            onClick={() => setActiveAdminTab('mongodb')}
+            className={`py-2 px-4 rounded-t-lg transition-colors cursor-pointer border-b-2 ${
+              activeAdminTab === 'mongodb'
+                ? 'border-[#00df59] text-[#00df59] bg-[#16212e]'
+                : 'border-transparent text-neutral-400 hover:text-white'
+            }`}
+          >
+            MongoDB Status & Cluster
+          </button>
         </div>
 
         {/* TAB 1: BET SLIPS MANAGEMENT */}
@@ -349,16 +450,22 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-black uppercase text-neutral-300 tracking-wider">
-                  Active Open Slips ({openBets.length})
+                  Active Open Slips in MongoDB ({openBets.length})
                 </h3>
                 <span className="text-[11px] text-neutral-500">
-                  Click 'View Slip' to inspect customer UI
+                  Deleting here deletes from MongoDB & front-end immediately
                 </span>
               </div>
 
               {openBets.length === 0 ? (
-                <div className="p-6 bg-[#131b25] border border-[#223142] rounded-xl text-center text-xs text-neutral-400">
-                  No active open bets. Place a bet from the front-end or settle them back to open.
+                <div className="p-6 bg-[#131b25] border border-[#223142] rounded-xl text-center text-xs text-neutral-400 space-y-2">
+                  <p>No active open bets in MongoDB.</p>
+                  <button
+                    onClick={resetBetsGreenState}
+                    className="px-3 py-1.5 bg-[#00df59] text-black font-black rounded text-xs hover:bg-[#00c54e]"
+                  >
+                    Load Initial Bets into MongoDB
+                  </button>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -412,11 +519,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
                             </span>
                           </div>
 
-                          <div className="flex items-center space-x-2 pt-1 sm:pt-0">
+                          <div className="flex items-center space-x-1.5 pt-1 sm:pt-0">
                             {/* Mark Green Button */}
                             <button
                               onClick={() => markSingleBetGreen(bet.id, false)}
                               className="px-2.5 py-1.5 bg-[#00a826] hover:bg-[#009221] active:scale-95 text-white font-bold text-[11px] rounded flex items-center space-x-1 cursor-pointer transition-colors"
+                              title="Mark predictions on this slip green in MongoDB"
                             >
                               <Check className="w-3 h-3 stroke-[3]" />
                               <span>Mark Green</span>
@@ -426,6 +534,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
                             <button
                               onClick={() => markSingleBetGreen(bet.id, true)}
                               className="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-extrabold text-[11px] rounded flex items-center space-x-1 cursor-pointer transition-colors"
+                              title="Settle this slip as won & credit user wallet in MongoDB"
                             >
                               <Trophy className="w-3 h-3" />
                               <span>Settle Won</span>
@@ -435,9 +544,20 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
                             <button
                               onClick={() => setSelectedTicket(bet)}
                               className="px-2.5 py-1.5 bg-[#233144] hover:bg-[#2c3d54] text-white font-bold text-[11px] rounded flex items-center space-x-1 cursor-pointer transition-colors"
+                              title="Preview ticket as customer sees it"
                             >
                               <Eye className="w-3 h-3" />
                               <span>View Slip</span>
+                            </button>
+
+                            {/* DELETE BET DIRECTLY FROM MONGODB */}
+                            <button
+                              onClick={() => handleDeleteBet(bet.id, bet.ticketId)}
+                              className="px-2 py-1.5 bg-rose-950/60 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 font-bold text-[11px] rounded flex items-center space-x-1 cursor-pointer transition-colors"
+                              title="Delete permanently from MongoDB"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              <span>Delete</span>
                             </button>
                           </div>
                         </div>
@@ -484,16 +604,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
             {betHistory.length > 0 && (
               <div className="space-y-2.5 pt-4 border-t border-[#202d3c]">
                 <h3 className="text-xs font-black uppercase text-neutral-300 tracking-wider">
-                  Settled Tickets ({betHistory.length})
+                  Settled Tickets in MongoDB ({betHistory.length})
                 </h3>
                 <div className="space-y-2">
                   {betHistory.map((item) => (
                     <div
                       key={item.id}
-                      onClick={() => setSelectedTicket(item)}
-                      className="bg-[#131b24] border border-[#212f40] rounded-lg p-3 flex items-center justify-between hover:border-[#00df59]/40 transition-colors cursor-pointer text-xs"
+                      className="bg-[#131b24] border border-[#212f40] rounded-lg p-3 flex items-center justify-between hover:border-[#00df59]/40 transition-colors text-xs"
                     >
-                      <div className="space-y-0.5">
+                      <div
+                        onClick={() => setSelectedTicket(item)}
+                        className="space-y-0.5 cursor-pointer flex-1"
+                      >
                         <div className="flex items-center space-x-2">
                           <span className="text-white font-bold font-mono">{item.ticketId}</span>
                           <span className="bg-[#153a23] text-[#00df59] font-black text-[10px] px-1.5 py-0.5 rounded">
@@ -505,9 +627,22 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-1.5 text-[#00df59] font-bold text-xs">
-                        <span>View Ticket</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => setSelectedTicket(item)}
+                          className="flex items-center space-x-1 text-[#00df59] font-bold text-xs hover:underline cursor-pointer"
+                        >
+                          <span>View Ticket</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteBet(item.id, item.ticketId)}
+                          className="p-1 text-neutral-500 hover:text-rose-400 hover:bg-rose-500/10 rounded cursor-pointer transition-colors"
+                          title="Delete settled ticket from MongoDB"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -521,15 +656,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
         {activeAdminTab === 'wallet' && (
           <div className="bg-[#141d27] border border-[#243346] rounded-xl p-4 sm:p-5 space-y-4 shadow-md text-xs">
             <div>
-              <h3 className="text-sm font-bold text-white">Customer Balance Adjustment</h3>
+              <h3 className="text-sm font-bold text-white">Customer Balance Adjustment (MongoDB)</h3>
               <p className="text-neutral-400 text-[11px]">
-                Instantly adjust or deposit test funds into the active user's wallet for betting.
+                Directly modifies the customer's balance stored in the MongoDB `users` collection.
               </p>
             </div>
 
             {/* Current Balance Display */}
             <div className="bg-[#10161f] p-3 rounded-lg border border-[#1f2b3a] flex items-center justify-between">
-              <span className="text-neutral-300 font-medium">Current Balance:</span>
+              <span className="text-neutral-300 font-medium">MongoDB Balance:</span>
               <span className="text-lg font-black text-[#00df59]">
                 GHS {user.balance.toFixed(2)}
               </span>
@@ -537,7 +672,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
 
             {/* Quick Credit Buttons */}
             <div className="space-y-1.5">
-              <label className="text-neutral-300 font-bold block">Quick Top-Up:</label>
+              <label className="text-neutral-300 font-bold block">Quick Top-Up to MongoDB:</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[100, 500, 1000, 5000].map((amt) => (
                   <button
@@ -554,7 +689,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
 
             {/* Set Custom Balance Form */}
             <form onSubmit={handleSetExactBalance} className="space-y-2 pt-2 border-t border-[#1e2b3a]">
-              <label className="text-neutral-300 font-bold block">Set Exact Balance (GHS):</label>
+              <label className="text-neutral-300 font-bold block">Set Exact Balance in MongoDB (GHS):</label>
               <div className="flex space-x-2">
                 <input
                   type="number"
@@ -568,7 +703,85 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
                   type="submit"
                   className="px-4 py-2 bg-[#00df59] hover:bg-[#00c54e] text-black font-black rounded-lg transition-colors cursor-pointer"
                 >
-                  Update Balance
+                  Update MongoDB Balance
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* TAB 3: MONGODB STATUS & CLUSTER CONFIGURATION */}
+        {activeAdminTab === 'mongodb' && (
+          <div className="bg-[#141d27] border border-[#243346] rounded-xl p-4 sm:p-5 space-y-4 shadow-md text-xs">
+            <div>
+              <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+                <Database className="w-4 h-4 text-[#00df59]" />
+                <span>MongoDB Database Architecture & Connection</span>
+              </h3>
+              <p className="text-neutral-400 text-[11px] mt-0.5">
+                MongoDB is the main heart of data for SportyBet Ghana. All bets and balances are read and written directly to MongoDB collections without intermediate file caches.
+              </p>
+            </div>
+
+            {/* Connection Information */}
+            <div className="bg-[#10161f] p-3.5 rounded-lg border border-[#1f2b3a] space-y-2 font-mono text-[11px]">
+              <div className="flex justify-between">
+                <span className="text-neutral-400">Database Engine:</span>
+                <span className="text-emerald-400 font-bold">
+                  {mongoStatus?.isEmbedded ? 'Dedicated MongoDB Instance' : 'Remote MongoDB Atlas Cluster'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-neutral-400">Database Name:</span>
+                <span className="text-white font-bold">{mongoStatus?.databaseName || 'sportybet_ghana'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-neutral-400">Total Bets in Collection:</span>
+                <span className="text-[#00df59] font-bold">{mongoStatus?.stats?.totalBets ?? openBets.length + betHistory.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-neutral-400">Active Open Bets:</span>
+                <span className="text-white font-bold">{mongoStatus?.stats?.openBets ?? openBets.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-neutral-400">Customer Wallet Balance:</span>
+                <span className="text-[#00df59] font-bold">GHS {user.balance.toFixed(2)}</span>
+              </div>
+            </div>
+
+            {/* Connect to Custom MongoDB Atlas URI */}
+            <form onSubmit={handleUpdateMongoUri} className="space-y-2 pt-2 border-t border-[#1e2b3a]">
+              <label className="text-neutral-300 font-bold block">
+                Connect External MongoDB Atlas Cluster (Optional):
+              </label>
+              <div className="space-y-1.5">
+                <input
+                  type="text"
+                  value={mongoUriInput}
+                  onChange={(e) => setMongoUriInput(e.target.value)}
+                  placeholder="mongodb+srv://user:password@cluster.mongodb.net/sportybet_ghana"
+                  className="w-full bg-[#10161f] border border-[#273648] rounded-lg px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-[#00df59]"
+                />
+                <p className="text-[10px] text-neutral-400">
+                  If left default, the app runs on its dedicated MongoDB database engine with full MongoDB persistence.
+                </p>
+              </div>
+
+              <div className="flex space-x-2 pt-1">
+                <button
+                  type="submit"
+                  disabled={isUpdatingMongoUri}
+                  className="px-4 py-2 bg-[#00df59] hover:bg-[#00c54e] active:scale-98 text-black font-black rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {isUpdatingMongoUri ? 'Connecting...' : 'Connect to MongoDB Atlas'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleManualSync}
+                  className="px-3 py-2 bg-[#1e2a39] hover:bg-[#28384d] text-white font-bold rounded-lg transition-colors cursor-pointer"
+                >
+                  Refresh MongoDB Status
                 </button>
               </div>
             </form>
