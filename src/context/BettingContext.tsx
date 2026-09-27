@@ -16,6 +16,7 @@ import {
 } from '../data/mockData';
 import { api } from '../services/api';
 import { resolveApiUrl } from '../config/apiConfig';
+import { markBetAsGreen } from '../utils/predictionHelper';
 
 interface BettingContextType {
   matches: Match[];
@@ -60,6 +61,11 @@ interface BettingContextType {
   sportsUsage: any[];
   refreshSportsUsage: () => Promise<void>;
   isQuotaProtected: boolean;
+  isAllGreenTriggered: boolean;
+  setIsAllGreenTriggered: (val: boolean) => void;
+  markAllBetsGreen: (settleAsWon?: boolean) => void;
+  markSingleBetGreen: (betId: string, settleAsWon?: boolean) => void;
+  resetBetsGreenState: () => void;
 }
 
 function normalizeMatchDates(rawMatches: Match[]): Match[] {
@@ -211,6 +217,9 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isLiveStale, setIsLiveStale] = useState<boolean>(false);
   const [isQuotaProtected, setIsQuotaProtected] = useState<boolean>(false);
   const [sportsUsage, setSportsUsage] = useState<any[]>([]);
+  const [isAllGreenTriggered, setIsAllGreenTriggered] = useState<boolean>(() => {
+    return localStorage.getItem('sportybet_all_green_mode') === 'true';
+  });
 
   // Query API-Sports usage metadata
   const refreshSportsUsage = async () => {
@@ -891,6 +900,70 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return fallbackCode;
   };
 
+  const markAllBetsGreen = (settleAsWon: boolean = false) => {
+    setIsAllGreenTriggered(true);
+    localStorage.setItem('sportybet_all_green_mode', 'true');
+
+    if (settleAsWon) {
+      let totalWonPayout = 0;
+      const settledBets = openBets.map(b => {
+        const green = markBetAsGreen(b, true);
+        totalWonPayout += green.potentialWin;
+        return green;
+      });
+
+      if (totalWonPayout > 0) {
+        setUser(prev => ({
+          ...prev,
+          balance: parseFloat((prev.balance + totalWonPayout).toFixed(2))
+        }));
+      }
+
+      setBetHistory(prev => [...settledBets, ...prev.map(b => markBetAsGreen(b, true))]);
+      setOpenBets([]);
+      localStorage.removeItem('sportybet_open_bets');
+      showToast(`🎉 All bet slips settled as WON! GHS ${totalWonPayout.toFixed(2)} credited to wallet!`);
+    } else {
+      setOpenBets(prev => prev.map(b => markBetAsGreen(b, false)));
+      setBetHistory(prev => prev.map(b => markBetAsGreen(b, false)));
+      showToast('🟢 All bet slip predictions marked GREEN (Correct)!');
+    }
+  };
+
+  const markSingleBetGreen = (betId: string, settleAsWon: boolean = false) => {
+    const betInOpen = openBets.find(b => b.id === betId);
+    if (betInOpen) {
+      if (settleAsWon) {
+        const green = markBetAsGreen(betInOpen, true);
+        setUser(prev => ({
+          ...prev,
+          balance: parseFloat((prev.balance + green.potentialWin).toFixed(2))
+        }));
+        setOpenBets(prev => prev.filter(b => b.id !== betId));
+        setBetHistory(prev => [green, ...prev]);
+        showToast(`🏆 Bet ${green.ticketId} settled as WON! GHS ${green.potentialWin.toFixed(2)} credited!`);
+      } else {
+        setOpenBets(prev => prev.map(b => b.id === betId ? markBetAsGreen(b, false) : b));
+        showToast(`🟢 Bet ${betInOpen.ticketId} marked GREEN!`);
+      }
+      return;
+    }
+
+    const betInHistory = betHistory.find(b => b.id === betId);
+    if (betInHistory) {
+      setBetHistory(prev => prev.map(b => b.id === betId ? markBetAsGreen(b, true) : b));
+      showToast(`🟢 Bet ${betInHistory.ticketId} marked GREEN!`);
+    }
+  };
+
+  const resetBetsGreenState = () => {
+    setIsAllGreenTriggered(false);
+    localStorage.removeItem('sportybet_all_green_mode');
+    setOpenBets(INITIAL_OPEN_BETS);
+    setBetHistory(INITIAL_BET_HISTORY);
+    showToast('Reset bets to normal live / pending state');
+  };
+
   const loadBookingCode = async (code: string): Promise<boolean> => {
     if (!code.trim()) return false;
     const cleanCode = code.trim().toUpperCase();
@@ -1105,7 +1178,12 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         isLiveStale,
         sportsUsage,
         refreshSportsUsage,
-        isQuotaProtected
+        isQuotaProtected,
+        isAllGreenTriggered,
+        setIsAllGreenTriggered,
+        markAllBetsGreen,
+        markSingleBetGreen,
+        resetBetsGreenState
       }}
     >
       {children}

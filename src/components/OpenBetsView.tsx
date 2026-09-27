@@ -21,12 +21,16 @@ import {
   Activity,
   Sliders,
   Sparkles,
-  Clock
+  Clock,
+  Zap,
+  FileText
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useBetting } from '../context/BettingContext';
 import { PlacedBet } from '../types';
 import { AuthModal } from './AuthModal';
+import { TicketDetailsModal } from './TicketDetailsModal';
+import { resolveWinningPredictionDetails } from '../utils/predictionHelper';
 
 export const OpenBetsView: React.FC = () => {
   const {
@@ -38,7 +42,10 @@ export const OpenBetsView: React.FC = () => {
     setIsBetslipOpen,
     addSelection,
     loadBookingCode,
-    setActiveTab: setNavTab
+    setActiveTab: setNavTab,
+    isAllGreenTriggered,
+    markAllBetsGreen,
+    markSingleBetGreen
   } = useBetting();
 
   const [activeTab, setActiveTab] = useState<'open' | 'history'>('open');
@@ -46,6 +53,7 @@ export const OpenBetsView: React.FC = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'join'>('login');
   const [recommendedCodesOpen, setRecommendedCodesOpen] = useState(false);
+  const [selectedDetailBet, setSelectedDetailBet] = useState<PlacedBet | null>(null);
 
   // Recommended booking codes for Ghana football (matches screenshot)
   const recommendedCodes = [
@@ -370,13 +378,28 @@ export const OpenBetsView: React.FC = () => {
               </button>
             </div>
 
-            <button
-              onClick={() => showToast('Grid view toggle')}
-              className="p-1 text-neutral-400 hover:text-white"
-              title="Grid View"
-            >
-              <LayoutGrid className="w-4 h-4 stroke-[2]" />
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => markAllBetsGreen(!isAllGreenTriggered)}
+                className={`px-2.5 py-1 rounded text-[11px] font-black flex items-center space-x-1.5 transition-all cursor-pointer shadow-sm active:scale-95 ${
+                  isAllGreenTriggered
+                    ? 'bg-[#00df59] text-black shadow-md'
+                    : 'bg-[#1b2633] text-[#00df59] border border-[#00df59]/40 hover:bg-[#233244]'
+                }`}
+                title="Admin: Trigger all bet slips to mark green"
+              >
+                <Zap className={`w-3 h-3 ${isAllGreenTriggered ? 'fill-black' : 'fill-[#00df59]'}`} />
+                <span>{isAllGreenTriggered ? 'Green: ON' : 'Trigger Green'}</span>
+              </button>
+
+              <button
+                onClick={() => showToast('Grid view toggle')}
+                className="p-1 text-neutral-400 hover:text-white cursor-pointer"
+                title="Grid View"
+              >
+                <LayoutGrid className="w-4 h-4 stroke-[2]" />
+              </button>
+            </div>
           </div>
 
           {/* Open Bets Cards List (Exact match to Screenshot 6) */}
@@ -451,6 +474,18 @@ export const OpenBetsView: React.FC = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
+                            setSelectedDetailBet(bet);
+                          }}
+                          className="flex items-center space-x-1 hover:text-emerald-300 transition-colors cursor-pointer"
+                          title="View Full Ticket Details"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>Slip</span>
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setEditingBet(bet);
                           }}
                           className="flex items-center space-x-1 hover:text-emerald-300 transition-colors cursor-pointer"
@@ -506,12 +541,107 @@ export const OpenBetsView: React.FC = () => {
                     {/* DROPPED-DOWN MATCH DETAILS (When clicked, shows full match list, Stake/Pot.Win & Cashout at Bottom) */}
                     {isExpanded && (
                       <div className="border-t border-[#232f3e] bg-[#16202c] animate-in slide-in-from-top-2 duration-200">
+                        {/* Top Remix Bet Banner (Exact Match to Screenshot) */}
+                        <div className="p-3 bg-[#182330] border-b border-[#243346] flex items-center justify-between">
+                          <div className="flex items-center space-x-2.5">
+                            <div className="w-8 h-8 rounded-full bg-[#1b3a57] border border-[#235682] flex items-center justify-center shrink-0">
+                              <span className="text-base">🤖</span>
+                            </div>
+                            <div className="text-xs font-bold text-white leading-tight">
+                              Bounce back fast —<br />
+                              <span className="text-neutral-300 font-normal text-[11px]">remix and retry your bet!</span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRebet(bet);
+                            }}
+                            className="bg-[#00c853] hover:bg-[#00b34a] text-white font-black text-xs px-3 py-1.5 rounded-md flex items-center space-x-1 shadow active:scale-95 cursor-pointer"
+                          >
+                            <Sparkles className="w-3 h-3 fill-white stroke-none" />
+                            <span>Remix Bet</span>
+                          </button>
+                        </div>
+
                         <div className="divide-y divide-[#202b3a]">
                           {bet.selections.map((sel, idx) => {
+                            const isGreen = bet.isAllGreen || isAllGreenTriggered || bet.status === 'won';
+                            const details = resolveWinningPredictionDetails(sel);
                             const isMatchLive = sel.isLive ?? bet.isLive;
                             const matchTimeStr = sel.liveTime || "16' H1";
                             const matchScoreStr = sel.liveScore || "0:1";
 
+                            // If Green Mode is active (or ticket marked won), render exact layout from Screenshot_20260927_102225_Chrome.jpg
+                            if (isGreen) {
+                              return (
+                                <div
+                                  key={idx}
+                                  className="px-3.5 py-3.5 flex items-start space-x-3.5 hover:bg-[#1a2636] transition-colors"
+                                >
+                                  {/* Left: Solid Green Circle with White Checkmark */}
+                                  <div className="pt-0.5 shrink-0">
+                                    <div className="w-5 h-5 rounded-full bg-[#00df59] flex items-center justify-center text-black shadow-md">
+                                      <Check className="w-3.5 h-3.5 stroke-[3.5]" />
+                                    </div>
+                                  </div>
+
+                                  {/* Right Content */}
+                                  <div className="flex-1 min-w-0 space-y-1.5">
+                                    {/* Game ID | Date */}
+                                    <div className="text-neutral-400 text-xs">
+                                      Game ID: {details.gameId} | {details.gameDate}
+                                    </div>
+
+                                    {/* Team v Team */}
+                                    <div className="font-bold text-white text-[15px] tracking-tight">
+                                      {details.formattedMatchTitle}
+                                    </div>
+
+                                    {/* FT Score | Match Tracker */}
+                                    <div className="flex items-center space-x-2 text-xs">
+                                      <span className="text-neutral-300">
+                                        FT Score: <strong className="text-white font-extrabold text-[13px] ml-1">{details.ftScore}</strong>
+                                      </span>
+                                      <span className="text-neutral-600">|</span>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          showToast(`Match Tracker opened for ${sel.matchTitle}`);
+                                        }}
+                                        className="text-[#00df59] hover:underline flex items-center space-x-1 font-bold text-xs cursor-pointer"
+                                      >
+                                        <span className="text-sm">📗</span>
+                                        <span>Match Tracker</span>
+                                      </button>
+                                    </div>
+
+                                    {/* Inner Dark Box: Pick, Market, Outcome, Trophy Watermark */}
+                                    <div className="bg-[#192330] border border-[#243346] rounded-md p-2.5 relative overflow-hidden text-xs space-y-1 shadow-sm">
+                                      <Trophy className="w-10 h-10 text-white/[0.07] absolute right-2 bottom-1 pointer-events-none" />
+
+                                      <div className="flex items-center space-x-1.5 text-neutral-300">
+                                        <span className="text-neutral-400">Pick:</span>
+                                        <strong className="text-white font-bold tracking-tight">
+                                          {details.pickText}
+                                        </strong>
+                                        <Check className="w-3.5 h-3.5 text-[#00df59] stroke-[3]" />
+                                      </div>
+
+                                      <div className="text-neutral-400">
+                                        Market: <span className="text-neutral-200 font-semibold">{sel.marketName || '1X2'}</span>
+                                      </div>
+
+                                      <div className="text-neutral-400">
+                                        Outcome: <strong className="text-white font-bold">{details.outcome}</strong>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            // Standard live/pending leg
                             return (
                               <div
                                 key={idx}
@@ -754,13 +884,19 @@ export const OpenBetsView: React.FC = () => {
                   </div>
 
                   {/* Right Ticket Card */}
-                  <div className="flex-1 bg-[#18222f] border border-[#243243] rounded-md overflow-hidden shadow">
+                  <div
+                    onClick={() => setSelectedDetailBet(item)}
+                    className="flex-1 bg-[#18222f] border border-[#243243] rounded-md overflow-hidden shadow cursor-pointer hover:border-[#00df59]/40 transition-colors"
+                  >
                     {/* Top Dark Green Banner: Multiple | 🏆 Won > */}
                     <div className="bg-[#153a23] px-3 py-2 flex items-center justify-between border-b border-emerald-900/40 text-xs">
                       <span className="font-bold text-white">{item.type}</span>
                       <button
-                        onClick={() => showToast('Viewing Ticket Details')}
-                        className="flex items-center space-x-1 text-[#00df59] font-black hover:underline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedDetailBet(item);
+                        }}
+                        className="flex items-center space-x-1 text-[#00df59] font-black hover:underline cursor-pointer"
                       >
                         <Trophy className="w-3.5 h-3.5" />
                         <span>Won</span>
@@ -780,11 +916,20 @@ export const OpenBetsView: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Matches Summary */}
-                    <div className="p-3 space-y-1 text-xs text-neutral-300">
-                      {item.selections.map((s, idx) => (
-                        <p key={idx}>{s.matchTitle}</p>
-                      ))}
+                    {/* Matches Summary with Green Checks and FT Scores */}
+                    <div className="p-3 space-y-1.5 text-xs text-neutral-300">
+                      {item.selections.map((s, idx) => {
+                        const details = resolveWinningPredictionDetails(s);
+                        return (
+                          <div key={idx} className="flex items-center justify-between py-0.5">
+                            <div className="flex items-center space-x-1.5 truncate pr-2">
+                              <Check className="w-3.5 h-3.5 text-[#00df59] stroke-[3.5] shrink-0" />
+                              <span className="truncate text-white font-medium">{details.formattedMatchTitle}</span>
+                            </div>
+                            <span className="font-mono font-bold text-neutral-300 shrink-0">{details.ftScore}</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -1210,6 +1355,13 @@ export const OpenBetsView: React.FC = () => {
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
         initialMode={authMode}
+      />
+
+      {/* SportyBet Ticket Details Modal (Matches Screenshot_20260927_102225_Chrome.jpg) */}
+      <TicketDetailsModal
+        isOpen={!!selectedDetailBet}
+        onClose={() => setSelectedDetailBet(null)}
+        bet={selectedDetailBet}
       />
     </div>
   );

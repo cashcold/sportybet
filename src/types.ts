@@ -51,6 +51,11 @@ export interface BetSelection {
   hasTracker?: boolean;
   hasStats?: boolean;
   handicapValue?: string;
+  isWon?: boolean;
+  predictionStatus?: 'won' | 'lost' | 'pending' | 'void';
+  ftScore?: string;
+  outcome?: string;
+  gameDate?: string;
 }
 
 export interface PlacedBet {
@@ -69,6 +74,9 @@ export interface PlacedBet {
   cashoutAvailable: boolean;
   cashoutAmount?: number;
   canRebet?: boolean;
+  isAllGreen?: boolean;
+  settledAt?: string;
+  winningsPaid?: boolean;
 }
 
 export type ActiveTab = 'sports' | 'az_menu' | 'games' | 'open_bets' | 'me' | 'deposit';

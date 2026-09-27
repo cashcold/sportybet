@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BettingProvider, useBetting } from './context/BettingContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Header } from './components/Header';
@@ -20,10 +20,50 @@ import { DepositModal } from './components/DepositModal';
 import { WithdrawModal } from './components/WithdrawModal';
 import { SearchModal } from './components/SearchModal';
 import { Toast } from './components/Toast';
+import { AdminPortal } from './components/AdminPortal';
 
 const MainContent: React.FC = () => {
   const { activeTab, setActiveTab } = useBetting();
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
+  const [isAdminRoute, setIsAdminRoute] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      return path.startsWith('/admin') || hash === '#/admin' || hash === '#admin';
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const handleLocationCheck = () => {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      setIsAdminRoute(path.startsWith('/admin') || hash === '#/admin' || hash === '#admin');
+    };
+
+    window.addEventListener('popstate', handleLocationCheck);
+    window.addEventListener('hashchange', handleLocationCheck);
+    return () => {
+      window.removeEventListener('popstate', handleLocationCheck);
+      window.removeEventListener('hashchange', handleLocationCheck);
+    };
+  }, []);
+
+  // Dedicated full-page Admin Portal at /admin
+  if (isAdminRoute) {
+    return (
+      <AdminPortal
+        onBackToApp={() => {
+          if (window.location.pathname.startsWith('/admin')) {
+            window.history.pushState(null, '', '/');
+          } else if (window.location.hash.includes('admin')) {
+            window.location.hash = '';
+          }
+          setIsAdminRoute(false);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0d1218] flex justify-center text-white antialiased font-sans">

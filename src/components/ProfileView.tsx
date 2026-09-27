@@ -72,12 +72,21 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
               </div>
             </button>
 
-            {/* Dark Mode crescent moon */}
-            <div className="flex items-center space-x-1.5 text-xs text-white">
-              <span>Dark Mode</span>
-              <svg className="w-4 h-4 text-white fill-white" viewBox="0 0 24 24">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
+            {/* Dark Mode crescent moon and Admin Gear */}
+            <div className="flex items-center space-x-3 text-xs text-white">
+              <button
+                onClick={() => setServerSettingsOpen(true)}
+                className="text-neutral-400 hover:text-[#00df59] p-1 transition-colors cursor-pointer"
+                title="Admin Dashboard & Green Trigger"
+              >
+                <Settings className="w-4 h-4 stroke-[2]" />
+              </button>
+              <div className="flex items-center space-x-1.5 text-xs text-white">
+                <span>Dark Mode</span>
+                <svg className="w-4 h-4 text-white fill-white" viewBox="0 0 24 24">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              </div>
             </div>
           </div>
 
@@ -782,10 +791,13 @@ function renderFooter(
         </button>
         <span>|</span>
         <button 
-          onClick={() => showToast('All Systems Operational - Real-time Sportsbook Online')} 
-          className="hover:text-neutral-200"
+          onClick={() => {
+            window.history.pushState(null, '', '/admin');
+            window.dispatchEvent(new PopStateEvent('popstate'));
+          }} 
+          className="text-[#00df59] font-bold hover:underline cursor-pointer"
         >
-          System Status
+          Admin Portal (/admin)
         </button>
       </div>
 
