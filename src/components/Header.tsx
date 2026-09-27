@@ -26,14 +26,21 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-[#de1a22] text-white px-3 py-2 flex items-center justify-between shadow-md select-none h-12">
+      <header className="sticky top-0 z-40 bg-[#de1a22] text-white px-3 py-2 flex items-center justify-between select-none h-12">
         {/* SportyBet Brand Logo matching exact typography and signature 2-dot 'S' */}
         <div 
-          className="flex items-center cursor-pointer hover:opacity-95 active:scale-[0.98] transition-all"
+          className="flex items-center min-w-0 shrink cursor-pointer hover:opacity-95 active:scale-[0.98] transition-all mr-2"
           onClick={() => setActiveTab('sports')}
           title="SportyBet Home"
         >
-          <SportyBetLogo size="md" variant="white" />
+          <SportyBetLogo
+            size="responsive"
+            variant="white"
+            bold={true}
+            src="/sportybet_logo_transparent.png"
+            fallbackSrc="/sportybet_exact_logo.png"
+            className="h-[26px] xs:h-[28px] sm:h-[30px] w-auto max-w-[125px] xs:max-w-[140px] sm:max-w-[155px] object-contain"
+          />
         </div>
 
         {/* Right controls */}
@@ -53,7 +60,7 @@ export const Header: React.FC = () => {
               {/* Deposit Button: White rectangle with red text */}
               <button
                 onClick={() => setActiveTab('deposit')}
-                className="bg-white text-[#de1a22] hover:bg-neutral-100 font-bold text-xs px-2.5 py-1.5 rounded-[4px] shadow-sm transition-all active:scale-95 flex items-center justify-center tracking-tight h-[30px]"
+                className="bg-white text-[#de1a22] hover:bg-neutral-100 font-bold text-xs px-2.5 py-1.5 rounded-[4px] transition-all active:scale-95 flex items-center justify-center tracking-tight h-[30px]"
               >
                 Deposit
               </button>
@@ -93,7 +100,7 @@ export const Header: React.FC = () => {
               {/* Join Now Button */}
               <button
                 onClick={() => openAuth('join')}
-                className="bg-white text-[#de1a22] hover:bg-neutral-100 font-black text-xs px-2.5 py-1.5 rounded-[4px] shadow-sm transition-all active:scale-95"
+                className="bg-white text-[#de1a22] hover:bg-neutral-100 font-black text-xs px-2.5 py-1.5 rounded-[4px] transition-all active:scale-95"
               >
                 Join Now
               </button>

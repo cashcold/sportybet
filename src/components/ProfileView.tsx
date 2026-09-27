@@ -268,7 +268,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
 
             {/* Official Sports Betting Partner: LaLiga */}
             <div className="flex items-center justify-center space-x-3 py-3 border-y border-[#1e2733]/80">
-              <SportyBetLogo size="sm" variant="red" />
+              <SportyBetLogo size="md" variant="red" />
               <div className="h-5 w-px bg-neutral-600/70" />
               <span className="text-[9px] uppercase font-bold text-neutral-300 leading-tight text-left">
                 Official Sports<br />Betting Partner
@@ -675,7 +675,7 @@ function renderFooter(
 
       {/* Official Sports Betting Partner: LaLiga */}
       <div className="flex items-center justify-center space-x-3 py-3 border-y border-[#1e2733]/80">
-        <SportyBetLogo size="sm" variant="red" />
+        <SportyBetLogo size="md" variant="red" />
         <div className="h-5 w-px bg-neutral-600/70" />
         <span className="text-[9px] uppercase font-bold text-neutral-300 leading-tight text-left">
           Official Sports<br />Betting Partner

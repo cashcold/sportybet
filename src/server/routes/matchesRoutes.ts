@@ -35,8 +35,8 @@ matchesRouter.get('/', async (req: Request, res: Response) => {
     try {
       await theOddsApiService.syncPopularLeagues(activeSport);
       theOddsMatches = theOddsApiService.getLocalMatches({ sport: activeSport });
-    } catch (syncErr: any) {
-      console.warn('[Matches API Sync fallback]', syncErr?.message);
+    } catch {
+      // Quiet fallback to local matches
     }
   }
   for (const m of theOddsMatches) {

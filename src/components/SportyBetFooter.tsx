@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShieldCheck, Smartphone } from 'lucide-react';
 import { useBetting } from '../context/BettingContext';
+import { SportyBetLogo } from './SportyBetLogo';
 
 export const SportyBetFooter: React.FC = () => {
   const { showToast } = useBetting();
@@ -21,7 +22,7 @@ export const SportyBetFooter: React.FC = () => {
       {/* Official Partnership Badge (Real Madrid & LaLiga) */}
       <div className="flex items-center justify-center space-x-3 mb-4 py-2 border-y border-[#18212c]">
         <div className="flex items-center space-x-1.5">
-          <span className="text-white font-black italic text-xs tracking-tight">SportyBet</span>
+          <SportyBetLogo size="sm" variant="white" src="/sportybet_logo_transparent.png" className="h-5 w-auto max-w-[95px] object-contain" />
           <span className="text-[9px] text-neutral-500 uppercase tracking-tighter">Official Sports<br />Betting Partner</span>
         </div>
         <div className="h-6 w-px bg-neutral-800" />

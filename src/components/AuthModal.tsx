@@ -202,7 +202,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
         {/* Top Header */}
         <div className="bg-[#de1a22] text-white px-4 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <SportyBetLogo size="sm" variant="white" />
+            <SportyBetLogo size="md" variant="white" bold={true} className="h-[25px] w-auto max-w-[125px]" />
             <span className="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-1.5 py-0.5 rounded">
               Ghana
             </span>

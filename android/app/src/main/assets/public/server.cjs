@@ -26,10 +26,10 @@ var import_config = require("dotenv/config");
 var import_fs = __toESM(require("fs"), 1);
 var import_path = __toESM(require("path"), 1);
 var import_vite = require("vite");
-var import_express8 = __toESM(require("express"), 1);
+var import_express9 = __toESM(require("express"), 1);
 
 // src/server/app.ts
-var import_express7 = __toESM(require("express"), 1);
+var import_express8 = __toESM(require("express"), 1);
 
 // src/server/routes/authRoutes.ts
 var import_express = require("express");
@@ -3794,15 +3794,15 @@ var REAL_UPCOMING_FIXTURES = [
     "league": "Premier League",
     "countryOrCategory": "England",
     "homeTeam": "Arsenal",
-    "awayTeam": "Leeds United",
+    "awayTeam": "Leicester City",
     "isLive": false,
     "startTime": "11:30",
-    "date": "2026-10-10",
-    "dateLabel": "Sat 10/10",
-    "commenceTime": "2026-10-10T11:30:00Z",
+    "date": "2026-09-26",
+    "dateLabel": "Today 26/09",
+    "commenceTime": "2026-09-26T11:30:00Z",
     "isHot": true,
     "hasLiveStream": true,
-    "marketsCount": 155,
+    "marketsCount": 218,
     "markets": {
       "1X2": [
         {
@@ -3870,12 +3870,12 @@ var REAL_UPCOMING_FIXTURES = [
     "awayTeam": "Brentford",
     "isLive": false,
     "startTime": "14:00",
-    "date": "2026-10-10",
-    "dateLabel": "Sat 10/10",
-    "commenceTime": "2026-10-10T14:00:00Z",
+    "date": "2026-09-26",
+    "dateLabel": "Today 26/09",
+    "commenceTime": "2026-09-26T14:00:00Z",
     "isHot": true,
     "hasLiveStream": true,
-    "marketsCount": 155,
+    "marketsCount": 218,
     "markets": {
       "1X2": [
         {
@@ -3943,12 +3943,12 @@ var REAL_UPCOMING_FIXTURES = [
     "awayTeam": "Bournemouth",
     "isLive": false,
     "startTime": "14:00",
-    "date": "2026-10-10",
-    "dateLabel": "Sat 10/10",
-    "commenceTime": "2026-10-10T14:00:00Z",
+    "date": "2026-09-26",
+    "dateLabel": "Today 26/09",
+    "commenceTime": "2026-09-26T14:00:00Z",
     "isHot": true,
     "hasLiveStream": true,
-    "marketsCount": 155,
+    "marketsCount": 218,
     "markets": {
       "1X2": [
         {
@@ -4012,16 +4012,16 @@ var REAL_UPCOMING_FIXTURES = [
     "sport": "football",
     "league": "Premier League",
     "countryOrCategory": "England",
-    "homeTeam": "Sunderland",
-    "awayTeam": "Brighton and Hove Albion",
+    "homeTeam": "Newcastle United",
+    "awayTeam": "Manchester City",
     "isLive": false,
     "startTime": "14:00",
-    "date": "2026-10-10",
-    "dateLabel": "Sat 10/10",
-    "commenceTime": "2026-10-10T14:00:00Z",
+    "date": "2026-09-26",
+    "dateLabel": "Today 26/09",
+    "commenceTime": "2026-09-26T14:00:00Z",
     "isHot": true,
     "hasLiveStream": true,
-    "marketsCount": 155,
+    "marketsCount": 218,
     "markets": {
       "1X2": [
         {
@@ -4089,12 +4089,12 @@ var REAL_UPCOMING_FIXTURES = [
     "awayTeam": "Fulham",
     "isLive": false,
     "startTime": "14:00",
-    "date": "2026-10-10",
-    "dateLabel": "Sat 10/10",
-    "commenceTime": "2026-10-10T14:00:00Z",
+    "date": "2026-09-26",
+    "dateLabel": "Today 26/09",
+    "commenceTime": "2026-09-26T14:00:00Z",
     "isHot": true,
     "hasLiveStream": true,
-    "marketsCount": 155,
+    "marketsCount": 218,
     "markets": {
       "1X2": [
         {
@@ -4162,12 +4162,12 @@ var REAL_UPCOMING_FIXTURES = [
     "awayTeam": "Tottenham Hotspur",
     "isLive": false,
     "startTime": "16:30",
-    "date": "2026-10-10",
-    "dateLabel": "Sat 10/10",
-    "commenceTime": "2026-10-10T16:30:00Z",
+    "date": "2026-09-26",
+    "dateLabel": "Today 26/09",
+    "commenceTime": "2026-09-26T16:30:00Z",
     "isHot": true,
     "hasLiveStream": true,
-    "marketsCount": 155,
+    "marketsCount": 218,
     "markets": {
       "1X2": [
         {
@@ -4889,7 +4889,7 @@ var REAL_UPCOMING_FIXTURES = [
     "league": "Premier League",
     "countryOrCategory": "England",
     "homeTeam": "Bournemouth",
-    "awayTeam": "Sunderland",
+    "awayTeam": "Southampton",
     "isLive": false,
     "startTime": "13:00",
     "date": "2026-10-18",
@@ -5034,8 +5034,8 @@ var REAL_UPCOMING_FIXTURES = [
     "sport": "football",
     "league": "Premier League",
     "countryOrCategory": "England",
-    "homeTeam": "Leeds United",
-    "awayTeam": "Manchester United",
+    "homeTeam": "Everton",
+    "awayTeam": "Crystal Palace",
     "isLive": false,
     "startTime": "13:00",
     "date": "2026-10-18",
@@ -5399,77 +5399,148 @@ var REAL_UPCOMING_FIXTURES = [
 var INITIAL_MATCHES = REAL_UPCOMING_FIXTURES;
 var INITIAL_OPEN_BETS = [
   {
-    id: "bet-nations-1",
-    ticketId: "SBGH-7819-2041",
-    transactionId: "TX-GH-892184912",
-    bookingCode: "DA2R3J",
+    id: "bet-sporty-screenshot-1",
+    ticketId: "SBGH-4819-2094",
+    transactionId: "TX-GH-481920941",
+    bookingCode: "CXA7PN",
     type: "Multiple",
-    date: "25/09 07:55",
+    date: "26/09 19:04",
     isLive: true,
     selections: [
       {
-        matchId: "live-alg-tun-u20",
-        gameId: "21094",
-        matchTitle: "Algeria U20 vs Tunisia U20",
+        matchId: "live-alb-blr",
+        gameId: "28101",
+        matchTitle: "Albania vs Belarus",
         marketName: "1X2",
-        selectionName: "Draw (X)",
-        odd: 1.85,
+        selectionName: "Home",
+        odd: 1.69,
         isLive: true,
-        liveOdds: 1.85,
-        liveOddsTrend: "same",
-        liveScore: "1:1",
-        liveTime: "76' 2H",
+        liveOdds: 2.1,
+        liveOddsTrend: "up",
+        liveScore: "0:0",
+        liveTime: "14' H1",
+        hasStream: true,
         hasTracker: true,
         hasStats: true
       },
       {
-        matchId: "theodds-95d5c8d1489bc284b68dc332fa1cb854",
-        gameId: "95581",
-        matchTitle: "Italy vs Belgium",
+        matchId: "live-cze-cro",
+        gameId: "28102",
+        matchTitle: "Czechia vs Croatia",
         marketName: "1X2",
-        selectionName: "Italy (1)",
-        odd: 2.27,
-        isLive: false,
-        liveOdds: 2.27,
-        liveOddsTrend: "same",
+        selectionName: "Away",
+        odd: 2.05,
+        isLive: true,
+        liveOdds: 1.95,
+        liveOddsTrend: "down",
+        liveScore: "0:0",
+        liveTime: "18' H1",
+        hasStream: true,
         hasTracker: true,
         hasStats: true
-      }
-    ],
-    stake: 7,
-    totalOdds: 4.2,
-    potentialWin: 29.4,
-    status: "open",
-    cashoutAvailable: true,
-    cashoutAmount: 7
-  },
-  {
-    id: "bet-france-1",
-    ticketId: "SBGH-9812-3312",
-    transactionId: "TX-GH-312984921",
-    bookingCode: "DA2R1A",
-    type: "Single",
-    date: "25/09 07:56",
-    isLive: false,
-    selections: [
+      },
       {
-        matchId: "theodds-2b7592be536420c10378dd7522466f6a",
-        gameId: "27592",
-        matchTitle: "Turkey vs France",
+        matchId: "theodds-eng-esp-nations",
+        gameId: "29810",
+        matchTitle: "England vs Spain",
         marketName: "1X2",
-        selectionName: "France (2)",
-        odd: 1.62,
+        selectionName: "Away",
+        odd: 2.27,
+        isLive: true,
+        liveOdds: 1.52,
+        liveOddsTrend: "down",
+        liveScore: "0:1",
+        liveTime: "16' H1",
+        hasStream: true,
+        hasTracker: true,
+        hasStats: true
+      },
+      {
+        matchId: "up-usa-per",
+        gameId: "48192",
+        matchTitle: "USA vs Peru",
+        marketName: "1X2",
+        selectionName: "Home",
+        odd: 1.43,
         isLive: false,
+        liveOdds: 1.43,
+        liveOddsTrend: "same",
+        liveTime: "26/09 20:30",
+        hasStream: false,
+        hasTracker: false,
+        hasStats: true
+      },
+      {
+        matchId: "up-can-chi",
+        gameId: "48193",
+        matchTitle: "Canada vs Chile",
+        marketName: "GG/NG",
+        selectionName: "Yes",
+        odd: 1.9,
+        isLive: false,
+        liveOdds: 1.9,
+        liveOddsTrend: "same",
+        liveTime: "26/09 23:00",
+        hasStream: false,
         hasTracker: false,
         hasStats: true
       }
     ],
-    stake: 5,
-    totalOdds: 1.62,
-    potentialWin: 8.1,
+    stake: 6,
+    totalOdds: 22.65,
+    potentialWin: 135.9,
     status: "open",
     cashoutAvailable: true,
-    cashoutAmount: 4.8
+    cashoutAmount: 6.05,
+    canRebet: true
+  },
+  {
+    id: "bet-sporty-screenshot-2",
+    ticketId: "SBGH-5912-3021",
+    transactionId: "TX-GH-591230211",
+    bookingCode: "BD9812",
+    type: "Multiple",
+    date: "26/09 19:10",
+    isLive: false,
+    selections: [
+      {
+        matchId: "live-bvb-wer",
+        gameId: "39101",
+        matchTitle: "Borussia Dortmund vs Werder Bremen",
+        marketName: "1X2",
+        selectionName: "Home",
+        odd: 1.55,
+        isLive: false,
+        liveOdds: 1.55,
+        liveOddsTrend: "same",
+        liveTime: "26/09 18:30",
+        hasStream: true,
+        hasTracker: true,
+        hasStats: true
+      },
+      {
+        matchId: "up-rbl-aug",
+        gameId: "39102",
+        matchTitle: "RB Leipzig vs FC Augsburg",
+        marketName: "1X2",
+        selectionName: "Home",
+        odd: 1.48,
+        isLive: false,
+        liveOdds: 1.48,
+        liveOddsTrend: "same",
+        liveTime: "26/09 18:30",
+        hasStream: false,
+        hasTracker: false,
+        hasStats: true
+      }
+    ],
+    stake: 7,
+    totalOdds: 2.29,
+    potentialWin: 16.03,
+    status: "open",
+    cashoutAvailable: true,
+    cashoutAmount: 0.88,
+    canRebet: true
   }
 ];
 var INITIAL_BET_HISTORY = [
@@ -5508,6 +5579,25 @@ var INITIAL_BET_HISTORY = [
     cashoutAvailable: false
   }
 ];
+var GUEST_USER = {
+  username: "",
+  balance: 0,
+  currency: "GHC",
+  loyaltyTier: "Tier 1",
+  loyaltyProgress: 0,
+  nextUpdate: "01 Oct",
+  dailyStreak: 0,
+  unreadNotifications: 0,
+  phone: "",
+  firstName: "",
+  lastName: "",
+  dateOfBirth: "",
+  location: "Ghana",
+  email: "",
+  isEmailVerified: false,
+  avatarUrl: "/user_beach_avatar.jpg",
+  isLoggedIn: false
+};
 var DEMO_USER = {
   username: "charles_asumah",
   balance: 5e3,
@@ -5527,6 +5617,7 @@ var DEMO_USER = {
   avatarUrl: "/user_beach_avatar.jpg",
   isLoggedIn: true
 };
+var INITIAL_USER = GUEST_USER;
 
 // src/server/db.ts
 var Database = class {
@@ -5549,8 +5640,6 @@ var Database = class {
     const demoUser = JSON.parse(JSON.stringify(DEMO_USER));
     const demoPhone = demoUser.phone || "0204891235";
     this.users.set(demoPhone, demoUser);
-    this.users.set("20******5", demoUser);
-    this.users.set("0204891235", demoUser);
     this.openBets.set(demoPhone, JSON.parse(JSON.stringify(INITIAL_OPEN_BETS)));
     this.betHistory.set(demoPhone, JSON.parse(JSON.stringify(INITIAL_BET_HISTORY)));
     this.openBets.set("20******5", JSON.parse(JSON.stringify(INITIAL_OPEN_BETS)));
@@ -5626,43 +5715,158 @@ var UserSchema = new import_mongoose.Schema(
 var UserModel = import_mongoose.default.models.User || import_mongoose.default.model("User", UserSchema);
 
 // src/server/mongodb.ts
+var import_mongoose3 = __toESM(require("mongoose"), 1);
+var import_mongodb_memory_server = require("mongodb-memory-server");
+
+// src/server/models/BetModel.ts
 var import_mongoose2 = __toESM(require("mongoose"), 1);
-function getMongoUri() {
-  return process.env.MONGODB_URI || "";
-}
-var MONGODB_URI = process.env.MONGODB_URI || "";
+var SelectionSubSchema = new import_mongoose2.Schema(
+  {
+    matchId: { type: String, required: true },
+    gameId: { type: String },
+    matchTitle: { type: String, required: true },
+    marketName: { type: String, required: true },
+    selectionName: { type: String, required: true },
+    odd: { type: Number, required: true },
+    isLive: { type: Boolean, default: false },
+    isWon: { type: Boolean, default: false },
+    predictionStatus: { type: String, default: "pending" },
+    ftScore: { type: String },
+    outcome: { type: String },
+    gameDate: { type: String },
+    liveOdds: { type: Number },
+    liveOddsTrend: { type: String },
+    liveScore: { type: String },
+    liveTime: { type: String },
+    hasStream: { type: Boolean, default: false },
+    hasTracker: { type: Boolean, default: false },
+    hasStats: { type: Boolean, default: false }
+  },
+  { _id: false }
+);
+var BetSchema = new import_mongoose2.Schema(
+  {
+    id: { type: String, required: true, unique: true, index: true },
+    ticketId: { type: String, required: true, unique: true, index: true },
+    transactionId: { type: String, required: true, unique: true, index: true },
+    userPhone: { type: String, required: true, index: true },
+    type: { type: String, default: "Single" },
+    date: { type: String },
+    isLive: { type: Boolean, default: false },
+    selections: [SelectionSubSchema],
+    stake: { type: Number, required: true },
+    totalOdds: { type: Number, required: true },
+    potentialWin: { type: Number, required: true },
+    status: {
+      type: String,
+      enum: ["open", "won", "lost", "cashed_out"],
+      default: "open"
+    },
+    cashoutAvailable: { type: Boolean, default: true },
+    cashoutAmount: { type: Number, default: 0 },
+    bookingCode: { type: String, index: true },
+    canRebet: { type: Boolean, default: true },
+    isAllGreen: { type: Boolean, default: false },
+    settledAt: { type: String },
+    winningsPaid: { type: Boolean, default: false }
+  },
+  { timestamps: true }
+);
+var BetModel = import_mongoose2.default.models.Bet || import_mongoose2.default.model("Bet", BetSchema);
+
+// src/server/mongodb.ts
+var customMongoUri = "";
+var memoryServerInstance = null;
 var isConnected = false;
 var connectionPromise = null;
-import_mongoose2.default.set("bufferCommands", false);
-async function connectToDatabase() {
-  const uri = getMongoUri();
-  if (!uri) {
-    return null;
+function getMongoUri() {
+  return customMongoUri || process.env.MONGODB_URI || "";
+}
+function setCustomMongoUri(uri) {
+  customMongoUri = uri.trim();
+  isConnected = false;
+  connectionPromise = null;
+}
+async function seedDefaultDatabase() {
+  try {
+    const userCount = await UserModel.countDocuments();
+    if (userCount === 0) {
+      await UserModel.create({
+        phone: INITIAL_USER.phone || "20******5",
+        firstName: INITIAL_USER.firstName || "Nana",
+        lastName: INITIAL_USER.lastName || "Kojo",
+        balance: INITIAL_USER.balance || 5e3,
+        currency: INITIAL_USER.currency || "GHS",
+        loyaltyTier: INITIAL_USER.loyaltyTier || "Gold VIP",
+        loyaltyProgress: INITIAL_USER.loyaltyProgress || 65,
+        sessionTokens: ["default_session_token_sportybet"]
+      });
+      console.log("[MongoDB Seed] Initial User created in MongoDB.");
+    }
+    const betCount = await BetModel.countDocuments();
+    if (betCount === 0) {
+      const allInitialBets = [...INITIAL_OPEN_BETS, ...INITIAL_BET_HISTORY];
+      for (const b of allInitialBets) {
+        await BetModel.create({
+          id: b.id,
+          ticketId: b.ticketId,
+          transactionId: b.transactionId || `TX-GH-${Math.floor(1e8 + Math.random() * 9e8)}`,
+          userPhone: "20******5",
+          type: b.type,
+          date: b.date,
+          isLive: b.isLive,
+          selections: b.selections,
+          stake: b.stake,
+          totalOdds: b.totalOdds,
+          potentialWin: b.potentialWin,
+          status: b.status,
+          cashoutAvailable: b.cashoutAvailable,
+          cashoutAmount: b.cashoutAmount || b.stake * 0.9,
+          bookingCode: b.bookingCode || "BD9812",
+          canRebet: b.canRebet ?? true,
+          isAllGreen: b.isAllGreen || false
+        });
+      }
+      console.log(`[MongoDB Seed] ${allInitialBets.length} Initial Bet Slips created in MongoDB.`);
+    }
+  } catch (err) {
+    console.warn("[MongoDB Seed Notice]", err?.message || err);
   }
-  if (isConnected && import_mongoose2.default.connection.readyState === 1) {
-    return import_mongoose2.default;
+}
+async function connectToDatabase() {
+  if (isConnected && import_mongoose3.default.connection.readyState === 1) {
+    return import_mongoose3.default;
   }
   if (connectionPromise) {
     return connectionPromise;
   }
   connectionPromise = (async () => {
     try {
-      console.log("[MongoDB] Connecting to SportyBet database...");
-      const conn = await import_mongoose2.default.connect(uri, {
-        serverSelectionTimeoutMS: 8e3,
-        connectTimeoutMS: 8e3,
-        bufferCommands: false
+      let targetUri = getMongoUri();
+      if (!targetUri) {
+        if (!memoryServerInstance) {
+          console.log("[MongoDB] Starting dedicated MongoDB database engine...");
+          memoryServerInstance = await import_mongodb_memory_server.MongoMemoryServer.create({
+            instance: {
+              dbName: "sportybet_ghana"
+            }
+          });
+        }
+        targetUri = memoryServerInstance.getUri();
+        console.log("[MongoDB Engine] Local MongoDB Server active at:", targetUri);
+      } else {
+        console.log("[MongoDB] Connecting to external MongoDB Cluster at:", targetUri.replace(/\/\/.*@/, "//***:***@"));
+      }
+      const conn = await import_mongoose3.default.connect(targetUri, {
+        serverSelectionTimeoutMS: 1e4,
+        connectTimeoutMS: 1e4
       });
       isConnected = true;
-      console.log("[MongoDB] Successfully connected to SportyBet MongoDB cluster!");
-      UserModel.updateMany(
-        { balance: { $gte: 9e6 } },
-        { $set: { balance: 5e3 } }
-      ).catch(() => {
-      });
+      console.log("[MongoDB] Connected successfully to SportyBet MongoDB database!");
+      await seedDefaultDatabase();
       return conn;
     } catch (error) {
-      console.warn("[MongoDB Notice] Operating with in-memory cache:", error?.message || error);
+      console.error("[MongoDB Connection Error]:", error?.message || error);
       isConnected = false;
       return null;
     } finally {
@@ -5674,7 +5878,35 @@ async function connectToDatabase() {
   return connectionPromise;
 }
 function isDbConnected() {
-  return isConnected && import_mongoose2.default.connection.readyState === 1;
+  return isConnected && import_mongoose3.default.connection.readyState === 1;
+}
+async function getMongoStatus() {
+  const connected = isDbConnected();
+  let betsCount = 0;
+  let openCount = 0;
+  let settledCount = 0;
+  let userCount = 0;
+  if (connected) {
+    try {
+      betsCount = await BetModel.countDocuments();
+      openCount = await BetModel.countDocuments({ status: "open" });
+      settledCount = await BetModel.countDocuments({ status: { $ne: "open" } });
+      userCount = await UserModel.countDocuments();
+    } catch {
+    }
+  }
+  return {
+    connected,
+    uri: getMongoUri() ? getMongoUri().replace(/\/\/.*@/, "//***:***@") : memoryServerInstance ? "Embedded MongoDB Engine (Localhost)" : "Disconnected",
+    isEmbedded: !getMongoUri(),
+    databaseName: import_mongoose3.default.connection.name || "sportybet_ghana",
+    stats: {
+      totalBets: betsCount,
+      openBets: openCount,
+      settledBets: settledCount,
+      users: userCount
+    }
+  };
 }
 
 // src/server/routes/authRoutes.ts
@@ -5690,8 +5922,8 @@ function formatUserProfile(doc) {
     dailyStreak: typeof doc.dailyStreak === "number" ? doc.dailyStreak : 5,
     unreadNotifications: typeof doc.unreadNotifications === "number" ? doc.unreadNotifications : 1,
     phone: doc.phone,
-    firstName: doc.firstName || "CHARLES",
-    lastName: doc.lastName || "ASUMAH",
+    firstName: doc.firstName || "",
+    lastName: doc.lastName || "",
     dateOfBirth: doc.dateOfBirth || "15/05/1998",
     location: doc.location || "Ghana",
     email: doc.email || "",
@@ -5707,11 +5939,46 @@ authRouter.post("/register", async (req, res) => {
     } catch (e) {
       console.warn("[Register DB connect skipped]", e);
     }
-    const { phone, password, firstName, lastName, email } = req.body || {};
+    const { phone, password, firstName, lastName, dateOfBirth, email } = req.body || {};
     if (!phone || !String(phone).trim()) {
       return res.status(400).json({ success: false, error: "Phone number is required" });
     }
     const cleanPhone = String(phone).trim();
+    let formattedDob = "15/05/1998";
+    if (dateOfBirth && String(dateOfBirth).trim()) {
+      const rawDob = String(dateOfBirth).trim();
+      let birthDate = null;
+      if (rawDob.includes("-")) {
+        const parts = rawDob.split("-");
+        if (parts.length === 3) {
+          birthDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+          formattedDob = `${parts[2].padStart(2, "0")}/${parts[1].padStart(2, "0")}/${parts[0]}`;
+        }
+      } else if (rawDob.includes("/")) {
+        const parts = rawDob.split("/");
+        if (parts.length === 3) {
+          birthDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+          formattedDob = rawDob;
+        }
+      } else {
+        birthDate = new Date(rawDob);
+        formattedDob = rawDob;
+      }
+      if (birthDate && !isNaN(birthDate.getTime())) {
+        const today = /* @__PURE__ */ new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || m === 0 && today.getDate() < birthDate.getDate()) {
+          age--;
+        }
+        if (age < 18) {
+          return res.status(400).json({
+            success: false,
+            error: "You must be at least 18 years old to register under Gaming Commission of Ghana regulations."
+          });
+        }
+      }
+    }
     if (isDbConnected()) {
       try {
         const existingUser = await UserModel.findOne({ phone: cleanPhone });
@@ -5746,7 +6013,7 @@ authRouter.post("/register", async (req, res) => {
           username: userBaseName,
           firstName: userFirstName,
           lastName: userLastName,
-          dateOfBirth: "15/05/1998",
+          dateOfBirth: formattedDob,
           location: "Ghana",
           email: email || "",
           isEmailVerified: false,
@@ -5782,7 +6049,7 @@ authRouter.post("/register", async (req, res) => {
       phone: cleanPhone,
       firstName: userFirstName,
       lastName: userLastName,
-      dateOfBirth: "15/05/1998",
+      dateOfBirth: formattedDob,
       location: "Ghana",
       email: email || "",
       isEmailVerified: false,
@@ -5837,14 +6104,13 @@ authRouter.post("/login", async (req, res) => {
           userDoc.sessionTokens.push(token);
           await userDoc.save();
         } else {
-          const isCharles2 = cleanPhone === "20******5" || cleanPhone === "0204891235" || cleanPhone === "204891235";
-          const defaultFirstName = isCharles2 ? "CHARLES" : "USER";
-          const defaultLastName = isCharles2 ? "ASUMAH" : cleanPhone.slice(-4);
+          const defaultFirstName = "USER";
+          const defaultLastName = cleanPhone.slice(-4);
           const hashedPassword = password ? await import_bcryptjs.default.hash(password, 10) : void 0;
           userDoc = await UserModel.create({
             phone: cleanPhone,
             password: hashedPassword,
-            username: isCharles2 ? "charles_asumah" : `user_${cleanPhone.slice(-4)}`,
+            username: `user_${cleanPhone.slice(-4)}`,
             firstName: defaultFirstName,
             lastName: defaultLastName,
             dateOfBirth: "15/05/1998",
@@ -6039,8 +6305,8 @@ authRouter.post("/daily-streak", async (req, res) => {
 var import_express2 = require("express");
 
 // src/server/models/TransactionModel.ts
-var import_mongoose3 = __toESM(require("mongoose"), 1);
-var TransactionSchema = new import_mongoose3.Schema(
+var import_mongoose4 = __toESM(require("mongoose"), 1);
+var TransactionSchema = new import_mongoose4.Schema(
   {
     id: { type: String, required: true, unique: true },
     transactionId: { type: String, required: true, unique: true, index: true },
@@ -6065,7 +6331,7 @@ var TransactionSchema = new import_mongoose3.Schema(
   },
   { timestamps: true }
 );
-var TransactionModel = import_mongoose3.default.models.Transaction || import_mongoose3.default.model("Transaction", TransactionSchema);
+var TransactionModel = import_mongoose4.default.models.Transaction || import_mongoose4.default.model("Transaction", TransactionSchema);
 
 // src/server/routes/walletRoutes.ts
 var walletRouter = (0, import_express2.Router)();
@@ -6316,47 +6582,6 @@ walletRouter.get("/transactions", async (req, res) => {
 // src/server/routes/betRoutes.ts
 var import_express3 = require("express");
 
-// src/server/models/BetModel.ts
-var import_mongoose4 = __toESM(require("mongoose"), 1);
-var SelectionSubSchema = new import_mongoose4.Schema(
-  {
-    matchId: { type: String, required: true },
-    gameId: { type: String },
-    matchTitle: { type: String, required: true },
-    marketName: { type: String, required: true },
-    selectionName: { type: String, required: true },
-    odd: { type: Number, required: true },
-    isLive: { type: Boolean, default: false }
-  },
-  { _id: false }
-);
-var BetSchema = new import_mongoose4.Schema(
-  {
-    id: { type: String, required: true, unique: true, index: true },
-    ticketId: { type: String, required: true, unique: true, index: true },
-    transactionId: { type: String, required: true, unique: true, index: true },
-    userPhone: { type: String, required: true, index: true },
-    type: { type: String, default: "Single" },
-    date: { type: String },
-    isLive: { type: Boolean, default: false },
-    selections: [SelectionSubSchema],
-    stake: { type: Number, required: true },
-    totalOdds: { type: Number, required: true },
-    potentialWin: { type: Number, required: true },
-    status: {
-      type: String,
-      enum: ["open", "won", "lost", "cashed_out"],
-      default: "open"
-    },
-    cashoutAvailable: { type: Boolean, default: true },
-    cashoutAmount: { type: Number, default: 0 },
-    bookingCode: { type: String, index: true },
-    canRebet: { type: Boolean, default: true }
-  },
-  { timestamps: true }
-);
-var BetModel = import_mongoose4.default.models.Bet || import_mongoose4.default.model("Bet", BetSchema);
-
 // src/server/models/BookingCodeModel.ts
 var import_mongoose5 = __toESM(require("mongoose"), 1);
 var SelectionSubSchema2 = new import_mongoose5.Schema(
@@ -6568,53 +6793,46 @@ betRouter.post("/place", async (req, res) => {
 });
 betRouter.get("/open", async (req, res) => {
   try {
+    await connectToDatabase();
     const authHeader = req.headers.authorization;
     const cleanToken = authHeader ? authHeader.replace("Bearer ", "").trim() : "";
-    if (!cleanToken) {
-      return res.json({ success: true, count: 0, bets: [] });
-    }
-    await connectToDatabase();
     let userPhone = "";
-    if (isDbConnected()) {
+    if (isDbConnected() && cleanToken) {
       const u = await UserModel.findOne({ sessionTokens: cleanToken });
       if (u) userPhone = u.phone;
     }
-    if (!userPhone) {
-      const cached = db.getUserByToken(authHeader);
-      if (cached && cached.phone) userPhone = cached.phone;
-    }
-    if (!userPhone) {
-      return res.json({ success: true, count: 0, bets: [] });
-    }
-    let bets = [];
+    let mongoBets = [];
     if (isDbConnected()) {
-      const phoneQueries = [userPhone];
-      if (userPhone.startsWith("0")) phoneQueries.push(userPhone.slice(1));
-      if (!userPhone.startsWith("0")) phoneQueries.push("0" + userPhone);
-      const mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: "open" }).sort({ createdAt: -1 });
-      if (mongoBets.length > 0) {
-        bets = mongoBets.map((doc) => ({
-          id: doc.id,
-          ticketId: doc.ticketId,
-          transactionId: doc.transactionId,
-          bookingCode: doc.bookingCode,
-          type: doc.type,
-          date: doc.date,
-          isLive: doc.isLive,
-          selections: doc.selections,
-          stake: doc.stake,
-          totalOdds: doc.totalOdds,
-          potentialWin: doc.potentialWin,
-          status: doc.status,
-          cashoutAvailable: doc.cashoutAvailable,
-          cashoutAmount: doc.cashoutAmount,
-          canRebet: doc.canRebet
-        }));
+      if (userPhone && userPhone !== "20******5") {
+        const phoneQueries = [userPhone];
+        if (userPhone.startsWith("0")) phoneQueries.push(userPhone.slice(1));
+        if (!userPhone.startsWith("0")) phoneQueries.push("0" + userPhone);
+        mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: "open" }).sort({ createdAt: -1 });
+      }
+      if (mongoBets.length === 0) {
+        mongoBets = await BetModel.find({ status: "open" }).sort({ createdAt: -1 });
       }
     }
-    if (bets.length === 0) {
-      bets = db.openBets.get(userPhone) || [];
-    }
+    const bets = mongoBets.map((doc) => ({
+      id: doc.id,
+      ticketId: doc.ticketId,
+      transactionId: doc.transactionId,
+      bookingCode: doc.bookingCode,
+      type: doc.type,
+      date: doc.date,
+      isLive: doc.isLive,
+      selections: doc.selections,
+      stake: doc.stake,
+      totalOdds: doc.totalOdds,
+      potentialWin: doc.potentialWin,
+      status: doc.status,
+      cashoutAvailable: doc.cashoutAvailable,
+      cashoutAmount: doc.cashoutAmount,
+      canRebet: doc.canRebet,
+      isAllGreen: doc.isAllGreen,
+      settledAt: doc.settledAt,
+      winningsPaid: doc.winningsPaid
+    }));
     return res.json({
       success: true,
       count: bets.length,
@@ -6627,53 +6845,46 @@ betRouter.get("/open", async (req, res) => {
 });
 betRouter.get("/history", async (req, res) => {
   try {
+    await connectToDatabase();
     const authHeader = req.headers.authorization;
     const cleanToken = authHeader ? authHeader.replace("Bearer ", "").trim() : "";
-    if (!cleanToken) {
-      return res.json({ success: true, count: 0, bets: [] });
-    }
-    await connectToDatabase();
     let userPhone = "";
-    if (isDbConnected()) {
+    if (isDbConnected() && cleanToken) {
       const u = await UserModel.findOne({ sessionTokens: cleanToken });
       if (u) userPhone = u.phone;
     }
-    if (!userPhone) {
-      const cached = db.getUserByToken(authHeader);
-      if (cached && cached.phone) userPhone = cached.phone;
-    }
-    if (!userPhone) {
-      return res.json({ success: true, count: 0, bets: [] });
-    }
-    let bets = [];
+    let mongoBets = [];
     if (isDbConnected()) {
-      const phoneQueries = [userPhone];
-      if (userPhone.startsWith("0")) phoneQueries.push(userPhone.slice(1));
-      if (!userPhone.startsWith("0")) phoneQueries.push("0" + userPhone);
-      const mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: { $ne: "open" } }).sort({ createdAt: -1 });
-      if (mongoBets.length > 0) {
-        bets = mongoBets.map((doc) => ({
-          id: doc.id,
-          ticketId: doc.ticketId,
-          transactionId: doc.transactionId,
-          bookingCode: doc.bookingCode,
-          type: doc.type,
-          date: doc.date,
-          isLive: doc.isLive,
-          selections: doc.selections,
-          stake: doc.stake,
-          totalOdds: doc.totalOdds,
-          potentialWin: doc.potentialWin,
-          status: doc.status,
-          cashoutAvailable: doc.cashoutAvailable,
-          cashoutAmount: doc.cashoutAmount,
-          canRebet: doc.canRebet
-        }));
+      if (userPhone && userPhone !== "20******5") {
+        const phoneQueries = [userPhone];
+        if (userPhone.startsWith("0")) phoneQueries.push(userPhone.slice(1));
+        if (!userPhone.startsWith("0")) phoneQueries.push("0" + userPhone);
+        mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: { $ne: "open" } }).sort({ createdAt: -1 });
+      }
+      if (mongoBets.length === 0) {
+        mongoBets = await BetModel.find({ status: { $ne: "open" } }).sort({ createdAt: -1 });
       }
     }
-    if (bets.length === 0) {
-      bets = db.betHistory.get(userPhone) || [];
-    }
+    const bets = mongoBets.map((doc) => ({
+      id: doc.id,
+      ticketId: doc.ticketId,
+      transactionId: doc.transactionId,
+      bookingCode: doc.bookingCode,
+      type: doc.type,
+      date: doc.date,
+      isLive: doc.isLive,
+      selections: doc.selections,
+      stake: doc.stake,
+      totalOdds: doc.totalOdds,
+      potentialWin: doc.potentialWin,
+      status: doc.status,
+      cashoutAvailable: doc.cashoutAvailable,
+      cashoutAmount: doc.cashoutAmount,
+      canRebet: doc.canRebet,
+      isAllGreen: doc.isAllGreen,
+      settledAt: doc.settledAt,
+      winningsPaid: doc.winningsPaid
+    }));
     return res.json({
       success: true,
       count: bets.length,
@@ -8516,6 +8727,33 @@ var TheOddsApiService = class {
       this.syncPopularLeagues().catch((e) => console.warn("[TheOddsAPI AutoSync]", e.message));
     }
     let matches = Array.from(this.localMatches.values());
+    const now = /* @__PURE__ */ new Date();
+    const todayYMD = now.toISOString().split("T")[0];
+    const todayDayMonth = now.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit" });
+    const tomorrow = new Date(now.getTime() + 864e5);
+    const tomorrowYMD = tomorrow.toISOString().split("T")[0];
+    const tomorrowDayMonth = tomorrow.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit" });
+    matches = matches.map((m, idx) => {
+      if (m.isLive) {
+        return {
+          ...m,
+          date: todayYMD,
+          dateLabel: "Live",
+          startTime: "Live",
+          commenceTime: now.toISOString()
+        };
+      }
+      if (!m.date || m.date < todayYMD) {
+        const isTom = idx % 2 === 1;
+        return {
+          ...m,
+          date: isTom ? tomorrowYMD : todayYMD,
+          dateLabel: isTom ? `Tomorrow ${tomorrowDayMonth}` : `Today ${todayDayMonth}`,
+          commenceTime: isTom ? `${tomorrowYMD}T18:00:00Z` : `${todayYMD}T18:00:00Z`
+        };
+      }
+      return m;
+    });
     if (filters.sport) {
       const s = filters.sport.toLowerCase();
       matches = matches.filter((m) => m.sport.toLowerCase() === s);
@@ -8928,16 +9166,466 @@ sportsRouter.post("/clear-cache", (req, res) => {
   });
 });
 
+// src/server/routes/adminRoutes.ts
+var import_express7 = require("express");
+
+// src/utils/predictionHelper.ts
+function resolveWinningPredictionDetails(sel) {
+  const title = sel.matchTitle || "Match";
+  const formattedMatchTitle = title.replace(/\s+vs\s+/gi, " v ");
+  const mName = (sel.marketName || "1X2").trim();
+  const sName = (sel.selectionName || "1").trim();
+  const oddStr = `@${sel.odd.toFixed(2)}`;
+  const gameId = sel.gameId || "23888";
+  const gameDate = sel.gameDate || sel.liveTime || "26/09 18:45";
+  const lowerTitle = title.toLowerCase();
+  if (lowerTitle.includes("albania") && lowerTitle.includes("belarus")) {
+    return {
+      ftScore: "2:0",
+      outcome: "Home",
+      pickText: `Home ${oddStr}`,
+      isWon: true,
+      gameId: "23888",
+      gameDate: "26/09 18:45",
+      formattedMatchTitle: "Albania v Belarus"
+    };
+  }
+  if (lowerTitle.includes("czechia") && lowerTitle.includes("croatia")) {
+    return {
+      ftScore: "1:2",
+      outcome: "Away",
+      pickText: `Away ${oddStr}`,
+      isWon: true,
+      gameId: "44737",
+      gameDate: "26/09 18:45",
+      formattedMatchTitle: "Czechia v Croatia"
+    };
+  }
+  if (lowerTitle.includes("england") && lowerTitle.includes("spain")) {
+    return {
+      ftScore: "2:3",
+      outcome: "Away",
+      pickText: `Away ${oddStr}`,
+      isWon: true,
+      gameId: "44945",
+      gameDate: "26/09 18:45",
+      formattedMatchTitle: "England v Spain"
+    };
+  }
+  if (lowerTitle.includes("usa") && lowerTitle.includes("peru")) {
+    return {
+      ftScore: "4:1",
+      outcome: "Home",
+      pickText: `Home ${oddStr}`,
+      isWon: true,
+      gameId: "32014",
+      gameDate: "26/09 20:30",
+      formattedMatchTitle: "USA v Peru"
+    };
+  }
+  if (lowerTitle.includes("canada") && lowerTitle.includes("chile")) {
+    return {
+      ftScore: "2:1",
+      outcome: "Yes",
+      pickText: `Yes ${oddStr}`,
+      isWon: true,
+      gameId: "48193",
+      gameDate: "26/09 23:00",
+      formattedMatchTitle: "Canada v Chile"
+    };
+  }
+  if (lowerTitle.includes("dortmund") && lowerTitle.includes("werder")) {
+    return {
+      ftScore: "2:1",
+      outcome: "Home",
+      pickText: `Home ${oddStr}`,
+      isWon: true,
+      gameId: "39101",
+      gameDate: "26/09 18:30",
+      formattedMatchTitle: "Borussia Dortmund v Werder Bremen"
+    };
+  }
+  if (lowerTitle.includes("leipzig") && lowerTitle.includes("augsburg")) {
+    return {
+      ftScore: "3:1",
+      outcome: "Home",
+      pickText: `Home ${oddStr}`,
+      isWon: true,
+      gameId: "39102",
+      gameDate: "26/09 18:30",
+      formattedMatchTitle: "RB Leipzig v FC Augsburg"
+    };
+  }
+  if (mName.toUpperCase().includes("1X2") || mName.toUpperCase() === "WINNER" || mName.toUpperCase() === "MATCH WINNER") {
+    if (sName === "1" || sName.toLowerCase() === "home" || sName.toLowerCase().includes("home")) {
+      return {
+        ftScore: "2:0",
+        outcome: "Home",
+        pickText: `Home ${oddStr}`,
+        isWon: true,
+        gameId,
+        gameDate,
+        formattedMatchTitle
+      };
+    }
+    if (sName === "2" || sName.toLowerCase() === "away" || sName.toLowerCase().includes("away")) {
+      return {
+        ftScore: "1:2",
+        outcome: "Away",
+        pickText: `Away ${oddStr}`,
+        isWon: true,
+        gameId,
+        gameDate,
+        formattedMatchTitle
+      };
+    }
+    if (sName.toUpperCase() === "X" || sName.toLowerCase() === "draw") {
+      return {
+        ftScore: "1:1",
+        outcome: "Draw",
+        pickText: `Draw ${oddStr}`,
+        isWon: true,
+        gameId,
+        gameDate,
+        formattedMatchTitle
+      };
+    }
+  }
+  if (mName.toUpperCase().includes("O/U") || mName.toLowerCase().includes("over") || mName.toLowerCase().includes("under")) {
+    if (sName.toLowerCase().includes("over")) {
+      return {
+        ftScore: "3:1",
+        outcome: sName,
+        pickText: `${sName} ${oddStr}`,
+        isWon: true,
+        gameId,
+        gameDate,
+        formattedMatchTitle
+      };
+    }
+    if (sName.toLowerCase().includes("under")) {
+      return {
+        ftScore: "1:0",
+        outcome: sName,
+        pickText: `${sName} ${oddStr}`,
+        isWon: true,
+        gameId,
+        gameDate,
+        formattedMatchTitle
+      };
+    }
+  }
+  if (mName.toUpperCase().includes("GG") || mName.toUpperCase().includes("BTTS")) {
+    if (sName.toLowerCase() === "yes" || sName.toUpperCase() === "GG") {
+      return {
+        ftScore: "2:1",
+        outcome: "Yes",
+        pickText: `Yes ${oddStr}`,
+        isWon: true,
+        gameId,
+        gameDate,
+        formattedMatchTitle
+      };
+    }
+    return {
+      ftScore: "2:0",
+      outcome: "No",
+      pickText: `No ${oddStr}`,
+      isWon: true,
+      gameId,
+      gameDate,
+      formattedMatchTitle
+    };
+  }
+  if (mName.toUpperCase().includes("DC") || mName.toLowerCase().includes("double chance")) {
+    if (sName === "1X") {
+      return {
+        ftScore: "2:0",
+        outcome: "1X",
+        pickText: `1X ${oddStr}`,
+        isWon: true,
+        gameId,
+        gameDate,
+        formattedMatchTitle
+      };
+    }
+    if (sName === "X2") {
+      return {
+        ftScore: "1:2",
+        outcome: "X2",
+        pickText: `X2 ${oddStr}`,
+        isWon: true,
+        gameId,
+        gameDate,
+        formattedMatchTitle
+      };
+    }
+    return {
+      ftScore: "2:1",
+      outcome: "12",
+      pickText: `12 ${oddStr}`,
+      isWon: true,
+      gameId,
+      gameDate,
+      formattedMatchTitle
+    };
+  }
+  return {
+    ftScore: "2:1",
+    outcome: sName,
+    pickText: `${sName} ${oddStr}`,
+    isWon: true,
+    gameId,
+    gameDate,
+    formattedMatchTitle
+  };
+}
+
+// src/server/routes/adminRoutes.ts
+var adminRouter = (0, import_express7.Router)();
+adminRouter.use(async (req, res, next) => {
+  try {
+    await connectToDatabase();
+  } catch (err) {
+  }
+  next();
+});
+adminRouter.get("/status", async (req, res) => {
+  try {
+    const status = await getMongoStatus();
+    return res.json({ success: true, ...status });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+adminRouter.post("/mongodb-uri", async (req, res) => {
+  try {
+    const { uri } = req.body;
+    if (!uri || typeof uri !== "string") {
+      return res.status(400).json({ success: false, error: "Valid MongoDB URI string is required" });
+    }
+    setCustomMongoUri(uri);
+    await connectToDatabase();
+    const status = await getMongoStatus();
+    return res.json({
+      success: true,
+      message: "MongoDB URI updated and database connected successfully!",
+      status
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+adminRouter.get("/bets", async (req, res) => {
+  try {
+    if (!isDbConnected()) {
+      return res.status(503).json({ success: false, error: "MongoDB is not connected" });
+    }
+    const bets = await BetModel.find().sort({ createdAt: -1 });
+    return res.json({
+      success: true,
+      count: bets.length,
+      bets
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+adminRouter.delete("/bets/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ success: false, error: "Bet ID or Ticket ID required" });
+    }
+    if (!isDbConnected()) {
+      return res.status(503).json({ success: false, error: "MongoDB is not connected" });
+    }
+    const result = await BetModel.deleteOne({
+      $or: [{ id }, { ticketId: id }]
+    });
+    for (const [phone, list] of db.openBets.entries()) {
+      db.openBets.set(phone, list.filter((b) => b.id !== id && b.ticketId !== id));
+    }
+    for (const [phone, list] of db.betHistory.entries()) {
+      db.betHistory.set(phone, list.filter((b) => b.id !== id && b.ticketId !== id));
+    }
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ success: false, error: `Bet ${id} not found in MongoDB` });
+    }
+    console.log(`[MongoDB Admin] Bet ${id} deleted directly from MongoDB.`);
+    return res.json({
+      success: true,
+      message: `Bet ${id} permanently deleted from MongoDB database!`,
+      deletedId: id
+    });
+  } catch (err) {
+    console.error("[Admin Delete Bet Error]", err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+adminRouter.post("/bets/mark-green", async (req, res) => {
+  try {
+    const { betId } = req.body;
+    if (!isDbConnected()) {
+      return res.status(503).json({ success: false, error: "MongoDB is not connected" });
+    }
+    const query = betId && betId !== "all" ? { $or: [{ id: betId }, { ticketId: betId }] } : {};
+    const bets = await BetModel.find(query);
+    for (const bet of bets) {
+      const updatedSelections = bet.selections.map((sel) => {
+        const details = resolveWinningPredictionDetails(sel);
+        return {
+          ...sel,
+          isWon: true,
+          predictionStatus: "won",
+          ftScore: details.ftScore,
+          outcome: details.outcome,
+          gameDate: details.gameDate
+        };
+      });
+      bet.isAllGreen = true;
+      bet.selections = updatedSelections;
+      await bet.save();
+    }
+    console.log(`[MongoDB Admin] Marked ${bets.length} bet(s) GREEN in MongoDB.`);
+    return res.json({
+      success: true,
+      message: `Marked ${bets.length} bet slip(s) GREEN in MongoDB!`,
+      updatedCount: bets.length
+    });
+  } catch (err) {
+    console.error("[Admin Mark Green Error]", err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+adminRouter.post("/bets/settle-won", async (req, res) => {
+  try {
+    const { betId } = req.body;
+    if (!isDbConnected()) {
+      return res.status(503).json({ success: false, error: "MongoDB is not connected" });
+    }
+    const query = betId && betId !== "all" ? { $or: [{ id: betId }, { ticketId: betId }], status: "open" } : { status: "open" };
+    const betsToSettle = await BetModel.find(query);
+    let totalPayout = 0;
+    for (const bet of betsToSettle) {
+      const updatedSelections = bet.selections.map((sel) => {
+        const details = resolveWinningPredictionDetails(sel);
+        return {
+          ...sel,
+          isWon: true,
+          predictionStatus: "won",
+          ftScore: details.ftScore,
+          outcome: details.outcome,
+          gameDate: details.gameDate
+        };
+      });
+      bet.status = "won";
+      bet.isAllGreen = true;
+      bet.cashoutAvailable = false;
+      bet.settledAt = (/* @__PURE__ */ new Date()).toISOString();
+      bet.winningsPaid = true;
+      bet.selections = updatedSelections;
+      await bet.save();
+      totalPayout += bet.potentialWin;
+      await TransactionModel.create({
+        id: `tx-won-${Date.now()}-${Math.floor(Math.random() * 1e3)}`,
+        transactionId: `TX-WON-${Math.floor(1e8 + Math.random() * 9e8)}`,
+        userPhone: bet.userPhone || "20******5",
+        type: "bet_won",
+        amount: bet.potentialWin,
+        currency: "GHS",
+        reference: bet.ticketId,
+        status: "completed",
+        date: (/* @__PURE__ */ new Date()).toISOString(),
+        description: `Winnings for Ticket ${bet.ticketId}`
+      });
+    }
+    let newBalance = 5e3;
+    const userDoc = await UserModel.findOne({ phone: "20******5" });
+    if (userDoc) {
+      userDoc.balance = parseFloat((userDoc.balance + totalPayout).toFixed(2));
+      await userDoc.save();
+      newBalance = userDoc.balance;
+    }
+    console.log(`[MongoDB Admin] Settled ${betsToSettle.length} bets as WON in MongoDB. Credited GHS ${totalPayout.toFixed(2)}.`);
+    return res.json({
+      success: true,
+      message: `Settled ${betsToSettle.length} bet(s) as WON! GHS ${totalPayout.toFixed(2)} credited in MongoDB.`,
+      settledCount: betsToSettle.length,
+      creditedAmount: totalPayout,
+      newBalance
+    });
+  } catch (err) {
+    console.error("[Admin Settle Won Error]", err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+adminRouter.post("/bets/reset", async (req, res) => {
+  try {
+    if (!isDbConnected()) {
+      return res.status(503).json({ success: false, error: "MongoDB is not connected" });
+    }
+    await BetModel.deleteMany({});
+    await seedDefaultDatabase();
+    const bets = await BetModel.find().sort({ createdAt: -1 });
+    console.log("[MongoDB Admin] Reset all bets to initial state in MongoDB.");
+    return res.json({
+      success: true,
+      message: "All bets reset in MongoDB database to standard live/pending state!",
+      bets
+    });
+  } catch (err) {
+    console.error("[Admin Reset Bets Error]", err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+adminRouter.post("/wallet/balance", async (req, res) => {
+  try {
+    const { balance, addAmount } = req.body;
+    if (!isDbConnected()) {
+      return res.status(503).json({ success: false, error: "MongoDB is not connected" });
+    }
+    let userDoc = await UserModel.findOne({ phone: "20******5" });
+    if (!userDoc) {
+      userDoc = await UserModel.findOne();
+    }
+    if (!userDoc) {
+      userDoc = await UserModel.create({
+        phone: "20******5",
+        firstName: "Nana",
+        lastName: "Kojo",
+        balance: 5e3,
+        currency: "GHS"
+      });
+    }
+    if (balance !== void 0) {
+      userDoc.balance = parseFloat(parseFloat(balance).toFixed(2));
+    } else if (addAmount !== void 0) {
+      userDoc.balance = parseFloat((userDoc.balance + parseFloat(addAmount)).toFixed(2));
+    }
+    await userDoc.save();
+    console.log(`[MongoDB Admin] User balance updated in MongoDB to GHS ${userDoc.balance.toFixed(2)}.`);
+    return res.json({
+      success: true,
+      message: `Balance updated in MongoDB to GHS ${userDoc.balance.toFixed(2)}!`,
+      balance: userDoc.balance
+    });
+  } catch (err) {
+    console.error("[Admin Update Balance Error]", err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // src/server/app.ts
-var app = (0, import_express7.default)();
+var app = (0, import_express8.default)();
 app.use((req, res, next) => {
   if (req.body && typeof req.body === "object" && Object.keys(req.body).length > 0) {
     req._body = true;
   }
   next();
 });
-app.use(import_express7.default.json());
-app.use(import_express7.default.urlencoded({ extended: true }));
+app.use(import_express8.default.json());
+app.use(import_express8.default.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   if (origin) {
@@ -9006,6 +9694,7 @@ app.use("/api/football", footballRouter);
 app.use("/football", footballRouter);
 app.use("/api/sports", sportsRouter);
 app.use("/sports", sportsRouter);
+app.use("/api/admin", adminRouter);
 app.use((err, req, res, next) => {
   if (err?.name === "MongooseError" || err?.name === "MongoNetworkError" || err?.message?.includes("buffering timed out")) {
     console.warn("[AI Studio] Database offline \u2014 returning mock response");
@@ -9035,7 +9724,7 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(import_express8.default.static(distPath));
+    app.use(import_express9.default.static(distPath));
     app.get("*", (req, res, next) => {
       if (req.path.startsWith("/api")) return next();
       res.sendFile(indexPath);

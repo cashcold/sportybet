@@ -1,149 +1,124 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-interface SportyBetLogoProps {
+export interface SportyBetLogoProps {
   className?: string;
-  variant?: 'white' | 'red';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  showTagline?: boolean;
+  variant?: 'white' | 'red' | 'banner';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'responsive' | 'auto' | 'full';
+  useImage?: boolean;
+  bold?: boolean;
+  src?: string;
+  fallbackSrc?: string;
+  width?: number | string;
+  height?: number | string;
+  maxHeight?: number | string;
+  maxWidth?: number | string;
+  style?: React.CSSProperties;
+  alt?: string;
 }
 
 /**
- * SportyBet Official Brand Logo
- * Matches the exact typography, stylized 'S' with top-right and bottom-left ball dots,
- * and bold rounded geometric font from official SportyBet branding.
+ * Official SportyBet Brand Logo
+ * Matches exact typography with italic athletic font, signature satellite dots,
+ * and prominent bold sizing that stands out sharply and proudly.
  */
 export const SportyBetLogo: React.FC<SportyBetLogoProps> = ({
   className = '',
   variant = 'white',
-  size = 'md',
+  size = 'responsive',
+  useImage = true,
+  bold = true,
+  src,
+  fallbackSrc,
+  width,
+  height,
+  maxHeight,
+  maxWidth,
+  style = {},
+  alt = 'SportyBet'
 }) => {
-  const textColor = variant === 'red' ? '#de1a22' : '#ffffff';
-  const dotColor = variant === 'red' ? '#de1a22' : '#ffffff';
+  const [imageError, setImageError] = useState(false);
+  const [useFallbackPng, setUseFallbackPng] = useState(false);
 
-  // Size configurations calibrated for mobile & web
-  const sizeStyles = {
-    sm: { 
-      container: 'h-5 text-[14.5px]', 
-      dot: 'w-[2.8px] h-[2.8px]', 
-      dotTop: '-top-[0.5px] -right-[1.1px]', 
-      dotBottom: '-bottom-[0.5px] -left-[1.4px]' 
-    },
-    md: { 
-      container: 'h-6 text-[17.5px]', 
-      dot: 'w-[3.4px] h-[3.4px]', 
-      dotTop: '-top-[0.5px] -right-[1.4px]', 
-      dotBottom: '-bottom-[0.5px] -left-[1.7px]' 
-    },
-    lg: { 
-      container: 'h-7 text-[20px]', 
-      dot: 'w-[3.8px] h-[3.8px]', 
-      dotTop: '-top-[1px] -right-[1.6px]', 
-      dotBottom: '-bottom-[1px] -left-[2px]' 
-    },
-    xl: { 
-      container: 'h-8 text-[23px]', 
-      dot: 'w-[4.4px] h-[4.4px]', 
-      dotTop: '-top-[1px] -right-[2px]', 
-      dotBottom: '-bottom-[1px] -left-[2.4px]' 
-    }
+  const isBanner = variant === 'banner';
+  const textColor = variant === 'red' ? '#de1a22' : '#ffffff';
+  const bgColor = isBanner ? '#de1a22' : 'transparent';
+
+  // Prominent, bold height and width mapping
+  const sizeClasses: Record<string, string> = {
+    xs: 'h-4.5 w-auto max-w-[90px]',
+    sm: 'h-5.5 w-auto max-w-[108px]',
+    md: 'h-7 w-auto max-w-[132px]',
+    lg: 'h-8 w-auto max-w-[155px]',
+    xl: 'h-9 w-auto max-w-[180px]',
+    '2xl': 'h-11 w-auto max-w-[220px]',
+    responsive: 'h-[26px] xs:h-[28px] sm:h-[30px] w-auto max-w-[125px] xs:max-w-[140px] sm:max-w-[155px]',
+    auto: 'h-auto w-auto max-w-full',
+    full: 'h-full w-full max-h-full max-w-full'
   };
 
-  const currentSize = sizeStyles[size] || sizeStyles.md;
+  const resolvedSize = sizeClasses[size] || sizeClasses.responsive;
 
+  const customStyles: React.CSSProperties = {
+    ...(height !== undefined ? { height: typeof height === 'number' ? `${height}px` : height } : {}),
+    ...(width !== undefined ? { width: typeof width === 'number' ? `${width}px` : width } : {}),
+    ...(maxHeight !== undefined ? { maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight } : {}),
+    ...(maxWidth !== undefined ? { maxWidth: typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth } : {}),
+    ...style
+  };
+
+  // Always use the user's exact uploaded image logo on transparent background
+  const defaultExactImg = '/sportybet_logo_transparent.png';
+  const defaultFallbackImg = '/sportybet_exact_logo.png';
+
+  const activeSrc = src || (useFallbackPng ? (fallbackSrc || defaultFallbackImg) : defaultExactImg);
+
+  // Clean, seamless rendering with no border shadows or color filters
+  const boldEffects = '';
+
+  if (useImage && !imageError) {
+    return (
+      <img
+        src={activeSrc}
+        alt={alt}
+        className={`object-contain shrink-0 select-none transition-all duration-150 ${resolvedSize} ${boldEffects} ${className}`}
+        style={customStyles}
+        loading="eager"
+        decoding="async"
+        onError={() => {
+          if (!useFallbackPng) {
+            setUseFallbackPng(true);
+          } else {
+            setImageError(true);
+          }
+        }}
+      />
+    );
+  }
+
+  // Exact vector fallback with bold stroke reinforcement
   return (
-    <div 
-      className={`inline-flex items-center select-none font-['Montserrat','Plus_Jakarta_Sans',system-ui,sans-serif] ${currentSize.container} ${className}`}
-      style={{
-        fontStyle: 'italic',
-        fontWeight: 800,
-        letterSpacing: '-0.025em',
-        lineHeight: 1
-      }}
-    >
-      {/* Custom Stylized 'S' with signature SportyBet top-right and bottom-left dots */}
-      <span className="relative inline-block mr-[0.5px]">
-        {/* Top-right satellite dot */}
-        <span 
-          className={`absolute ${currentSize.dotTop} ${currentSize.dot} rounded-full pointer-events-none`}
-          style={{ backgroundColor: dotColor }}
-        />
-
-        {/* Bottom-left satellite dot */}
-        <span 
-          className={`absolute ${currentSize.dotBottom} ${currentSize.dot} rounded-full pointer-events-none`}
-          style={{ backgroundColor: dotColor }}
-        />
-
-        {/* Capital 'S' */}
-        <span 
-          className="font-extrabold text-inherit"
-          style={{ color: textColor }}
-        >
-          S
-        </span>
-      </span>
-
-      {/* 'porty' in athletic geometric sans with matching bold weight */}
-      <span 
-        className="font-extrabold tracking-[-0.025em]"
-        style={{ color: textColor }}
-      >
-        porty
-      </span>
-
-      {/* 'Bet' in matching font and weight */}
-      <span 
-        className="font-extrabold tracking-[-0.025em]"
-        style={{ color: textColor }}
-      >
-        Bet
-      </span>
-    </div>
-  );
-};
-
-/**
- * Pure SVG version of the official SportyBet logo for places where vector rendering is preferred.
- */
-export const SportyBetLogoSvg: React.FC<{
-  className?: string;
-  fill?: string;
-  height?: number;
-}> = ({
-  className = 'h-5 w-auto',
-  fill = '#ffffff',
-  height = 20
-}) => {
-  return (
-    <svg 
-      height={height} 
-      viewBox="0 0 150 26" 
-      fill="none" 
+    <svg
       xmlns="http://www.w3.org/2000/svg"
-      className={`select-none ${className}`}
-      aria-label="SportyBet"
+      viewBox="0 0 279 66"
+      preserveAspectRatio="xMinYMid meet"
+      className={`shrink-0 select-none ${resolvedSize} ${className}`}
+      style={customStyles}
+      aria-label={alt}
     >
-      <g transform="skewX(-7) translate(3, 0)">
-        {/* S top-right dot */}
-        <circle cx="16" cy="5.5" r="2.1" fill={fill} />
-        
-        {/* S bottom-left dot */}
-        <circle cx="2" cy="19.5" r="2.1" fill={fill} />
-
-        {/* Text rendered with Montserrat/Plus Jakarta Sans extra bold */}
-        <text
-          x="3"
-          y="20.5"
-          fill={fill}
-          fontFamily="'Montserrat', 'Plus Jakarta Sans', system-ui, sans-serif"
-          fontWeight="800"
-          fontSize="19"
-          letterSpacing="-0.025em"
-          fontStyle="italic"
-        >
-          SportyBet
-        </text>
-      </g>
+      {isBanner && (
+        <rect width="100%" height="100%" fill={bgColor} rx="4" />
+      )}
+      <circle cx="53.1" cy="20.1" r={bold ? "4.4" : "4"} fill={textColor} />
+      <circle cx="17.4" cy="48.3" r={bold ? "4.4" : "4"} fill={textColor} />
+      <path
+        d="M35.44 50.77Q30.93 50.77 27.11 49.81Q23.30 48.85 20.90 47.36L25.26 39.01Q28.10 40.64 30.95 41.38Q33.81 42.13 36.59 42.13Q38.80 42.13 39.93 41.60Q41.06 41.07 41.06 40.16Q41.06 39.25 39.90 38.74Q38.75 38.24 36.93 37.81Q35.10 37.38 33.06 36.78Q31.02 36.18 29.20 35.19Q27.38 34.21 26.22 32.53Q25.07 30.85 25.07 28.26Q25.07 24.42 27.11 21.58Q29.15 18.75 32.97 17.19Q36.78 15.63 42.06 15.63Q45.81 15.63 49.05 16.38Q52.29 17.12 54.64 18.51L50.56 26.77Q48.54 25.52 46.17 24.90Q43.79 24.27 41.34 24.27Q38.85 24.27 37.62 24.97Q36.40 25.66 36.40 26.53Q36.40 27.44 37.55 27.97Q38.70 28.50 40.53 28.90Q42.35 29.31 44.42 29.89Q46.48 30.46 48.30 31.42Q50.13 32.38 51.28 34.02Q52.43 35.65 52.43 38.24Q52.43 41.98 50.37 44.79Q48.30 47.60 44.49 49.18Q40.67 50.77 35.44 50.77 M70.41 50.48Q68.01 50.48 66.06 49.74Q64.12 48.99 62.92 47.22L60.47 59.31L49.62 59.31L56.73 23.74L66.95 23.74L66.47 26.14Q69.40 23.26 73.58 23.26Q76.22 23.26 78.69 24.68Q81.16 26.10 82.77 28.78Q84.38 31.47 84.38 35.41Q84.38 38.62 83.27 41.38Q82.17 44.14 80.22 46.18Q78.28 48.22 75.76 49.35Q73.24 50.48 70.41 50.48M68.63 41.94Q70.74 41.94 72.06 40.30Q73.38 38.67 73.38 35.94Q73.38 34.11 72.35 32.96Q71.32 31.81 69.50 31.81Q67.38 31.81 66.06 33.44Q64.74 35.07 64.74 37.81Q64.74 39.63 65.78 40.78Q66.81 41.94 68.63 41.94 M98.70 50.48Q94.38 50.48 91.17 48.97Q87.95 47.46 86.20 44.72Q84.45 41.98 84.45 38.34Q84.45 34.02 86.56 30.61Q88.67 27.20 92.37 25.23Q96.06 23.26 100.82 23.26Q105.18 23.26 108.38 24.78Q111.57 26.29 113.32 29Q115.07 31.71 115.07 35.41Q115.07 39.73 112.96 43.14Q110.85 46.54 107.18 48.51Q103.50 50.48 98.70 50.48M99.33 42.03Q101.44 42.03 102.76 40.38Q104.08 38.72 104.08 35.94Q104.08 34.26 103.07 32.98Q102.06 31.71 100.19 31.71Q98.08 31.71 96.76 33.37Q95.44 35.02 95.44 37.81Q95.44 39.68 96.47 40.86Q97.50 42.03 99.33 42.03 M124.79 50L113.94 50L119.18 23.74L129.40 23.74L128.87 26.43Q130.55 24.75 132.93 24.01Q135.30 23.26 138.09 23.26L136.17 32.86Q134.97 32.67 133.82 32.67Q131.13 32.67 129.47 33.87Q127.82 35.07 127.24 37.86 M146.61 50.48Q143.25 50.48 140.90 49.23Q138.54 47.98 137.58 45.56Q136.62 43.14 137.30 39.73L138.93 31.66L135.28 31.66L136.86 23.74L140.46 23.74L141.66 17.84L152.51 17.84L151.31 23.74L156.69 23.74L155.10 31.66L149.73 31.66L148.14 39.68Q147.90 41.02 148.43 41.65Q148.96 42.27 150.06 42.27Q150.74 42.27 151.29 42.10Q151.84 41.94 152.46 41.65L153.71 48.94Q152.22 49.76 150.38 50.12Q148.53 50.48 146.61 50.48 M158.63 59.79Q156.47 59.79 154.34 59.17Q152.20 58.54 150.90 57.54L155.61 50Q156.42 50.62 157.43 51.01Q158.44 51.39 159.54 51.39Q161.18 51.39 162.23 50.29L156.47 23.74L167.27 23.74L169.96 37.86L178.22 23.74L188.82 23.74L172.70 50.53Q170.54 54.13 168.47 56.14Q166.41 58.16 164.03 58.98Q161.66 59.79 158.63 59.79 M203.15 50L183.76 50L190.48 16.40L208.29 16.40Q214.29 16.40 217.31 18.49Q220.34 20.58 220.34 24.42Q220.34 27.34 218.73 29.43Q217.12 31.52 214.34 32.72Q216.50 33.68 217.67 35.34Q218.85 36.99 218.85 39.30Q218.85 42.99 216.71 45.37Q214.58 47.74 211.02 48.87Q207.47 50 203.15 50M197.54 36.80L196.48 42.08L203.78 42.08Q205.46 42.08 206.54 41.31Q207.62 40.54 207.62 39.01Q207.62 37.90 206.78 37.35Q205.94 36.80 204.83 36.80L197.54 36.80M200.03 24.32L199.02 29.31L204.78 29.31Q206.75 29.31 207.64 28.52Q208.53 27.73 208.53 26.38Q208.53 25.33 207.74 24.82Q206.94 24.32 205.55 24.32 M234.38 50.48Q230.06 50.48 226.82 48.99Q223.58 47.50 221.75 44.77Q219.93 42.03 219.93 38.34Q219.93 34.02 221.94 30.61Q223.96 27.20 227.63 25.23Q231.30 23.26 236.20 23.26Q240.42 23.26 243.40 24.75Q246.38 26.24 247.96 28.83Q249.54 31.42 249.54 34.83Q249.54 36.03 249.38 37.18Q249.21 38.34 248.97 39.39L230.58 39.39Q230.92 41.02 232.19 41.74Q233.46 42.46 235.62 42.46Q237.11 42.46 238.60 42.01Q240.09 41.55 241.34 40.64L245.85 47.22Q243.16 49.04 240.26 49.76Q237.35 50.48 234.38 50.48M231.02 34.16L239.61 34.16Q239.61 32.53 238.53 31.59Q237.45 30.66 235.72 30.66Q233.85 30.66 232.72 31.64Q231.59 32.62 231.02 34.16 M260.61 50.48Q257.25 50.48 254.90 49.23Q252.54 47.98 251.58 45.56Q250.62 43.14 251.30 39.73L252.93 31.66L249.28 31.66L250.86 23.74L254.46 23.74L255.66 17.84L266.51 17.84L265.31 23.74L270.69 23.74L269.10 31.66L263.73 31.66L262.14 39.68Q261.90 41.02 262.43 41.65Q262.96 42.27 264.06 42.27Q264.74 42.27 265.29 42.10Q265.84 41.94 266.46 41.65L267.71 48.94Q266.22 49.76 264.38 50.12Q262.53 50.48 260.61 50.48"
+        fill={textColor}
+        stroke={bold ? textColor : undefined}
+        strokeWidth={bold ? "1.2" : undefined}
+        strokeLinejoin="round"
+      />
     </svg>
   );
 };
+
+export const SportyBetLogoSvg = SportyBetLogo;
