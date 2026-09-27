@@ -39,13 +39,52 @@ authRouter.post('/register', async (req: Request, res: Response) => {
       console.warn('[Register DB connect skipped]', e);
     }
 
-    const { phone, password, firstName, lastName, email } = req.body || {};
+    const { phone, password, firstName, lastName, dateOfBirth, email } = req.body || {};
 
     if (!phone || !String(phone).trim()) {
       return res.status(400).json({ success: false, error: 'Phone number is required' });
     }
 
     const cleanPhone = String(phone).trim();
+
+    // Date of Birth & 18+ Age Verification (Gaming Commission of Ghana Act 721)
+    let formattedDob = '15/05/1998';
+    if (dateOfBirth && String(dateOfBirth).trim()) {
+      const rawDob = String(dateOfBirth).trim();
+      let birthDate: Date | null = null;
+
+      if (rawDob.includes('-')) {
+        const parts = rawDob.split('-');
+        if (parts.length === 3) {
+          birthDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+          formattedDob = `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+        }
+      } else if (rawDob.includes('/')) {
+        const parts = rawDob.split('/');
+        if (parts.length === 3) {
+          birthDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+          formattedDob = rawDob;
+        }
+      } else {
+        birthDate = new Date(rawDob);
+        formattedDob = rawDob;
+      }
+
+      if (birthDate && !isNaN(birthDate.getTime())) {
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        if (age < 18) {
+          return res.status(400).json({
+            success: false,
+            error: 'You must be at least 18 years old to register under Gaming Commission of Ghana regulations.'
+          });
+        }
+      }
+    }
 
     // Check if user already exists in MongoDB
     if (isDbConnected()) {
@@ -90,7 +129,7 @@ authRouter.post('/register', async (req: Request, res: Response) => {
           username: userBaseName,
           firstName: userFirstName,
           lastName: userLastName,
-          dateOfBirth: '15/05/1998',
+          dateOfBirth: formattedDob,
           location: 'Ghana',
           email: email || '',
           isEmailVerified: false,
@@ -129,7 +168,7 @@ authRouter.post('/register', async (req: Request, res: Response) => {
           phone: cleanPhone,
           firstName: userFirstName,
           lastName: userLastName,
-          dateOfBirth: '15/05/1998',
+          dateOfBirth: formattedDob,
           location: 'Ghana',
           email: email || '',
           isEmailVerified: false,

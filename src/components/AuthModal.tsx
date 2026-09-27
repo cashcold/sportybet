@@ -38,8 +38,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('2000-01-15');
   const [loading, setLoading] = useState(false);
   const [rawErrorMessage, setRawErrorMessage] = useState<string | null>(null);
+
+  const maxDobDate = (() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 18);
+    return d.toISOString().split('T')[0];
+  })();
 
   const errorMessage = sanitizeError(rawErrorMessage);
   const setErrorMessage = (msg: string | null) => setRawErrorMessage(sanitizeError(msg));
@@ -109,10 +116,38 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
     e.preventDefault();
     setErrorMessage(null);
 
-    if (mode === 'join' && (!firstName.trim() || !lastName.trim())) {
-      showToast('Please enter your First Name and Last Name');
-      setErrorMessage('First Name and Last Name are required for registration');
-      return;
+    if (mode === 'join') {
+      if (!firstName.trim() || !lastName.trim()) {
+        showToast('Please enter your First Name and Last Name');
+        setErrorMessage('First Name and Last Name are required for registration');
+        return;
+      }
+
+      if (!dateOfBirth) {
+        showToast('Please enter your Date of Birth (18+ required)');
+        setErrorMessage('Date of Birth is required for 18+ age verification under Ghanaian law');
+        return;
+      }
+
+      const birthDate = new Date(dateOfBirth);
+      if (isNaN(birthDate.getTime())) {
+        showToast('Please enter a valid Date of Birth');
+        setErrorMessage('Invalid Date of Birth format');
+        return;
+      }
+
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      if (age < 18) {
+        showToast('You must be at least 18 years old to register');
+        setErrorMessage('Under Ghanaian Gaming Commission regulations, you must be 18 years or older to register.');
+        return;
+      }
     }
 
     if (!phone.trim()) {
@@ -133,7 +168,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
 
     try {
       if (mode === 'join') {
-        const res = await register(formattedPhone, password, firstName.trim(), lastName.trim());
+        const res = await register(formattedPhone, password, firstName.trim(), lastName.trim(), dateOfBirth);
         if (res.success) {
           onClose();
         } else {
@@ -324,32 +359,58 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
           )}
 
           {mode === 'join' && (
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="text-[11px] font-bold text-neutral-300 block mb-1">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="e.g. Kwame"
-                  className="w-full bg-[#121922] border border-[#2c3848] rounded px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#00df59]"
-                />
+            <>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[11px] font-bold text-neutral-300 block mb-1">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="e.g. Kwame"
+                    className="w-full bg-[#121922] border border-[#2c3848] rounded px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#00df59]"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-neutral-300 block mb-1">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="e.g. Mensah"
+                    className="w-full bg-[#121922] border border-[#2c3848] rounded px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#00df59]"
+                    required
+                  />
+                </div>
               </div>
+
               <div>
-                <label className="text-[11px] font-bold text-neutral-300 block mb-1">
-                  Last Name
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[11px] font-bold text-neutral-300">
+                    Date of Birth
+                  </label>
+                  <span className="text-[10px] text-amber-400 font-bold bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20">
+                    18+ Required
+                  </span>
+                </div>
                 <input
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  placeholder="e.g. Mensah"
-                  className="w-full bg-[#121922] border border-[#2c3848] rounded px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#00df59]"
+                  type="date"
+                  value={dateOfBirth}
+                  max={maxDobDate}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  className="w-full bg-[#121922] border border-[#2c3848] rounded px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#00df59] [color-scheme:dark]"
+                  required
                 />
+                <p className="text-[10px] text-neutral-400 mt-1">
+                  Gaming Commission of Ghana Act 721 compliance: players must be 18+ to register.
+                </p>
               </div>
-            </div>
+            </>
           )}
 
           <div>

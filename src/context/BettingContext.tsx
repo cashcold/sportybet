@@ -49,7 +49,7 @@ interface BettingContextType {
   updateUsername: (name: string) => void;
   updateProfile: (updates: Partial<UserProfile>) => void;
   login: (phone?: string, password?: string) => Promise<{ success: boolean; error?: string }>;
-  register: (phone: string, password?: string, firstName?: string, lastName?: string) => Promise<{ success: boolean; error?: string }>;
+  register: (phone: string, password?: string, firstName?: string, lastName?: string, dateOfBirth?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   loadBookingCode: (code: string) => Promise<boolean>;
   generateBookingCode: () => Promise<string | null>;
@@ -865,16 +865,17 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return { success: true };
   };
 
-  const register = async (phone: string, password?: string, firstName?: string, lastName?: string): Promise<{ success: boolean; error?: string }> => {
+  const register = async (phone: string, password?: string, firstName?: string, lastName?: string, dateOfBirth?: string): Promise<{ success: boolean; error?: string }> => {
     const cleanPhone = phone.trim();
     const cleanFirst = firstName && firstName.trim() ? firstName.trim().toUpperCase() : 'USER';
     const cleanLast = lastName && lastName.trim() ? lastName.trim().toUpperCase() : cleanPhone.slice(-4);
+    const cleanDob = dateOfBirth && dateOfBirth.trim() ? dateOfBirth.trim() : '15/05/1998';
     const baseUsername = (firstName && lastName)
       ? `${firstName.trim().toLowerCase()}_${lastName.trim().toLowerCase()}`
       : `user_${cleanPhone.slice(-4)}`;
 
     try {
-      const res = await api.auth.register(cleanPhone, password, cleanFirst, cleanLast);
+      const res = await api.auth.register(cleanPhone, password, cleanFirst, cleanLast, cleanDob);
       if (res.success && res.user) {
         setUser(res.user);
         const displayName = res.user.firstName ? `${res.user.firstName} ${res.user.lastName || ''}`.trim() : (res.user.username || 'User');
@@ -903,7 +904,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       phone: cleanPhone,
       firstName: cleanFirst,
       lastName: cleanLast,
-      dateOfBirth: '15/05/1998',
+      dateOfBirth: cleanDob,
       location: 'Ghana',
       email: '',
       isEmailVerified: false,

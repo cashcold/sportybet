@@ -74,13 +74,13 @@ export const api = {
       }
     },
 
-    async register(phone: string, password?: string, firstName?: string, lastName?: string): Promise<{ success: boolean; user?: UserProfile; token?: string; message?: string; error?: string }> {
+    async register(phone: string, password?: string, firstName?: string, lastName?: string, dateOfBirth?: string): Promise<{ success: boolean; user?: UserProfile; token?: string; message?: string; error?: string }> {
       const endpoint = '/auth/register';
       try {
         const res = await fetch(resolveApiUrl(endpoint), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, password, firstName, lastName })
+          body: JSON.stringify({ phone, password, firstName, lastName, dateOfBirth })
         });
         const data = await parseJsonResponse(res, endpoint);
         if (data.token) {
