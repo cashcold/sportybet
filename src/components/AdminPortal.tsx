@@ -22,13 +22,20 @@ import {
   ChevronDown,
   Trash2,
   Database,
-  Server
+  Server,
+  Plane,
+  Gauge,
+  Compass,
+  Radio,
+  Flame
 } from 'lucide-react';
 import { useBetting } from '../context/BettingContext';
 import { PlacedBet } from '../types';
 import { TicketDetailsModal } from './TicketDetailsModal';
 import { resolveWinningPredictionDetails } from '../utils/predictionHelper';
 import { api } from '../services/api';
+import { AdminAviatorControl } from './AdminAviatorControl';
+import { aviatorEngine, AviatorEngineState } from '../services/aviatorEngine';
 
 interface AdminPortalProps {
   onBackToApp: () => void;
@@ -46,7 +53,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
     markSingleBetGreen,
     resetBetsGreenState,
     deleteBetFromMongo,
-    syncWithMongo
+    syncWithMongo,
+    setActiveTab
   } = useBetting();
 
   const ADMIN_PASSWORD = 'admin12345@';
@@ -59,11 +67,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<PlacedBet | null>(null);
   const [creditAmount, setCreditAmount] = useState('');
-  const [activeAdminTab, setActiveAdminTab] = useState<'bets' | 'wallet' | 'mongodb'>('bets');
+  const [activeAdminTab, setActiveAdminTab] = useState<'bets' | 'wallet' | 'mongodb' | 'aviator'>('bets');
   const [isSyncing, setIsSyncing] = useState(false);
   const [mongoStatus, setMongoStatus] = useState<any>(null);
   const [mongoUriInput, setMongoUriInput] = useState('');
   const [isUpdatingMongoUri, setIsUpdatingMongoUri] = useState(false);
+  const [aviatorState, setAviatorState] = useState<AviatorEngineState>(aviatorEngine.getState());
+
+  useEffect(() => {
+    const unsub = aviatorEngine.subscribe(setAviatorState);
+    return unsub;
+  }, []);
 
   // Load MongoDB Status
   const fetchMongoStatus = async () => {
@@ -194,10 +208,41 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
 
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-4">
+            {/* Live Aviator Signal Badge on Lock Screen */}
+            <div className="bg-[#101722] border border-red-500/40 rounded-xl p-3 text-xs flex items-center justify-between shadow-inner">
+              <div className="flex items-center space-x-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+                <span className="font-black text-white uppercase text-[11px] flex items-center space-x-1">
+                  <Plane className="w-3.5 h-3.5 text-red-500" />
+                  <span>Aviator Signal</span>
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className={`font-black text-sm ${aviatorState.nextRound.sign.textClass}`}>
+                  {aviatorState.nextRound.crashPoint.toFixed(2)}x
+                </span>
+                <span className="text-[10px] text-neutral-400 font-bold">
+                  ({aviatorState.nextRound.estimatedDurationSec.toFixed(1)}s)
+                </span>
+                <span className={`px-1.5 py-0.2 rounded text-[9px] font-black uppercase ${aviatorState.nextRound.sign.textClass} bg-black/40`}>
+                  {aviatorState.nextRound.sign.badgeText}
+                </span>
+              </div>
+            </div>
+
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-neutral-300 block">
-                Admin Password
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-neutral-300 block">
+                  Admin Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setPasswordInput(ADMIN_PASSWORD)}
+                  className="text-[10px] text-[#00df59] hover:underline cursor-pointer"
+                >
+                  Quick Autofill Password
+                </button>
+              </div>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -304,8 +349,101 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
 
       {/* Main Content Area */}
       <div className="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-5 space-y-4">
-        {/* KPI Stat Cards (Direct from MongoDB) */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+        {/* ========================================================= */}
+        {/* TOP HIGHLIGHT: AVIATOR LIVE SIGNAL & FLY SPEED RADAR BAR   */}
+        {/* ========================================================= */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#1b1128] via-[#141d2d] to-[#0f1724] border-2 border-red-500/50 p-4 sm:p-5 shadow-2xl space-y-3.5">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex items-center space-x-3.5">
+              <div className="w-12 h-12 rounded-xl bg-red-600/20 border border-red-500/50 flex items-center justify-center text-red-500 shrink-0 shadow-inner">
+                <Plane className="w-7 h-7 stroke-[2.2] animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+                  <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                    AVIATOR LIVE SIGNAL (RADAR FEED)
+                  </h2>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30">
+                    Next Flight: {aviatorState.nextRound.roundId}
+                  </span>
+                  {aviatorState.adminOverrideActive && (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                      Rigged
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-neutral-300 flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
+                  <span>
+                    Next Multiplier Signal:{' '}
+                    <strong className={`text-base font-black ${aviatorState.nextRound.sign.textClass}`}>
+                      {aviatorState.nextRound.crashPoint.toFixed(2)}x
+                    </strong>{' '}
+                    <span className="text-neutral-400">({aviatorState.nextRound.sign.label})</span>
+                  </span>
+                  <span className="text-neutral-500">•</span>
+                  <span>
+                    Plane Fly Speed:{' '}
+                    <strong className="text-sky-300 font-bold">
+                      {aviatorState.nextRound.estimatedDurationSec.toFixed(1)}s
+                    </strong>{' '}
+                    <span className="text-neutral-400">({aviatorState.nextRound.speedLabel})</span>
+                  </span>
+                  <span className="text-neutral-500">•</span>
+                  <span>
+                    Trend Signal:{' '}
+                    <strong className="text-white">
+                      {aviatorState.nextRound.sign.trend} {aviatorState.nextRound.sign.trendIcon}
+                    </strong>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2 shrink-0 self-end md:self-center">
+              <button
+                onClick={() => setActiveAdminTab('aviator')}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-extrabold text-xs rounded-xl shadow-lg flex items-center space-x-1.5 transition-all cursor-pointer"
+              >
+                <Gauge className="w-4 h-4" />
+                <span>Open Aviator Master Radar</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Signal Presets Row */}
+          <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
+              Quick Force Signal:
+            </span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {[
+                { label: '1.05x Trap', val: 1.05, color: 'text-rose-400 border-rose-500/40 bg-rose-950/30' },
+                { label: '1.85x Blue', val: 1.85, color: 'text-sky-400 border-sky-500/40 bg-sky-950/30' },
+                { label: '2.75x Purple', val: 2.75, color: 'text-purple-400 border-purple-500/40 bg-purple-950/30' },
+                { label: '5.50x Cloud', val: 5.50, color: 'text-purple-300 border-purple-400/40 bg-purple-900/30' },
+                { label: '12.00x Rocket', val: 12.0, color: 'text-pink-400 border-pink-500/40 bg-pink-950/30' },
+                { label: '50.00x Mega', val: 50.0, color: 'text-amber-400 border-amber-500/40 bg-amber-950/30' }
+              ].map((item) => (
+                <button
+                  key={item.val}
+                  type="button"
+                  onClick={() => {
+                    aviatorEngine.overrideNextRound({ crashPoint: item.val });
+                    showToast(`Next Aviator signal rigged to ${item.val.toFixed(2)}x!`);
+                  }}
+                  className={`px-2 py-1 rounded text-[11px] font-black border transition-all hover:scale-105 active:scale-95 cursor-pointer ${item.color}`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* KPI Stat Cards (Direct from MongoDB & Aviator Engine) */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 sm:gap-3">
           {/* Card 1: MongoDB Database Status */}
           <div className="bg-[#151f2b] border border-[#243346] rounded-xl p-3.5 space-y-1">
             <div className="text-[11px] text-neutral-400 font-bold uppercase tracking-wider flex items-center justify-between">
@@ -343,6 +481,34 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
             </div>
             <div className="text-xl font-black text-[#00df59]">
               GHS {user.balance.toFixed(2)}
+            </div>
+          </div>
+
+          {/* Card 5: Next Aviator Plane Speed & Sign */}
+          <div
+            onClick={() => setActiveAdminTab('aviator')}
+            className="bg-gradient-to-br from-[#1a1226] to-[#121927] border border-red-500/40 rounded-xl p-3.5 space-y-1 cursor-pointer hover:border-red-400 transition-all shadow-md group col-span-2 sm:col-span-1"
+          >
+            <div className="text-[11px] text-red-400 font-black uppercase tracking-wider flex items-center justify-between">
+              <span className="flex items-center space-x-1">
+                <Plane className="w-3 h-3 text-red-500 group-hover:translate-x-0.5 transition-transform" />
+                <span>Aviator Signal</span>
+              </span>
+              <span className="text-[9px] px-1 py-0.2 bg-red-600/30 text-red-300 rounded font-bold">LIVE</span>
+            </div>
+            <div className="flex items-baseline space-x-1.5">
+              <span className={`text-xl font-black ${aviatorState.nextRound.sign.textClass}`}>
+                {aviatorState.nextRound.crashPoint.toFixed(2)}x
+              </span>
+              <span className="text-[10px] text-neutral-400 font-bold truncate">
+                {aviatorState.nextRound.estimatedDurationSec.toFixed(1)}s
+              </span>
+            </div>
+            <div className="text-[10px] text-neutral-400 truncate flex items-center space-x-1">
+              <span>Sign:</span>
+              <span className={`font-black ${aviatorState.nextRound.sign.textClass} truncate`}>
+                {aviatorState.nextRound.sign.badgeText} ({aviatorState.nextRound.sign.trend})
+              </span>
             </div>
           </div>
         </div>
@@ -440,6 +606,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
             }`}
           >
             MongoDB Status & Cluster
+          </button>
+
+          <button
+            onClick={() => setActiveAdminTab('aviator')}
+            className={`py-2 px-4 rounded-t-lg transition-colors cursor-pointer border-b-2 flex items-center space-x-1.5 ${
+              activeAdminTab === 'aviator'
+                ? 'border-red-500 text-red-400 bg-[#1e1525]'
+                : 'border-transparent text-neutral-400 hover:text-white'
+            }`}
+          >
+            <Plane className="w-3.5 h-3.5" />
+            <span>Aviator Signal & Radar ({aviatorState.nextRound.crashPoint.toFixed(2)}x)</span>
           </button>
         </div>
 
@@ -786,6 +964,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
               </div>
             </form>
           </div>
+        )}
+
+        {/* TAB 4: AVIATOR RADAR & NEXT FLIGHT PREDICTOR */}
+        {activeAdminTab === 'aviator' && (
+          <AdminAviatorControl
+            onShowToast={showToast}
+            onNavigateToGame={() => {
+              setActiveTab('games');
+              onBackToApp();
+            }}
+          />
         )}
       </div>
 

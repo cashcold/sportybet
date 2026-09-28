@@ -298,3 +298,62 @@ adminRouter.post('/wallet/balance', async (req: Request, res: Response) => {
     return res.status(500).json({ success: false, error: err.message });
   }
 });
+
+// In-memory Aviator master control state for backend sync
+let serverAviatorState = {
+  currentRoundNumber: 4892,
+  nextCrashPoint: 2.75,
+  nextSpeedMultiplier: 1.0,
+  nextSignTier: 'PURPLE_SIGN',
+  isOverridden: false,
+  updatedAt: new Date().toISOString()
+};
+
+// 9. GET /api/admin/aviator/next-round - Get planned next Aviator fly speed, crash point, and sign
+adminRouter.get('/aviator/next-round', (req: Request, res: Response) => {
+  const duration = parseFloat((Math.pow(Math.max(0.01, serverAviatorState.nextCrashPoint - 1.0), 1 / 1.42) / (0.72 * serverAviatorState.nextSpeedMultiplier)).toFixed(2));
+  return res.json({
+    success: true,
+    roundId: `SB-AV-${serverAviatorState.currentRoundNumber + 1}`,
+    crashPoint: serverAviatorState.nextCrashPoint,
+    speedMultiplier: serverAviatorState.nextSpeedMultiplier,
+    estimatedDurationSec: duration,
+    signTier: serverAviatorState.nextSignTier,
+    isOverridden: serverAviatorState.isOverridden,
+    updatedAt: serverAviatorState.updatedAt
+  });
+});
+
+// 10. POST /api/admin/aviator/override - Force next Aviator fly speed and crash multiplier
+adminRouter.post('/aviator/override', (req: Request, res: Response) => {
+  const { crashPoint, speedMultiplier } = req.body;
+  if (crashPoint && !isNaN(parseFloat(crashPoint))) {
+    serverAviatorState.nextCrashPoint = parseFloat(parseFloat(crashPoint).toFixed(2));
+    serverAviatorState.isOverridden = true;
+  }
+  if (speedMultiplier && !isNaN(parseFloat(speedMultiplier))) {
+    serverAviatorState.nextSpeedMultiplier = parseFloat(parseFloat(speedMultiplier).toFixed(2));
+  }
+  serverAviatorState.updatedAt = new Date().toISOString();
+
+  return res.json({
+    success: true,
+    message: `Next Aviator flight set to ${serverAviatorState.nextCrashPoint}x at ${serverAviatorState.nextSpeedMultiplier}x speed!`,
+    state: serverAviatorState
+  });
+});
+
+// 11. POST /api/admin/aviator/reset - Reset to algorithmic natural Aviator outcome
+adminRouter.post('/aviator/reset', (req: Request, res: Response) => {
+  serverAviatorState.nextCrashPoint = parseFloat((1.15 + Math.random() * 2.8).toFixed(2));
+  serverAviatorState.nextSpeedMultiplier = 1.0;
+  serverAviatorState.isOverridden = false;
+  serverAviatorState.updatedAt = new Date().toISOString();
+
+  return res.json({
+    success: true,
+    message: 'Reset Aviator engine to natural RNG distribution.',
+    state: serverAviatorState
+  });
+});
+

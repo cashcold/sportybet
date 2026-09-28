@@ -537,6 +537,42 @@ export const api = {
       } catch (err: any) {
         return { success: false, error: formatFetchError(err, endpoint) };
       }
+    },
+
+    async getAviatorNextRound(): Promise<{ success: boolean; roundId?: string; crashPoint?: number; speedMultiplier?: number; estimatedDurationSec?: number; signTier?: string; isOverridden?: boolean; error?: string }> {
+      const endpoint = '/api/admin/aviator/next-round';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint));
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    },
+
+    async overrideAviatorNextRound(crashPoint: number, speedMultiplier?: number): Promise<{ success: boolean; message?: string; error?: string }> {
+      const endpoint = '/api/admin/aviator/override';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ crashPoint, speedMultiplier })
+        });
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    },
+
+    async resetAviatorEngine(): Promise<{ success: boolean; message?: string; error?: string }> {
+      const endpoint = '/api/admin/aviator/reset';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint), {
+          method: 'POST'
+        });
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
     }
   },
 

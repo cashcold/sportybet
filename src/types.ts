@@ -75,6 +75,7 @@ export interface PlacedBet {
   cashoutAmount?: number;
   canRebet?: boolean;
   isAllGreen?: boolean;
+  placedAt?: string;
   settledAt?: string;
   winningsPaid?: boolean;
 }

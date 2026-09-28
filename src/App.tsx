@@ -29,7 +29,8 @@ const MainContent: React.FC = () => {
     if (typeof window !== 'undefined') {
       const path = window.location.pathname.toLowerCase();
       const hash = window.location.hash.toLowerCase();
-      return path.startsWith('/admin') || hash === '#/admin' || hash === '#admin';
+      const search = window.location.search.toLowerCase();
+      return path.startsWith('/admin') || hash === '#/admin' || hash === '#admin' || search.includes('admin');
     }
     return false;
   });
@@ -38,7 +39,8 @@ const MainContent: React.FC = () => {
     const handleLocationCheck = () => {
       const path = window.location.pathname.toLowerCase();
       const hash = window.location.hash.toLowerCase();
-      setIsAdminRoute(path.startsWith('/admin') || hash === '#/admin' || hash === '#admin');
+      const search = window.location.search.toLowerCase();
+      setIsAdminRoute(path.startsWith('/admin') || hash === '#/admin' || hash === '#admin' || search.includes('admin'));
     };
 
     window.addEventListener('popstate', handleLocationCheck);

@@ -792,12 +792,13 @@ function renderFooter(
         <span>|</span>
         <button 
           onClick={() => {
+            window.location.hash = '#admin';
             window.history.pushState(null, '', '/admin');
             window.dispatchEvent(new PopStateEvent('popstate'));
           }} 
-          className="text-[#00df59] font-bold hover:underline cursor-pointer"
+          className="text-red-400 font-extrabold hover:text-red-300 hover:underline cursor-pointer flex items-center space-x-1"
         >
-          Admin Portal (/admin)
+          <span>🚀 Admin Portal & Aviator Signal</span>
         </button>
       </div>
 
