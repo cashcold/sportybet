@@ -93,6 +93,35 @@ export const OpenBetsView: React.FC = () => {
     }));
   };
 
+  // Bet History accordion state: collapsed by default, only drops down details on click like open bets
+  const [expandedHistoryIds, setExpandedHistoryIds] = useState<Record<string, boolean>>({});
+
+  const toggleExpandHistoryBet = (betId: string) => {
+    setExpandedHistoryIds((prev) => ({
+      ...prev,
+      [betId]: !prev[betId]
+    }));
+  };
+
+  const parseBetDate = (bet: PlacedBet) => {
+    if (bet.date) {
+      const parts = bet.date.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        return { day: parts[0], month: parts[1] };
+      }
+    }
+    if (bet.placedAt) {
+      const d = new Date(bet.placedAt);
+      if (!isNaN(d.getTime())) {
+        return {
+          day: d.getDate().toString(),
+          month: d.toLocaleString('en-US', { month: 'short' })
+        };
+      }
+    }
+    return { day: '24', month: 'Sep' };
+  };
+
   // Live Match Simulation (SIM) state matching SportyBet video
   const [simulatingBet, setSimulatingBet] = useState<PlacedBet | null>(null);
   const [simMatchData, setSimMatchData] = useState<{
@@ -860,65 +889,261 @@ export const OpenBetsView: React.FC = () => {
                 </button>
               </div>
             ) : (
-              activeBetHistory.map((item) => (
-                <div key={item.id} className="flex items-start space-x-3">
-                  {/* Left Date Column: 24 Sep */}
-                  <div className="text-center shrink-0 w-10 pt-1">
-                    <div className="text-2xl font-black text-white leading-none">24</div>
-                    <div className="text-[11px] text-neutral-400 mt-0.5">Sep</div>
-                  </div>
+              activeBetHistory.map((item) => {
+                const isExpanded = !!expandedHistoryIds[item.id];
+                const dateParts = parseBetDate(item);
 
-                  {/* Right Ticket Card */}
-                  <div
-                    onClick={() => setSelectedDetailBet(item)}
-                    className="flex-1 bg-[#18222f] border border-[#243243] rounded-md overflow-hidden shadow cursor-pointer hover:border-[#00df59]/40 transition-colors"
-                  >
-                    {/* Top Dark Green Banner: Multiple | 🏆 Won > */}
-                    <div className="bg-[#153a23] px-3 py-2 flex items-center justify-between border-b border-emerald-900/40 text-xs">
-                      <span className="font-bold text-white">{item.type}</span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedDetailBet(item);
-                        }}
-                        className="flex items-center space-x-1 text-[#00df59] font-black hover:underline cursor-pointer"
-                      >
-                        <Trophy className="w-3.5 h-3.5" />
-                        <span>Won</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-
-                    {/* Stake & Return Row */}
-                    <div className="px-3 py-2 border-b border-[#232f3e] flex items-center justify-between text-xs font-bold">
-                      <div className="text-neutral-300">
-                        <span>Total Stake(GHS): </span>
-                        <strong className="text-white">{item.stake.toFixed(2)}</strong>
+                return (
+                  <div key={item.id} className="flex items-start space-x-3">
+                    {/* Left Date Column: e.g. 24 Sep */}
+                    <div className="text-center shrink-0 w-10 pt-1">
+                      <div className="text-2xl font-black text-white leading-none">
+                        {dateParts.day}
                       </div>
-                      <div className="text-neutral-300">
-                        <span>Total Return: </span>
-                        <strong className="text-[#00df59]">{item.potentialWin.toFixed(2)}</strong>
+                      <div className="text-[11px] text-neutral-400 mt-0.5">
+                        {dateParts.month}
                       </div>
                     </div>
 
-                    {/* Matches Summary with Green Checks and FT Scores */}
-                    <div className="p-3 space-y-1.5 text-xs text-neutral-300">
-                      {item.selections.map((s, idx) => {
-                        const details = resolveWinningPredictionDetails(s);
-                        return (
-                          <div key={idx} className="flex items-center justify-between py-0.5">
-                            <div className="flex items-center space-x-1.5 truncate pr-2">
-                              <Check className="w-3.5 h-3.5 text-[#00df59] stroke-[3.5] shrink-0" />
-                              <span className="truncate text-white font-medium">{details.formattedMatchTitle}</span>
+                    {/* Right Ticket Card: Collapsed by default, drops down details only on click like open bet */}
+                    <div className="flex-1 bg-[#17212d] border border-[#243243] rounded-md overflow-hidden shadow-lg transition-all duration-200">
+                      {/* Top Row: Multiple [Won] on Left | Rebet, Slip, Dropdown Arrow on Right */}
+                      <div className="px-3.5 pt-3 pb-2 flex items-center justify-between text-xs select-none">
+                        <div
+                          onClick={() => toggleExpandHistoryBet(item.id)}
+                          className="flex items-center space-x-2 cursor-pointer"
+                        >
+                          <span className="font-bold text-white text-[15px] tracking-wide">
+                            {item.type}
+                          </span>
+                          {item.status === 'won' ? (
+                            <span className="bg-[#153a23] text-[#00df59] font-black text-[11px] px-2 py-0.5 rounded flex items-center space-x-1 border border-emerald-800/40">
+                              <Trophy className="w-3 h-3 text-[#00df59]" />
+                              <span>Won</span>
+                            </span>
+                          ) : item.status === 'lost' ? (
+                            <span className="bg-red-950/60 text-red-400 font-bold text-[11px] px-2 py-0.5 rounded border border-red-900/40">
+                              Lost
+                            </span>
+                          ) : (
+                            <span className="bg-[#1e2a38] text-neutral-300 font-bold text-[11px] px-2 py-0.5 rounded">
+                              Settled
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center space-x-3 font-bold text-[#00df59] text-[13px]">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRebet(item);
+                            }}
+                            className="flex items-center space-x-1 hover:text-emerald-300 transition-colors cursor-pointer"
+                            title="Rebet this ticket"
+                          >
+                            <RefreshCw className="w-3.5 h-3.5" />
+                            <span>Rebet</span>
+                          </button>
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedDetailBet(item);
+                            }}
+                            className="flex items-center space-x-1 hover:text-emerald-300 transition-colors cursor-pointer"
+                            title="View Official Ticket Slip"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                            <span>Slip</span>
+                          </button>
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleExpandHistoryBet(item.id);
+                            }}
+                            className="p-1 text-neutral-400 hover:text-white transition-colors cursor-pointer flex items-center"
+                            title={isExpanded ? 'Hide Details' : 'Show Details'}
+                          >
+                            {isExpanded ? (
+                              <ChevronUp className="w-4 h-4 text-[#00df59]" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4 text-neutral-400" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Collapsed State: Match Title preview & Total Stake on Left | Total Return & Details button on Right */}
+                      {!isExpanded && (
+                        <div
+                          onClick={() => toggleExpandHistoryBet(item.id)}
+                          className="px-3.5 pb-3.5 pt-1 flex items-center justify-between cursor-pointer hover:bg-[#1a2634] transition-colors"
+                        >
+                          {/* Left: Match Title preview & Stake */}
+                          <div className="space-y-1 pr-3 flex-1 min-w-0">
+                            <div className="text-[14px] font-bold text-white truncate">
+                              {item.selections[0]?.matchTitle || 'Match'}
+                              {item.selections.length > 1 && (
+                                <span className="text-xs font-normal text-neutral-400 ml-1.5">
+                                  (+{item.selections.length - 1} more)
+                                </span>
+                              )}
                             </div>
-                            <span className="font-mono font-bold text-neutral-300 shrink-0">{details.ftScore}</span>
+                            <div className="text-xs text-neutral-400">
+                              <span>Stake </span>
+                              <strong className="font-bold text-white">{item.stake.toFixed(2)}</strong>
+                            </div>
                           </div>
-                        );
-                      })}
+
+                          {/* Right: Return & Dropdown Click Indicator */}
+                          <div className="shrink-0 flex items-center space-x-2">
+                            <div className="text-right">
+                              <div className="text-[10px] text-neutral-400 leading-tight">Total Return</div>
+                              <div className="text-sm font-black text-[#00df59] leading-tight">
+                                GHS {item.potentialWin.toFixed(2)}
+                              </div>
+                            </div>
+                            <div className="w-6 h-6 rounded bg-[#1f2b3a] flex items-center justify-center text-neutral-400">
+                              <ChevronDown className="w-3.5 h-3.5" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* DROPPED-DOWN MATCH DETAILS (Only displays when user clicks, like open bet) */}
+                      {isExpanded && (
+                        <div className="border-t border-[#232f3e] bg-[#16202c] animate-in slide-in-from-top-2 duration-200">
+                          {/* Detailed Match Legs */}
+                          <div className="divide-y divide-[#202b3a]">
+                            {item.selections.map((sel, idx) => {
+                              const details = resolveWinningPredictionDetails(sel);
+                              return (
+                                <div
+                                  key={idx}
+                                  className="px-3.5 py-3.5 flex items-start space-x-3.5 hover:bg-[#1a2636] transition-colors"
+                                >
+                                  {/* Left: Solid Green Circle with White Checkmark */}
+                                  <div className="pt-0.5 shrink-0">
+                                    <div className="w-5 h-5 rounded-full bg-[#00df59] flex items-center justify-center text-black shadow-md">
+                                      <Check className="w-3.5 h-3.5 stroke-[3.5]" />
+                                    </div>
+                                  </div>
+
+                                  {/* Right Content */}
+                                  <div className="flex-1 min-w-0 space-y-1.5">
+                                    {/* Game ID | Date */}
+                                    <div className="text-neutral-400 text-xs">
+                                      Game ID: {details.gameId} | {details.gameDate}
+                                    </div>
+
+                                    {/* Team v Team */}
+                                    <div className="font-bold text-white text-[15px] tracking-tight">
+                                      {details.formattedMatchTitle}
+                                    </div>
+
+                                    {/* FT Score | Settled badge */}
+                                    <div className="flex items-center space-x-2 text-xs">
+                                      <span className="text-neutral-300">
+                                        FT Score:{' '}
+                                        <strong className="text-white font-extrabold text-[13px] ml-1">
+                                          {details.ftScore}
+                                        </strong>
+                                      </span>
+                                      <span className="text-neutral-600">|</span>
+                                      <span className="text-[#00df59] flex items-center space-x-1 font-bold text-xs">
+                                        <span>📗</span>
+                                        <span>Settled (Won)</span>
+                                      </span>
+                                    </div>
+
+                                    {/* Inner Dark Box: Pick, Market, Outcome, Trophy Watermark */}
+                                    <div className="bg-[#192330] border border-[#243346] rounded-md p-2.5 relative overflow-hidden text-xs space-y-1 shadow-sm">
+                                      <Trophy className="w-10 h-10 text-white/[0.07] absolute right-2 bottom-1 pointer-events-none" />
+
+                                      <div className="flex items-center space-x-1.5 text-neutral-300">
+                                        <span className="text-neutral-400">Pick:</span>
+                                        <strong className="text-white font-bold tracking-tight">
+                                          {details.pickText}
+                                        </strong>
+                                        <Check className="w-3.5 h-3.5 text-[#00df59] stroke-[3]" />
+                                      </div>
+
+                                      <div className="text-neutral-400">
+                                        Market:{' '}
+                                        <span className="text-neutral-200 font-semibold">
+                                          {sel.marketName || '1X2'}
+                                        </span>
+                                      </div>
+
+                                      <div className="text-neutral-400">
+                                        Outcome:{' '}
+                                        <strong className="text-white font-bold">
+                                          {details.outcome}
+                                        </strong>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Bottom inside dropdown: Hide Match Details ▲, Stake / Total Return, and Actions */}
+                          <div className="bg-[#17212d] border-t border-[#202b3a] p-3.5 space-y-2.5">
+                            <div className="flex justify-end">
+                              <button
+                                onClick={() => toggleExpandHistoryBet(item.id)}
+                                className="text-[#00df59] text-xs font-bold flex items-center space-x-1 hover:underline cursor-pointer"
+                              >
+                                <span>Hide Match Details</span>
+                                <span className="text-[10px]">▲</span>
+                              </button>
+                            </div>
+
+                            <div className="flex justify-between items-center text-xs">
+                              <div className="space-y-1 text-neutral-400 text-xs">
+                                <div>Total Stake(GHS)</div>
+                                <div>Total Return</div>
+                              </div>
+                              <div className="space-y-1 text-right font-black text-xs">
+                                <div className="text-white">{item.stake.toFixed(2)}</div>
+                                <div className="text-[#00df59] text-sm">
+                                  {item.potentialWin.toFixed(2)}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Action Buttons: Rebet & View Official Slip */}
+                            <div className="pt-1 flex items-center space-x-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRebet(item);
+                                }}
+                                className="flex-1 py-2.5 bg-[#00c853] hover:bg-[#00b34a] active:scale-98 text-white font-black text-xs rounded-md shadow flex items-center justify-center space-x-1.5 transition-all cursor-pointer"
+                              >
+                                <RefreshCw className="w-3.5 h-3.5" />
+                                <span>Rebet</span>
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedDetailBet(item);
+                                }}
+                                className="flex-1 py-2.5 bg-[#223042] hover:bg-[#2c3d53] active:scale-98 text-white font-bold text-xs rounded-md border border-[#31445b] flex items-center justify-center space-x-1.5 transition-all cursor-pointer"
+                              >
+                                <FileText className="w-3.5 h-3.5 text-neutral-300" />
+                                <span>View Ticket Slip</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
 
             {/* Subtext below list */}

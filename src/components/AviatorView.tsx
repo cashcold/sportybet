@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useBetting } from '../context/BettingContext';
+import { aviatorEngine } from '../services/aviatorEngine';
 
 interface BetRow {
   id: string;
@@ -50,6 +51,7 @@ export const AviatorView: React.FC = () => {
   const [gameState, setGameState] = useState<'waiting' | 'flying' | 'crashed'>('waiting');
   const [multiplier, setMultiplier] = useState<number>(1.0);
   const [crashPoint, setCrashPoint] = useState<number>(2.45);
+  const [flightSpeedMultiplier, setFlightSpeedMultiplier] = useState<number>(1.0);
   const [countdown, setCountdown] = useState<number>(5); // 5s waiting intermission
   const [multiplierHistory, setMultiplierHistory] = useState<number[]>([
     2.30, 1.00, 1.39, 1.00, 1.87, 16.48, 1.61, 1.23, 1.73, 22.96, 3.42, 1.05, 5.12
@@ -98,7 +100,8 @@ export const AviatorView: React.FC = () => {
   const [panel2CashedMultiplier, setPanel2CashedMultiplier] = useState<number>(0);
 
   // Bottom live multiplayer bets table
-  const [bottomTab, setBottomTab] = useState<'All Bets' | 'Previous' | 'Top'>('All Bets');
+  const [bottomTab, setBottomTab] = useState<'All Bets' | 'My Bets' | 'Top'>('All Bets');
+  const [topTimeFilter, setTopTimeFilter] = useState<'Day' | 'Month' | 'Year'>('Day');
   const [liveBets, setLiveBets] = useState<BetRow[]>([]);
   const [totalRoundBetsCount, setTotalRoundBetsCount] = useState<number>(1970);
   const [totalRoundWinAmount, setTotalRoundWinAmount] = useState<number>(41023.58);
@@ -326,8 +329,9 @@ export const AviatorView: React.FC = () => {
 
       interval = setInterval(() => {
         const elapsed = (Date.now() - startTime) / 1000;
-        // Exponential growth formula mimicking Spribe Aviator: 1 * e^(0.06 * t^1.2)
-        const nextVal = parseFloat((1.0 + Math.pow(elapsed * 0.72, 1.42)).toFixed(2));
+        const speed = flightSpeedMultiplier || 1.0;
+        // Exponential growth formula with dynamic speed multiplier
+        const nextVal = parseFloat((1.0 + Math.pow(elapsed * 0.72 * speed, 1.42)).toFixed(2));
 
         // Adjust engine drone pitch with climbing multiplier
         updateEnginePitch(nextVal);
@@ -338,6 +342,7 @@ export const AviatorView: React.FC = () => {
           handleCrash(currentCrash);
         } else {
           setMultiplier(nextVal);
+          aviatorEngine.updateCurrentGameStatus('flying', nextVal, currentCrash);
 
           // Check Panel 1 auto cashout
           if (
@@ -395,24 +400,16 @@ export const AviatorView: React.FC = () => {
       clearInterval(interval);
       stopEngineSound();
     };
-  }, [gameState, crashPoint, panel1BetState, panel1AutoCashoutEnabled, panel1AutoCashout, panel2BetState, panel2AutoCashoutEnabled, panel2AutoCashout]);
+  }, [gameState, crashPoint, panel1BetState, panel1AutoCashoutEnabled, panel1AutoCashout, panel2BetState, panel2AutoCashoutEnabled, panel2AutoCashout, flightSpeedMultiplier]);
 
   const startFlight = () => {
-    // Generate crash point matching realistic Aviator distribution
-    const rand = Math.random();
-    let point = 1.0;
-    if (rand < 0.08) {
-      point = 1.01 + Math.random() * 0.12; // Instant crash
-    } else if (rand < 0.65) {
-      point = 1.15 + Math.random() * 2.20; // 1.15x - 3.35x
-    } else if (rand < 0.90) {
-      point = 3.35 + Math.random() * 5.65; // 3.35x - 9.00x
-    } else {
-      point = 9.00 + Math.random() * 25.00; // 9.00x - 34.00x
-    }
-    const finalCrash = parseFloat(point.toFixed(2));
+    // Consume scheduled next round plan from the synchronized Aviator engine
+    const nextRoundPlan = aviatorEngine.advanceToNextRound();
+    const finalCrash = nextRoundPlan.crashPoint;
+    const speed = nextRoundPlan.speedMultiplier || 1.0;
 
     setCrashPoint(finalCrash);
+    setFlightSpeedMultiplier(speed);
     setMultiplier(1.0);
     setGameState('flying');
     setLiveBets(generateLiveBets());
@@ -432,6 +429,7 @@ export const AviatorView: React.FC = () => {
     setGameState('crashed');
     stopEngineSound();
     playSound('crash');
+    aviatorEngine.updateCurrentGameStatus('crashed', finalPoint);
 
     // Add to history strip
     setMultiplierHistory(prev => [finalPoint, ...prev.slice(0, 24)]);
@@ -470,6 +468,7 @@ export const AviatorView: React.FC = () => {
     // After 3 seconds of crash screen, go to waiting intermission
     setTimeout(() => {
       setGameState('waiting');
+      aviatorEngine.updateCurrentGameStatus('waiting', 1.0);
       setCountdown(5);
       setTotalRoundBetsCount(0);
       // Reset any cashed out states for next round
@@ -571,27 +570,44 @@ export const AviatorView: React.FC = () => {
   // Helper color for multiplier pills
   const getMultiplierColor = (mult: number) => {
     if (mult < 2.0) {
-      return 'text-[#34b4ff] hover:bg-[#34b4ff]/20';
+      return 'bg-[#102130] text-[#34b4ff] border border-[#34b4ff]/30 hover:bg-[#152e44]';
     } else if (mult < 10.0) {
-      return 'text-[#9042f6] hover:bg-[#9042f6]/20';
+      return 'bg-[#201432] text-[#9042f6] border border-[#9042f6]/30 hover:bg-[#2c1a45]';
+    } else if (mult < 50.0) {
+      return 'bg-[#30132b] text-[#e024c3] border border-[#e024c3]/40 font-black hover:bg-[#42173b]';
     } else {
-      return 'text-[#e024c3] font-black hover:bg-[#e024c3]/20';
+      return 'bg-[#30132b] text-[#e024c3] border border-amber-400 font-black shadow-[0_0_8px_rgba(251,191,36,0.4)]';
     }
   };
 
-  // Canvas / SVG curve calculation
-  // Growth progresses from 0 to 1 as multiplier climbs from 1.00x to ~2.5x, then smoothly caps at cruising
-  const climbRatio = Math.min((multiplier - 1.0) / 1.5, 1.0); // 0 at 1.0x, 1 at 2.5x+
-  // Base plane coordinate (canvas is 350x230)
-  const basePlaneX = 35 + climbRatio * 225; // 35 to 260
-  const basePlaneY = 195 - Math.pow(climbRatio, 0.75) * 130; // 195 down to 65
+  // Canvas / SVG curve calculation in unified 1000x650 coordinates
+  const originX = 60;
+  const originY = 570;
+  const climbRatio = Math.min((multiplier - 1.0) / 1.4, 1.0); // 0 at 1.0x, 1 at 2.4x+
 
-  // Aerodynamic oscillations during flight (subtle pitch & altitude bobbing)
-  const bobY = gameState === 'flying' ? Math.sin(Date.now() / 250) * 3.5 : 0;
-  const bobRot = gameState === 'flying' ? Math.sin(Date.now() / 320) * 2.5 : 0;
-  const planeX = basePlaneX;
-  const planeY = basePlaneY + bobY;
-  const planeRotation = -14 + (1 - climbRatio) * -12 + bobRot;
+  // Base coordinates across 1000x650 viewBox
+  const baseX = 100 + climbRatio * 620; // 100 to 720
+  const baseY = 570 - Math.pow(climbRatio, 0.72) * 380; // 570 down to 190
+
+  // Subtle cruising aerodynamic bobbing
+  const bobY = gameState === 'flying' && climbRatio > 0.85 ? Math.sin(multiplier * 3.5) * 8 : 0;
+  const bobRot = gameState === 'flying' && climbRatio > 0.85 ? Math.cos(multiplier * 3.5) * 2.5 : 0;
+  const tipX = baseX;
+  const tipY = baseY + bobY;
+
+  // Control point for smooth parabolic curve
+  const ctrlX = originX + (tipX - originX) * 0.52;
+  const ctrlY = originY;
+
+  // Exact tangent angle
+  const dx = Math.max(1, tipX - ctrlX);
+  const dy = tipY - ctrlY;
+  const curveAngle = Math.atan2(dy, dx) * (180 / Math.PI);
+  const planeRotation = curveAngle + bobRot;
+
+  // Curve and Area paths
+  const curveLinePath = `M ${originX} ${originY} Q ${ctrlX} ${ctrlY} ${tipX} ${tipY}`;
+  const curveAreaPath = `M ${originX} ${originY} Q ${ctrlX} ${ctrlY} ${tipX} ${tipY} L ${tipX} ${originY} Z`;
 
   return (
     <div className="bg-[#0f141c] text-white min-h-screen flex flex-col select-none relative overflow-x-hidden font-sans">
@@ -601,7 +617,7 @@ export const AviatorView: React.FC = () => {
       <div className="bg-[#12171f] px-3 py-2 flex items-center justify-between border-b border-[#1b232e]">
         <button
           onClick={() => setActiveTab('sports')}
-          className="p-1.5 text-neutral-300 hover:text-white rounded-full transition-colors flex items-center"
+          className="p-1.5 text-neutral-300 hover:text-white rounded-full transition-colors flex items-center cursor-pointer"
           title="Back to Sports"
         >
           <ChevronLeft className="w-6 h-6 stroke-[2.2]" />
@@ -614,13 +630,13 @@ export const AviatorView: React.FC = () => {
       </div>
 
       {/* ========================================================= */}
-      {/* 2. IN-GAME AVIATOR HEADER (Screenshot 1: Aviator logo, 0.00 GHS, Chat, Hamburger) */}
+      {/* 2. IN-GAME AVIATOR HEADER (Spribe Header: Logo, How To Play, Balance, Sound, Chat, Hamburger) */}
       {/* ========================================================= */}
       <div className="bg-[#141a22] px-3 py-2 flex items-center justify-between border-b border-[#1c2430]">
-        {/* Left: Aviator Logo */}
+        {/* Left: Aviator Logo & How to Play */}
         <div className="flex items-center space-x-2">
           {/* Purple square with rounded corners and white circle/spribe logo */}
-          <div className="w-7 h-7 rounded-[7px] bg-gradient-to-br from-[#8a3ffc] to-[#6929c4] flex items-center justify-center shadow-md border border-white/20">
+          <div className="w-7 h-7 rounded-[7px] bg-gradient-to-br from-[#8a3ffc] to-[#6929c4] flex items-center justify-center shadow-md border border-white/20 shrink-0">
             <div className="w-3.5 h-3.5 rounded-full bg-white/95 flex items-center justify-center">
               <div className="w-1.5 h-1.5 rounded-full bg-[#6929c4]" />
             </div>
@@ -629,34 +645,59 @@ export const AviatorView: React.FC = () => {
           <span className="text-xl font-black italic tracking-tight text-[#e51b24] font-serif select-none drop-shadow">
             Aviator
           </span>
+
+          {/* Orange '? How to play?' pill button */}
+          <button
+            onClick={() => setHowToPlayOpen(true)}
+            className="bg-[#e67e22] hover:bg-[#f39c12] text-black text-[10px] font-black px-2 py-0.5 rounded-full flex items-center space-x-1 shadow-sm transition-transform active:scale-95 cursor-pointer ml-1"
+            title="How to Play"
+          >
+            <span className="w-3 h-3 rounded-full bg-black text-[#e67e22] text-[9px] font-black flex items-center justify-center leading-none">
+              ?
+            </span>
+            <span className="leading-none">How to play?</span>
+          </button>
         </div>
 
-        {/* Right: Balance, Chat, Hamburger Menu */}
-        <div className="flex items-center space-x-3">
-          {/* Balance in bright white bold */}
+        {/* Right: Balance, Audio toggle, Chat, Hamburger Menu */}
+        <div className="flex items-center space-x-2.5">
+          {/* Balance in bright green bold */}
           <div className="text-right">
-            <span className="text-sm font-bold text-white">
-              {user.balance.toFixed(2)} {user.currency || 'GHC'}
+            <span className="text-xs sm:text-sm font-black text-[#00df59] tracking-tight">
+              {user.balance.toFixed(2)} {user.currency || 'GHS'}
             </span>
           </div>
+
+          {/* Sound Toggle Icon */}
+          <button
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className="p-1 text-white hover:text-neutral-300 transition-colors cursor-pointer"
+            title={soundEnabled ? 'Mute Sound' : 'Enable Sound'}
+          >
+            {soundEnabled ? (
+              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#00df59]" />
+            ) : (
+              <VolumeX className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-400" />
+            )}
+          </button>
 
           {/* Chat bubble icon */}
           <button
             onClick={() => setChatOpen(!chatOpen)}
-            className="p-1 text-white hover:text-neutral-300 transition-colors relative"
+            className="p-1 text-white hover:text-neutral-300 transition-colors relative cursor-pointer"
             title="Live Chat"
           >
-            <MessageSquare className="w-5 h-5 fill-white stroke-white" />
-            <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#00df59] rounded-full" />
+            <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 fill-white stroke-white" />
+            <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#00df59] rounded-full ring-2 ring-[#141a22]" />
           </button>
 
           {/* Hamburger Menu (Screenshot 2) */}
           <button
             onClick={() => setMenuOpen(true)}
-            className="p-1 text-white hover:text-neutral-300 transition-colors"
+            className="p-1 text-white hover:text-neutral-300 transition-colors cursor-pointer"
             title="Game Menu"
           >
-            <Menu className="w-6 h-6 stroke-[2.2]" />
+            <Menu className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
           </button>
         </div>
       </div>
@@ -665,11 +706,11 @@ export const AviatorView: React.FC = () => {
       {/* 3. MULTIPLIER HISTORY RIBBON (Screenshot 1: colored pills with ...) */}
       {/* ========================================================= */}
       <div className="bg-[#12171f] px-2 py-1.5 border-b border-[#1c2430] flex items-center justify-between overflow-x-auto no-scrollbar space-x-2">
-        <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar py-0.5">
-          {multiplierHistory.slice(0, 14).map((mult, idx) => (
+        <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-0.5">
+          {multiplierHistory.slice(0, 16).map((mult, idx) => (
             <span
               key={idx}
-              className={`px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 transition-transform active:scale-95 cursor-pointer bg-[#19222c] border border-white/5 ${getMultiplierColor(
+              className={`px-2.5 py-0.5 rounded-full text-[11px] font-extrabold shrink-0 transition-transform active:scale-95 cursor-pointer shadow-sm ${getMultiplierColor(
                 mult
               )}`}
               onClick={() => showToast(`Round Multiplier: ${mult.toFixed(2)}x`)}
@@ -679,13 +720,14 @@ export const AviatorView: React.FC = () => {
           ))}
         </div>
 
-        {/* History Modal Trigger Button (...) */}
+        {/* History Modal Trigger Button (•••) */}
         <button
           onClick={() => setHistoryModalOpen(true)}
-          className="p-1 px-1.5 bg-[#19222c] hover:bg-[#222e3c] text-neutral-400 hover:text-white rounded-full text-xs font-bold shrink-0 border border-white/10"
+          className="p-1 px-2 bg-[#19222c] hover:bg-[#222e3c] text-neutral-300 hover:text-white rounded-full text-xs font-bold shrink-0 border border-white/10 flex items-center space-x-0.5 cursor-pointer"
           title="Round History"
         >
-          •••
+          <span>•••</span>
+          <ChevronDown className="w-3 h-3 text-neutral-400" />
         </button>
       </div>
 
@@ -743,229 +785,235 @@ export const AviatorView: React.FC = () => {
           <div className="absolute inset-0 shadow-[inset_0_0_50px_rgba(0,0,0,0.9)] pointer-events-none" />
 
           {/* ===================================================== */}
-          {/* C. INTERMISSION SCREEN (Screenshot 4 & Video: UFC | Aviator PARTNERS + SPRIBE) */}
+          {/* C. THE UNIFIED SVG FLIGHT ARENA (Curve, Runway, Aircraft) */}
           {/* ===================================================== */}
-          {gameState === 'waiting' && (
-            <>
-              {/* Parked plane on bottom-left runway (video frames 00:00 & 00:05-00:10) */}
-              <div
-                className="absolute bottom-3 left-3 z-20 pointer-events-none drop-shadow-[0_4px_10px_rgba(229,27,36,0.5)]"
-                style={{ transform: 'rotate(0deg)' }}
-              >
-                <div className="relative w-16 h-10">
-                  <svg viewBox="0 0 100 60" className="w-full h-full">
-                    {/* Fuselage */}
-                    <path
-                      d="M 15 32 Q 50 18, 85 28 Q 78 38, 20 38 Z"
-                      fill="#e51b24"
-                      stroke="#ff4d4f"
-                      strokeWidth="1.5"
-                    />
-                    {/* Cockpit / Windshield */}
-                    <path d="M 45 23 Q 55 20, 62 27 Z" fill="#ffffff" opacity="0.9" />
-                    {/* Wing */}
-                    <path
-                      d="M 38 12 L 68 12 Q 70 16, 65 17 L 35 17 Z"
-                      fill="#e51b24"
-                      stroke="#ff4d4f"
-                      strokeWidth="1"
-                    />
-                    {/* Wing Struts */}
-                    <line x1="45" y1="17" x2="48" y2="28" stroke="#ffffff" strokeWidth="1.5" />
-                    <line x1="60" y1="17" x2="62" y2="28" stroke="#ffffff" strokeWidth="1.5" />
-                    {/* Tail fin */}
-                    <path d="M 15 32 L 6 15 L 18 15 L 24 32 Z" fill="#e51b24" stroke="#ff4d4f" strokeWidth="1" />
-                    {/* Fuselage X decal */}
-                    <text x="32" y="34" fill="#ffffff" fontSize="11" fontWeight="bold" fontFamily="sans-serif">
-                      X
-                    </text>
-                    {/* Static propeller */}
-                    <circle cx="86" cy="28" r="3" fill="#ffffff" />
-                    <ellipse cx="86" cy="28" rx="2" ry="12" fill="#ffffff" opacity="0.8" />
-                  </svg>
-                </div>
-              </div>
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-10" viewBox="0 0 1000 650">
+            <defs>
+              {/* Crimson gradient fill */}
+              <linearGradient id="aviatorCrimson" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#e51b24" stopOpacity="0.55" />
+                <stop offset="65%" stopColor="#99001b" stopOpacity="0.22" />
+                <stop offset="100%" stopColor="#000000" stopOpacity="0.0" />
+              </linearGradient>
+            </defs>
 
-              {/* UFC Aviator Center Banner */}
-              <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full animate-in fade-in duration-300">
-                {/* UFC | Aviator OFFICIAL PARTNERS */}
-                <div className="flex items-center space-x-2">
-                  <span className="text-xl font-black italic tracking-tighter text-[#de1a22]">
-                    UFC
-                  </span>
-                  <span className="text-neutral-500 font-light">|</span>
-                  <span className="text-sm font-black italic text-[#de1a22]">
-                    Aviator
-                  </span>
-                </div>
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90 mt-0.5">
-                  Official Partners
-                </div>
+            {/* Telemetry coordinate grid lines */}
+            <g opacity="0.1" stroke="#ffffff" strokeWidth="1" strokeDasharray="4 4">
+              <line x1="50" y1="450" x2="950" y2="450" />
+              <line x1="50" y1="320" x2="950" y2="320" />
+              <line x1="50" y1="190" x2="950" y2="190" />
+              <line x1="280" y1="80" x2="280" y2="570" />
+              <line x1="510" y1="80" x2="510" y2="570" />
+              <line x1="740" y1="80" x2="740" y2="570" />
+            </g>
+            {/* Runway baseline */}
+            <line x1="40" y1="570" x2="960" y2="570" stroke="#e51b24" strokeWidth="1.5" opacity="0.35" />
 
-                {/* Red horizontal accent bar */}
-                <div className="w-40 h-[2px] bg-gradient-to-r from-transparent via-[#de1a22] to-transparent my-2" />
-
-                {/* SPRIBE Official Game badge */}
-                <div className="bg-[#121e14]/90 border border-[#1e4620] rounded-xl px-4 py-2 mt-1 shadow-lg backdrop-blur-sm flex flex-col items-center">
-                  <div className="flex items-center space-x-1.5 text-white font-black text-xs tracking-wider">
-                    <div className="w-3.5 h-3.5 rounded-full border border-[#00df59] flex items-center justify-center">
-                      <span className="text-[8px] text-[#00df59]">S</span>
-                    </div>
-                    <span>SPRIBE</span>
-                  </div>
-                  <div className="mt-1 flex items-center space-x-1 bg-[#00a826]/20 text-[#00df59] border border-[#00a826]/40 px-2 py-0.5 rounded-full text-[9px] font-bold">
-                    <span>Official Game</span>
-                    <CheckCircle2 className="w-2.5 h-2.5" />
-                  </div>
-                  <span className="text-[9px] text-neutral-400 mt-0.5">Since 2019</span>
-                </div>
-
-                {/* Waiting for Next Round Progress Bar */}
-                <div className="w-56 mt-4">
-                  <div className="flex items-center justify-between text-[10px] font-bold text-neutral-300 mb-1">
-                    <span>WAITING FOR NEXT ROUND</span>
-                    <span>{countdown}s</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-neutral-800 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#00df59] transition-all duration-1000 ease-linear rounded-full shadow-[0_0_8px_#00df59]"
-                      style={{ width: `${((5 - countdown) / 5) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* ===================================================== */}
-          {/* D. ACTIVE FLIGHT STATE: SVG Curve, Red Plane, Center Multiplier */}
-          {/* ===================================================== */}
-          {gameState === 'flying' && (
-            <>
-              {/* SVG Flight Curve & Trailing Crimson Area */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none z-10" viewBox="0 0 350 230">
-                <defs>
-                  {/* Crimson gradient fill */}
-                  <linearGradient id="aviatorCrimson" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#e51b24" stopOpacity="0.55" />
-                    <stop offset="70%" stopColor="#99001b" stopOpacity="0.25" />
-                    <stop offset="100%" stopColor="#000000" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-
+            {/* Active Flight or Frozen Crash Curve */}
+            {(gameState === 'flying' || gameState === 'crashed') && (
+              <>
                 {/* Filled Area Under Curve */}
-                <path
-                  d={`M 0 215 Q ${planeX * 0.52} 215, ${planeX - 10} ${planeY + 12} L ${planeX - 10} 215 Z`}
-                  fill="url(#aviatorCrimson)"
-                />
+                <path d={curveAreaPath} fill="url(#aviatorCrimson)" />
 
                 {/* Red Flight Line Curve */}
                 <path
-                  d={`M 0 215 Q ${planeX * 0.52} 215, ${planeX - 10} ${planeY + 12}`}
+                  d={curveLinePath}
                   fill="none"
                   stroke="#e51b24"
-                  strokeWidth="3.5"
+                  strokeWidth="6"
                   strokeLinecap="round"
-                  className="drop-shadow-[0_0_8px_#e51b24]"
+                  className="drop-shadow-[0_0_12px_#e51b24]"
                 />
-              </svg>
+              </>
+            )}
 
-              {/* The Red Propeller Plane (Flying state) */}
-              <div
-                className="absolute z-20 transition-transform duration-75 pointer-events-none"
+            {/* Parked Aircraft on Runway when Waiting */}
+            {gameState === 'waiting' && (
+              <g
+                transform={`translate(${originX + 25}, ${originY - 8})`}
+                style={{ filter: 'drop-shadow(0 4px 10px rgba(229,27,36,0.6))' }}
+              >
+                {/* Fuselage */}
+                <path
+                  d="M 0 0 Q 30 -12, 75 0 Q 70 12, 5 6 Z"
+                  fill="#e51b24"
+                  stroke="#ff4d4f"
+                  strokeWidth="2"
+                />
+                {/* Cockpit / Windshield with glass gloss reflection */}
+                <path d="M 32 -6 Q 44 -14, 54 -4 Z" fill="#ffffff" opacity="0.95" />
+                <path d="M 35 -6 Q 43 -12, 50 -5 Z" fill="#90caf9" opacity="0.85" />
+                {/* Top wing */}
+                <path
+                  d="M 22 -18 L 52 -18 Q 55 -14, 48 -13 L 20 -13 Z"
+                  fill="#e51b24"
+                  stroke="#ff4d4f"
+                  strokeWidth="1.5"
+                />
+                {/* Wing Struts */}
+                <line x1="28" y1="-13" x2="32" y2="0" stroke="#ffffff" strokeWidth="2" />
+                <line x1="44" y1="-13" x2="48" y2="0" stroke="#ffffff" strokeWidth="2" />
+                {/* Tail fin */}
+                <path d="M 0 0 L -12 -18 L -3 -18 L 8 0 Z" fill="#e51b24" stroke="#ff4d4f" strokeWidth="1.5" />
+                {/* Fuselage X decal */}
+                <text x="18" y="2" fill="#ffffff" fontSize="11" fontWeight="bold" fontFamily="sans-serif">
+                  X
+                </text>
+                {/* Landing gear & wheels on runway */}
+                <line x1="38" y1="6" x2="35" y2="16" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="34" cy="16" r="4" fill="#151a22" stroke="#ffffff" strokeWidth="1.5" />
+                <line x1="55" y1="5" x2="52" y2="16" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="51" cy="16" r="4" fill="#151a22" stroke="#ffffff" strokeWidth="1.5" />
+                {/* Propeller hub and idling blades */}
+                <circle cx="75" cy="0" r="3.5" fill="#ffffff" />
+                <ellipse cx="75" cy="0" rx="2.5" ry="16" fill="#ffffff" opacity="0.85" />
+              </g>
+            )}
+
+            {/* Flying or Flew-Away Red Aviator Aircraft (Seamlessly attached to curve tip) */}
+            {(gameState === 'flying' || gameState === 'crashed') && (
+              <g
+                transform={
+                  gameState === 'crashed'
+                    ? `translate(${tipX + 380}, ${tipY - 260}) rotate(-26deg) scale(0.6)`
+                    : `translate(${tipX}, ${tipY}) rotate(${planeRotation})`
+                }
+                opacity={gameState === 'crashed' ? 0 : 1}
                 style={{
-                  left: `${planeX - 35}px`,
-                  top: `${planeY - 25}px`,
-                  transform: `rotate(${planeRotation}deg)`
+                  transition:
+                    gameState === 'crashed'
+                      ? 'transform 0.7s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.55s ease-out'
+                      : 'none',
+                  filter: 'drop-shadow(0 4px 14px rgba(229,27,36,0.75))'
                 }}
               >
-                <div className="relative w-16 h-10">
-                  {/* SVG Red Aviator Aircraft */}
-                  <svg viewBox="0 0 100 60" className="w-full h-full drop-shadow-[0_4px_10px_rgba(229,27,36,0.6)]">
-                    {/* Fuselage */}
-                    <path
-                      d="M 15 32 Q 50 18, 85 28 Q 78 38, 20 38 Z"
-                      fill="#e51b24"
-                      stroke="#ff4d4f"
-                      strokeWidth="1.5"
-                    />
-                    {/* Cockpit / Windshield */}
-                    <path d="M 45 23 Q 55 20, 62 27 Z" fill="#ffffff" opacity="0.9" />
-                    {/* Top wing */}
-                    <path
-                      d="M 38 12 L 68 12 Q 70 16, 65 17 L 35 17 Z"
-                      fill="#e51b24"
-                      stroke="#ff4d4f"
-                      strokeWidth="1"
-                    />
-                    {/* Wing Struts */}
-                    <line x1="45" y1="17" x2="48" y2="28" stroke="#ffffff" strokeWidth="1.5" />
-                    <line x1="60" y1="17" x2="62" y2="28" stroke="#ffffff" strokeWidth="1.5" />
-                    {/* Tail fin & rudder */}
-                    <path d="M 15 32 L 6 15 L 18 15 L 24 32 Z" fill="#e51b24" stroke="#ff4d4f" strokeWidth="1" />
-                    {/* Fuselage "X" decal (Iconic Aviator design) */}
-                    <text x="32" y="34" fill="#ffffff" fontSize="11" fontWeight="bold" fontFamily="sans-serif">
-                      X
-                    </text>
-                    {/* Propeller Hub & Spinning Blades with blur disc */}
-                    <circle cx="86" cy="28" r="3" fill="#ffffff" />
-                    <circle cx="86" cy="28" r="14" fill="#ffffff" opacity="0.15" />
-                    <ellipse
-                      cx="86"
-                      cy="28"
-                      rx="2.5"
-                      ry="15"
-                      fill="#ffffff"
-                      opacity="0.85"
-                      className="animate-spin"
-                      style={{ transformOrigin: '86px 28px' }}
-                    />
-                  </svg>
-                </div>
+                {/* Fuselage (starts at 0 0 where the red curve touches) */}
+                <path
+                  d="M 0 0 Q 30 -12, 75 0 Q 70 12, 5 6 Z"
+                  fill="#e51b24"
+                  stroke="#ff4d4f"
+                  strokeWidth="2"
+                />
+                {/* Cockpit / Windshield with glass reflection */}
+                <path d="M 32 -6 Q 44 -14, 54 -4 Z" fill="#ffffff" opacity="0.95" />
+                <path d="M 35 -6 Q 43 -12, 50 -5 Z" fill="#90caf9" opacity="0.85" />
+                {/* Top wing */}
+                <path
+                  d="M 22 -18 L 52 -18 Q 55 -14, 48 -13 L 20 -13 Z"
+                  fill="#e51b24"
+                  stroke="#ff4d4f"
+                  strokeWidth="1.5"
+                />
+                {/* Wing Struts */}
+                <line x1="28" y1="-13" x2="32" y2="0" stroke="#ffffff" strokeWidth="2" />
+                <line x1="44" y1="-13" x2="48" y2="0" stroke="#ffffff" strokeWidth="2" />
+                {/* Tail fin & rudder */}
+                <path d="M 0 0 L -12 -18 L -3 -18 L 8 0 Z" fill="#e51b24" stroke="#ff4d4f" strokeWidth="1.5" />
+                {/* Fuselage "X" decal (Iconic Aviator design) */}
+                <text x="18" y="2" fill="#ffffff" fontSize="11" fontWeight="bold" fontFamily="sans-serif">
+                  X
+                </text>
+                {/* Landing gear & wheels */}
+                <line x1="38" y1="6" x2="35" y2="16" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="34" cy="16" r="4" fill="#151a22" stroke="#ffffff" strokeWidth="1.5" />
+                <line x1="55" y1="5" x2="52" y2="16" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="51" cy="16" r="4" fill="#151a22" stroke="#ffffff" strokeWidth="1.5" />
+                {/* Aerodynamic wind / vapor trailing lines */}
+                <path d="M -8 -18 Q -24 -20, -38 -20" stroke="#ff4d4f" strokeWidth="1.5" opacity="0.6" strokeDasharray="3 3" />
+                <path d="M -5 3 Q -20 5, -35 5" stroke="#ff4d4f" strokeWidth="1.5" opacity="0.6" strokeDasharray="3 3" />
+                {/* Propeller Hub & Spinning Blades with motion blur disc */}
+                <circle cx="75" cy="0" r="3.5" fill="#ffffff" />
+                <circle cx="75" cy="0" r="16" fill="#ffffff" opacity="0.2" />
+                <ellipse
+                  cx="75"
+                  cy="0"
+                  rx="2.5"
+                  ry="18"
+                  fill="#ffffff"
+                  opacity="0.9"
+                  className="animate-spin"
+                  style={{ transformOrigin: '75px 0px' }}
+                />
+              </g>
+            )}
+          </svg>
+
+          {/* ===================================================== */}
+          {/* D. INTERMISSION OVERLAYS (Waiting State) */}
+          {/* ===================================================== */}
+          {gameState === 'waiting' && (
+            <div className="relative z-20 flex flex-col items-center justify-center text-center px-4 w-full animate-in fade-in duration-300 pointer-events-none">
+              {/* UFC | Aviator OFFICIAL PARTNERS */}
+              <div className="flex items-center space-x-2">
+                <span className="text-xl font-black italic tracking-tighter text-[#de1a22]">
+                  UFC
+                </span>
+                <span className="text-neutral-500 font-light">|</span>
+                <span className="text-sm font-black italic text-[#de1a22]">
+                  Aviator
+                </span>
+              </div>
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90 mt-0.5">
+                Official Partners
               </div>
 
-              {/* Center Multiplier Typography (Flying: Crisp White) */}
-              <div className="absolute z-20 inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <div className="text-5xl sm:text-6xl font-black tracking-tight font-sans select-none text-white drop-shadow-2xl">
-                  {multiplier.toFixed(2)}x
+              {/* Red horizontal accent bar */}
+              <div className="w-40 h-[2px] bg-gradient-to-r from-transparent via-[#de1a22] to-transparent my-2" />
+
+              {/* SPRIBE Official Game badge */}
+              <div className="bg-[#121e14]/90 border border-[#1e4620] rounded-xl px-4 py-2 mt-1 shadow-lg backdrop-blur-sm flex flex-col items-center">
+                <div className="flex items-center space-x-1.5 text-white font-black text-xs tracking-wider">
+                  <div className="w-3.5 h-3.5 rounded-full border border-[#00df59] flex items-center justify-center">
+                    <span className="text-[8px] text-[#00df59]">S</span>
+                  </div>
+                  <span>SPRIBE</span>
+                </div>
+                <div className="mt-1 flex items-center space-x-1 bg-[#00a826]/20 text-[#00df59] border border-[#00a826]/40 px-2 py-0.5 rounded-full text-[9px] font-bold">
+                  <span>Official Game</span>
+                  <CheckCircle2 className="w-2.5 h-2.5" />
+                </div>
+                <span className="text-[9px] text-neutral-400 mt-0.5">Since 2019</span>
+              </div>
+
+              {/* Waiting for Next Round Progress Bar */}
+              <div className="w-56 mt-4">
+                <div className="flex items-center justify-between text-[10px] font-bold text-neutral-300 mb-1">
+                  <span>WAITING FOR NEXT ROUND</span>
+                  <span>{countdown}s</span>
+                </div>
+                <div className="w-full h-1.5 bg-neutral-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#00df59] transition-all duration-1000 ease-linear rounded-full shadow-[0_0_8px_#00df59]"
+                    style={{ width: `${((5 - countdown) / 5) * 100}%` }}
+                  />
                 </div>
               </div>
-            </>
+            </div>
           )}
 
           {/* ===================================================== */}
-          {/* E. CRASHED / FLEW AWAY SCREEN (Exact video match 00:01-00:04) */}
-          {/* White 'FLEW AWAY!' with crimson red final multiplier below */}
+          {/* E. FLYING MULTIPLIER DISPLAY */}
+          {/* ===================================================== */}
+          {gameState === 'flying' && (
+            <div className="absolute z-20 inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <div className="text-5xl sm:text-6xl font-black tracking-tight font-sans select-none text-white drop-shadow-2xl">
+                {multiplier.toFixed(2)}x
+              </div>
+            </div>
+          )}
+
+          {/* ===================================================== */}
+          {/* F. CRASHED / FLEW AWAY SCREEN */}
           {/* ===================================================== */}
           {gameState === 'crashed' && (
-            <>
-              {/* Plane zooms off screen */}
-              <div
-                className="absolute z-20 pointer-events-none transition-all duration-700 ease-out"
-                style={{
-                  left: `${planeX}px`,
-                  top: `${planeY}px`,
-                  transform: 'translate(140px, -90px) rotate(-18deg)',
-                  opacity: 0
-                }}
-              >
-                <div className="relative w-16 h-10">
-                  <svg viewBox="0 0 100 60" className="w-full h-full">
-                    <path d="M 15 32 Q 50 18, 85 28 Q 78 38, 20 38 Z" fill="#e51b24" />
-                  </svg>
-                </div>
+            <div className="absolute z-20 inset-0 flex flex-col items-center justify-center pointer-events-none animate-in fade-in duration-200">
+              <span className="text-sm sm:text-base font-black uppercase tracking-widest text-white mb-1 drop-shadow">
+                FLEW AWAY!
+              </span>
+              <div className="text-5xl sm:text-6xl font-black tracking-tight font-sans select-none text-[#e51b24] drop-shadow-2xl">
+                {multiplier.toFixed(2)}x
               </div>
-
-              {/* Centered FLEW AWAY! (White) and final multiplier (Red) */}
-              <div className="absolute z-20 inset-0 flex flex-col items-center justify-center pointer-events-none animate-in fade-in duration-200">
-                <span className="text-sm sm:text-base font-black uppercase tracking-widest text-white mb-1 drop-shadow">
-                  FLEW AWAY!
-                </span>
-                <div className="text-5xl sm:text-6xl font-black tracking-tight font-sans select-none text-[#e51b24] drop-shadow-2xl">
-                  {multiplier.toFixed(2)}x
-                </div>
-              </div>
-            </>
+            </div>
           )}
 
           {/* F. Active Players Indicator in Round (Bottom-Right, Screenshot 1: 3 avatars + live count) */}
@@ -995,17 +1043,18 @@ export const AviatorView: React.FC = () => {
       </div>
 
       {/* ========================================================= */}
-      {/* 5. DUAL BETTING PANELS (Screenshot 1, 3, 4, 5) */}
+      {/* 5. DUAL BETTING PANELS (SportyBet / Spribe Authentic Layout) */}
       {/* ========================================================= */}
       <div className="px-3 space-y-2.5">
         {/* ==================== PANEL 1 ==================== */}
-        <div className="bg-[#18202a] rounded-2xl p-3 border border-[#243040] shadow-lg">
-          {/* Bet / Auto Pill Switcher */}
-          <div className="flex items-center justify-center mb-2.5">
+        <div className="bg-[#18202a] rounded-2xl p-3 border border-[#243040] shadow-lg relative">
+          {/* Bet / Auto Pill Switcher & Optional + Button */}
+          <div className="flex items-center justify-between mb-2.5">
+            <div className="w-6" /> {/* spacer to balance header */}
             <div className="bg-[#10161f] p-0.5 rounded-full flex items-center border border-white/5 w-48">
               <button
                 onClick={() => setPanel1Mode('Bet')}
-                className={`flex-1 py-1 rounded-full text-xs font-bold transition-all ${
+                className={`flex-1 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
                   panel1Mode === 'Bet'
                     ? 'bg-[#253243] text-white shadow'
                     : 'text-neutral-400 hover:text-white'
@@ -1015,7 +1064,7 @@ export const AviatorView: React.FC = () => {
               </button>
               <button
                 onClick={() => setPanel1Mode('Auto')}
-                className={`flex-1 py-1 rounded-full text-xs font-bold transition-all ${
+                className={`flex-1 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
                   panel1Mode === 'Auto'
                     ? 'bg-[#253243] text-white shadow'
                     : 'text-neutral-400 hover:text-white'
@@ -1024,6 +1073,19 @@ export const AviatorView: React.FC = () => {
                 Auto
               </button>
             </div>
+
+            {/* Quick '+' icon to open Panel 2 if hidden */}
+            {!panel2Visible ? (
+              <button
+                onClick={() => setPanel2Visible(true)}
+                className="w-6 h-6 rounded-md bg-[#10161f] hover:bg-[#202a38] text-neutral-300 hover:text-white flex items-center justify-center transition-colors border border-white/5 cursor-pointer"
+                title="Add second bet panel"
+              >
+                <Plus className="w-3.5 h-3.5 text-[#00df59]" />
+              </button>
+            ) : (
+              <div className="w-6" />
+            )}
           </div>
 
           {/* Stepper + Presets + Big Action Button */}
@@ -1034,34 +1096,39 @@ export const AviatorView: React.FC = () => {
               <div className="bg-[#10161f] rounded-xl px-2 py-1.5 flex items-center justify-between border border-white/5">
                 <button
                   onClick={() => setPanel1Stake(prev => Math.max(1.0, parseFloat((prev - 1).toFixed(2))))}
-                  className="w-7 h-7 rounded-full bg-[#1b2533] hover:bg-[#253346] active:scale-95 text-neutral-300 hover:text-white flex items-center justify-center"
+                  className="w-7 h-7 rounded-full bg-[#1b2533] hover:bg-[#253346] active:scale-95 text-neutral-300 hover:text-white flex items-center justify-center cursor-pointer transition-colors"
                 >
                   <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
                 </button>
-                <div className="text-center font-black text-sm text-white">
-                  {panel1Stake.toFixed(2)}
-                </div>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0.5"
+                  value={panel1Stake}
+                  onChange={e => setPanel1Stake(Math.max(0.5, parseFloat(e.target.value) || 1.0))}
+                  className="w-16 bg-transparent text-center font-black text-sm text-white focus:outline-none"
+                />
                 <button
                   onClick={() => setPanel1Stake(prev => parseFloat((prev + 1).toFixed(2)))}
-                  className="w-7 h-7 rounded-full bg-[#1b2533] hover:bg-[#253346] active:scale-95 text-neutral-300 hover:text-white flex items-center justify-center"
+                  className="w-7 h-7 rounded-full bg-[#1b2533] hover:bg-[#253346] active:scale-95 text-neutral-300 hover:text-white flex items-center justify-center cursor-pointer transition-colors"
                 >
                   <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                 </button>
               </div>
 
-              {/* 2x2 Quick Stake Presets: 1, 5, 10, 50 */}
+              {/* 2x2 Quick Stake Presets: 1.00, 2.00, 5.00, 10.00 */}
               <div className="grid grid-cols-2 gap-1.5">
-                {[1, 5, 10, 50].map(val => (
+                {[1, 2, 5, 10].map(val => (
                   <button
                     key={val}
                     onClick={() => setPanel1Stake(val)}
-                    className={`py-1 rounded-lg text-xs font-bold transition-all active:scale-95 ${
+                    className={`py-1 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer ${
                       panel1Stake === val
                         ? 'bg-[#29384b] text-white border border-white/20'
                         : 'bg-[#121922] text-neutral-400 hover:text-white hover:bg-[#1a2330]'
                     }`}
                   >
-                    {val}
+                    {val.toFixed(2)}
                   </button>
                 ))}
               </div>
@@ -1091,52 +1158,52 @@ export const AviatorView: React.FC = () => {
               )}
             </div>
 
-            {/* Right: Big Action Button (Exact match to Screenshot 1, 3, 4, 5) */}
+            {/* Right: Big Action Button */}
             <div className="flex flex-col">
               {panel1BetState === 'active' && gameState === 'flying' ? (
                 /* Cash Out button in bright orange/yellow */
                 <button
                   onClick={() => handleCashOut(1, multiplier)}
-                  className="flex-1 bg-gradient-to-b from-[#ffb300] to-[#ff8c00] hover:from-[#ffc107] hover:to-[#ff9800] active:scale-[0.98] text-black rounded-xl p-2 flex flex-col items-center justify-center shadow-lg transition-all animate-pulse"
+                  className="flex-1 bg-gradient-to-b from-[#ff9a00] to-[#ff7700] hover:from-[#ffa81a] hover:to-[#ff851a] active:scale-[0.98] text-black rounded-xl p-2 flex flex-col items-center justify-center shadow-[0_0_20px_rgba(255,154,0,0.5)] transition-all animate-pulse cursor-pointer"
                 >
-                  <span className="text-xs font-black uppercase tracking-wider">Cash Out</span>
-                  <span className="text-base font-black tracking-tight">
-                    {(panel1Stake * multiplier).toFixed(2)} GHS
+                  <span className="text-sm font-black uppercase tracking-wider text-black">CASH OUT</span>
+                  <span className="text-lg font-black tracking-tight text-black">
+                    {(panel1Stake * multiplier).toFixed(2)} {user.currency || 'GHS'}
                   </span>
                 </button>
               ) : panel1BetState === 'queued' ? (
                 /* Waiting for round / Cancel */
                 <button
                   onClick={() => handleCancelBet(1)}
-                  className="flex-1 bg-[#d9383a] hover:bg-[#c22e30] active:scale-[0.98] text-white rounded-xl p-2 flex flex-col items-center justify-center shadow-lg transition-all"
+                  className="flex-1 bg-[#d9383a] hover:bg-[#c22e30] active:scale-[0.98] text-white rounded-xl p-2 flex flex-col items-center justify-center shadow-lg transition-all cursor-pointer"
                 >
-                  <span className="text-xs font-black uppercase tracking-wider">Waiting</span>
+                  <span className="text-xs font-black uppercase tracking-wider">WAITING</span>
                   <span className="text-[11px] text-white/90 font-bold">
-                    Cancel ({panel1Stake.toFixed(2)} GHS)
+                    Cancel ({panel1Stake.toFixed(2)} {user.currency || 'GHS'})
                   </span>
                 </button>
               ) : panel1BetState === 'cashed_out' ? (
                 /* Cashed out success */
                 <div className="flex-1 bg-[#1a4025] border border-[#00df59]/40 rounded-xl p-2 flex flex-col items-center justify-center text-center">
                   <span className="text-[10px] font-black uppercase tracking-wider text-[#00df59]">
-                    Cashed Out
+                    CASHED OUT
                   </span>
-                  <span className="text-sm font-black text-white">
-                    +{panel1CashedAmount.toFixed(2)} GHS
+                  <span className="text-base font-black text-white">
+                    +{panel1CashedAmount.toFixed(2)} {user.currency || 'GHS'}
                   </span>
-                  <span className="text-[10px] text-neutral-400">
+                  <span className="text-[10px] text-neutral-300">
                     at {panel1CashedMultiplier.toFixed(2)}x
                   </span>
                 </div>
               ) : (
-                /* Default Big Green Bet Button (Screenshot 1) */
+                /* Default Big Green Bet Button */
                 <button
                   onClick={() => handlePlaceBet(1)}
-                  className="flex-1 bg-gradient-to-b from-[#22c55e] to-[#16a34a] hover:from-[#2ecc71] hover:to-[#1eb956] active:scale-[0.98] text-white rounded-xl p-2 flex flex-col items-center justify-center shadow-lg shadow-green-900/30 transition-all"
+                  className="flex-1 bg-gradient-to-b from-[#22c55e] to-[#16a34a] hover:from-[#2ecc71] hover:to-[#1eb956] active:scale-[0.98] text-white rounded-xl p-2 flex flex-col items-center justify-center shadow-lg shadow-green-900/30 transition-all cursor-pointer"
                 >
-                  <span className="text-base font-black tracking-wide">Bet</span>
+                  <span className="text-xl font-black tracking-wide uppercase">BET</span>
                   <span className="text-xs font-bold text-white/90">
-                    {panel1Stake.toFixed(2)} GHS
+                    {panel1Stake.toFixed(2)} {user.currency || 'GHS'}
                   </span>
                 </button>
               )}
@@ -1153,7 +1220,7 @@ export const AviatorView: React.FC = () => {
               <div className="bg-[#10161f] p-0.5 rounded-full flex items-center border border-white/5 w-48">
                 <button
                   onClick={() => setPanel2Mode('Bet')}
-                  className={`flex-1 py-1 rounded-full text-xs font-bold transition-all ${
+                  className={`flex-1 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
                     panel2Mode === 'Bet'
                       ? 'bg-[#253243] text-white shadow'
                       : 'text-neutral-400 hover:text-white'
@@ -1163,7 +1230,7 @@ export const AviatorView: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setPanel2Mode('Auto')}
-                  className={`flex-1 py-1 rounded-full text-xs font-bold transition-all ${
+                  className={`flex-1 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
                     panel2Mode === 'Auto'
                       ? 'bg-[#253243] text-white shadow'
                       : 'text-neutral-400 hover:text-white'
@@ -1173,10 +1240,10 @@ export const AviatorView: React.FC = () => {
                 </button>
               </div>
 
-              {/* Minimize/Close [-] button (Screenshot 1 & 4) */}
+              {/* Minimize/Close [-] button */}
               <button
                 onClick={() => setPanel2Visible(false)}
-                className="w-6 h-6 rounded-md bg-[#10161f] hover:bg-[#202a38] text-neutral-400 hover:text-white flex items-center justify-center transition-colors border border-white/5"
+                className="w-6 h-6 rounded-md bg-[#10161f] hover:bg-[#202a38] text-neutral-400 hover:text-white flex items-center justify-center transition-colors border border-white/5 cursor-pointer"
                 title="Hide second bet panel"
               >
                 <Minus className="w-3.5 h-3.5" />
@@ -1190,33 +1257,38 @@ export const AviatorView: React.FC = () => {
                 <div className="bg-[#10161f] rounded-xl px-2 py-1.5 flex items-center justify-between border border-white/5">
                   <button
                     onClick={() => setPanel2Stake(prev => Math.max(1.0, parseFloat((prev - 1).toFixed(2))))}
-                    className="w-7 h-7 rounded-full bg-[#1b2533] hover:bg-[#253346] active:scale-95 text-neutral-300 hover:text-white flex items-center justify-center"
+                    className="w-7 h-7 rounded-full bg-[#1b2533] hover:bg-[#253346] active:scale-95 text-neutral-300 hover:text-white flex items-center justify-center cursor-pointer transition-colors"
                   >
                     <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
                   </button>
-                  <div className="text-center font-black text-sm text-white">
-                    {panel2Stake.toFixed(2)}
-                  </div>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0.5"
+                    value={panel2Stake}
+                    onChange={e => setPanel2Stake(Math.max(0.5, parseFloat(e.target.value) || 1.0))}
+                    className="w-16 bg-transparent text-center font-black text-sm text-white focus:outline-none"
+                  />
                   <button
                     onClick={() => setPanel2Stake(prev => parseFloat((prev + 1).toFixed(2)))}
-                    className="w-7 h-7 rounded-full bg-[#1b2533] hover:bg-[#253346] active:scale-95 text-neutral-300 hover:text-white flex items-center justify-center"
+                    className="w-7 h-7 rounded-full bg-[#1b2533] hover:bg-[#253346] active:scale-95 text-neutral-300 hover:text-white flex items-center justify-center cursor-pointer transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                   </button>
                 </div>
 
                 <div className="grid grid-cols-2 gap-1.5">
-                  {[1, 5, 10, 50].map(val => (
+                  {[1, 2, 5, 10].map(val => (
                     <button
                       key={val}
                       onClick={() => setPanel2Stake(val)}
-                      className={`py-1 rounded-lg text-xs font-bold transition-all active:scale-95 ${
+                      className={`py-1 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer ${
                         panel2Stake === val
                           ? 'bg-[#29384b] text-white border border-white/20'
                           : 'bg-[#121922] text-neutral-400 hover:text-white hover:bg-[#1a2330]'
                       }`}
                     >
-                      {val}
+                      {val.toFixed(2)}
                     </button>
                   ))}
                 </div>
@@ -1250,43 +1322,43 @@ export const AviatorView: React.FC = () => {
                 {panel2BetState === 'active' && gameState === 'flying' ? (
                   <button
                     onClick={() => handleCashOut(2, multiplier)}
-                    className="flex-1 bg-gradient-to-b from-[#ffb300] to-[#ff8c00] hover:from-[#ffc107] hover:to-[#ff9800] active:scale-[0.98] text-black rounded-xl p-2 flex flex-col items-center justify-center shadow-lg transition-all animate-pulse"
+                    className="flex-1 bg-gradient-to-b from-[#ff9a00] to-[#ff7700] hover:from-[#ffa81a] hover:to-[#ff851a] active:scale-[0.98] text-black rounded-xl p-2 flex flex-col items-center justify-center shadow-[0_0_20px_rgba(255,154,0,0.5)] transition-all animate-pulse cursor-pointer"
                   >
-                    <span className="text-xs font-black uppercase tracking-wider">Cash Out</span>
-                    <span className="text-base font-black tracking-tight">
-                      {(panel2Stake * multiplier).toFixed(2)} GHS
+                    <span className="text-sm font-black uppercase tracking-wider text-black">CASH OUT</span>
+                    <span className="text-lg font-black tracking-tight text-black">
+                      {(panel2Stake * multiplier).toFixed(2)} {user.currency || 'GHS'}
                     </span>
                   </button>
                 ) : panel2BetState === 'queued' ? (
                   <button
                     onClick={() => handleCancelBet(2)}
-                    className="flex-1 bg-[#d9383a] hover:bg-[#c22e30] active:scale-[0.98] text-white rounded-xl p-2 flex flex-col items-center justify-center shadow-lg transition-all"
+                    className="flex-1 bg-[#d9383a] hover:bg-[#c22e30] active:scale-[0.98] text-white rounded-xl p-2 flex flex-col items-center justify-center shadow-lg transition-all cursor-pointer"
                   >
-                    <span className="text-xs font-black uppercase tracking-wider">Waiting</span>
+                    <span className="text-xs font-black uppercase tracking-wider">WAITING</span>
                     <span className="text-[11px] text-white/90 font-bold">
-                      Cancel ({panel2Stake.toFixed(2)} GHS)
+                      Cancel ({panel2Stake.toFixed(2)} {user.currency || 'GHS'})
                     </span>
                   </button>
                 ) : panel2BetState === 'cashed_out' ? (
                   <div className="flex-1 bg-[#1a4025] border border-[#00df59]/40 rounded-xl p-2 flex flex-col items-center justify-center text-center">
                     <span className="text-[10px] font-black uppercase tracking-wider text-[#00df59]">
-                      Cashed Out
+                      CASHED OUT
                     </span>
-                    <span className="text-sm font-black text-white">
-                      +{panel2CashedAmount.toFixed(2)} GHS
+                    <span className="text-base font-black text-white">
+                      +{panel2CashedAmount.toFixed(2)} {user.currency || 'GHS'}
                     </span>
-                    <span className="text-[10px] text-neutral-400">
+                    <span className="text-[10px] text-neutral-300">
                       at {panel2CashedMultiplier.toFixed(2)}x
                     </span>
                   </div>
                 ) : (
                   <button
                     onClick={() => handlePlaceBet(2)}
-                    className="flex-1 bg-gradient-to-b from-[#22c55e] to-[#16a34a] hover:from-[#2ecc71] hover:to-[#1eb956] active:scale-[0.98] text-white rounded-xl p-2 flex flex-col items-center justify-center shadow-lg shadow-green-900/30 transition-all"
+                    className="flex-1 bg-gradient-to-b from-[#22c55e] to-[#16a34a] hover:from-[#2ecc71] hover:to-[#1eb956] active:scale-[0.98] text-white rounded-xl p-2 flex flex-col items-center justify-center shadow-lg shadow-green-900/30 transition-all cursor-pointer"
                   >
-                    <span className="text-base font-black tracking-wide">Bet</span>
+                    <span className="text-xl font-black tracking-wide uppercase">BET</span>
                     <span className="text-xs font-bold text-white/90">
-                      {panel2Stake.toFixed(2)} GHS
+                      {panel2Stake.toFixed(2)} {user.currency || 'GHS'}
                     </span>
                   </button>
                 )}
@@ -1297,7 +1369,7 @@ export const AviatorView: React.FC = () => {
           /* Add Second Bet Panel Button */
           <button
             onClick={() => setPanel2Visible(true)}
-            className="w-full py-2 bg-[#18202a] hover:bg-[#202b38] rounded-xl border border-dashed border-[#2d3a4e] text-xs font-bold text-neutral-300 hover:text-white flex items-center justify-center space-x-1.5 transition-colors"
+            className="w-full py-2.5 bg-[#18202a] hover:bg-[#202b38] rounded-xl border border-dashed border-[#2d3a4e] text-xs font-bold text-neutral-300 hover:text-white flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4 text-[#00df59]" />
             <span>Add Second Bet</span>
@@ -1306,18 +1378,18 @@ export const AviatorView: React.FC = () => {
       </div>
 
       {/* ========================================================= */}
-      {/* 6. BOTTOM LIVE BETS CONSOLE (Screenshot 1, 3: All Bets, Previous, Top) */}
+      {/* 6. BOTTOM LIVE BETS CONSOLE (All Bets, My Bets, Top) */}
       {/* ========================================================= */}
       <div className="mt-4 px-3 pb-8">
         <div className="bg-[#18202a] rounded-2xl border border-[#243040] overflow-hidden shadow-xl">
           {/* Capsule Tab Switcher */}
           <div className="p-2 border-b border-[#212b38]">
             <div className="bg-[#10161f] p-0.5 rounded-full flex items-center border border-white/5">
-              {(['All Bets', 'Previous', 'Top'] as const).map(tab => (
+              {(['All Bets', 'My Bets', 'Top'] as const).map(tab => (
                 <button
                   key={tab}
                   onClick={() => setBottomTab(tab)}
-                  className={`flex-1 py-1.5 rounded-full text-xs font-bold transition-all ${
+                  className={`flex-1 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                     bottomTab === tab
                       ? 'bg-[#253243] text-white shadow'
                       : 'text-neutral-400 hover:text-white'
@@ -1329,7 +1401,7 @@ export const AviatorView: React.FC = () => {
             </div>
           </div>
 
-          {/* Subheader: Avatars + 611/1931 Bets + 41,023.58 Total win GHS (Screenshot 1 & 3) */}
+          {/* Subheader: Avatars + 611/1931 Bets + Total win GHS */}
           <div className="px-4 py-2.5 bg-[#141a22] flex items-center justify-between border-b border-[#202936]">
             <div>
               <div className="flex items-center space-x-2">
@@ -1351,47 +1423,85 @@ export const AviatorView: React.FC = () => {
                   />
                 </div>
                 <span className="text-xs font-bold text-neutral-300">
-                  {totalRoundBetsCount}/1529 Bets
+                  {bottomTab === 'My Bets'
+                    ? `${userBetHistory.length} My Bets`
+                    : `${totalRoundBetsCount}/1529 Bets`}
                 </span>
               </div>
               {/* Thin green progress bar underneath */}
               <div className="w-24 h-1 bg-neutral-800 rounded-full mt-1.5 overflow-hidden">
                 <div
                   className="h-full bg-[#00df59] rounded-full transition-all duration-300"
-                  style={{ width: `${Math.min(100, Math.max(5, (totalRoundBetsCount / 1529) * 100))}%` }}
+                  style={{
+                    width: `${Math.min(
+                      100,
+                      Math.max(5, (totalRoundBetsCount / 1529) * 100)
+                    )}%`
+                  }}
                 />
               </div>
             </div>
 
-            {/* Total Win GHS */}
+            {/* Total Win GHS / Sub-selector for Top */}
             <div className="text-right">
-              <div className="text-sm font-black text-white">
-                {bottomTab === 'All Bets'
-                  ? totalRoundWinAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                  : bottomTab === 'Previous'
-                  ? '1,127.00'
-                  : '98,450.00'}
-              </div>
-              <div className="text-[10px] text-neutral-400">Total win GHS</div>
+              {bottomTab === 'Top' ? (
+                <div className="flex items-center space-x-1 bg-[#10161f] p-0.5 rounded-lg border border-white/5">
+                  {(['Day', 'Month', 'Year'] as const).map(f => (
+                    <button
+                      key={f}
+                      onClick={() => setTopTimeFilter(f)}
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors ${
+                        topTimeFilter === f
+                          ? 'bg-[#253243] text-white'
+                          : 'text-neutral-400 hover:text-white'
+                      }`}
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div className="text-sm font-black text-white">
+                    {bottomTab === 'All Bets'
+                      ? totalRoundWinAmount.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })
+                      : userBetHistory
+                          .reduce((acc, b) => acc + (b.won ? b.payout : 0), 0)
+                          .toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                          })}
+                  </div>
+                  <div className="text-[10px] text-neutral-400">Total win GHS</div>
+                </>
+              )}
             </div>
           </div>
 
-          {/* Table Header: Player | Bet GHS | X | Win GHS (Screenshot 3) */}
+          {/* Table Header: Player / Time | Bet GHS | X | Cash out GHS */}
           <div className="px-4 py-2 bg-[#121820] grid grid-cols-12 text-[11px] font-bold text-neutral-400 border-b border-[#1d2632]">
-            <div className="col-span-4">Player</div>
+            <div className="col-span-4">
+              {bottomTab === 'My Bets' ? 'Time' : 'Player'}
+            </div>
             <div className="col-span-3 text-right">Bet GHS</div>
             <div className="col-span-2 text-center">X</div>
-            <div className="col-span-3 text-right">Win GHS</div>
+            <div className="col-span-3 text-right">Cash out GHS</div>
           </div>
 
-          {/* Table Rows (Matching video frames 00:31-00:34) */}
+          {/* Table Rows */}
           <div className="divide-y divide-[#1e2733] max-h-72 overflow-y-auto no-scrollbar">
+            {/* 1. ALL BETS TAB */}
             {bottomTab === 'All Bets' &&
               liveBets.map(bet => (
                 <div
                   key={bet.id}
                   className={`px-4 py-2 grid grid-cols-12 items-center text-xs transition-colors ${
-                    bet.winAmount ? 'bg-[#152a1d]/20 hover:bg-[#152a1d]/30' : 'hover:bg-[#1a232f]'
+                    bet.winAmount
+                      ? 'bg-[#152a1d]/20 hover:bg-[#152a1d]/30'
+                      : 'hover:bg-[#1a232f]'
                   }`}
                 >
                   {/* Player with avatar and masked name */}
@@ -1408,7 +1518,10 @@ export const AviatorView: React.FC = () => {
 
                   {/* Bet Amount */}
                   <div className="col-span-3 text-right font-medium text-white text-[11px]">
-                    {bet.betAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {bet.betAmount.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
                   </div>
 
                   {/* Multiplier X (Clean green text in video) */}
@@ -1422,11 +1535,14 @@ export const AviatorView: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Win GHS (Clean green bold in video) */}
+                  {/* Cash out GHS */}
                   <div className="col-span-3 text-right font-bold text-[11px]">
                     {bet.winAmount ? (
                       <span className="text-[#00df59]">
-                        {bet.winAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {bet.winAmount.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })}
                       </span>
                     ) : (
                       <span className="text-transparent">-</span>
@@ -1435,33 +1551,109 @@ export const AviatorView: React.FC = () => {
                 </div>
               ))}
 
-            {bottomTab === 'Previous' && (
-              <div className="p-4 text-center text-xs text-neutral-400 space-y-2">
-                <p>Round #284920 Ended at {multiplierHistory[0]?.toFixed(2)}x</p>
-                <div className="text-[11px] text-neutral-500">1,970 players participated</div>
-              </div>
+            {/* 2. MY BETS TAB */}
+            {bottomTab === 'My Bets' && (
+              <>
+                {userBetHistory.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-neutral-400">
+                    No bets placed yet in this session. Place your bet above to fly!
+                  </div>
+                ) : (
+                  userBetHistory.map(b => (
+                    <div
+                      key={b.id}
+                      className={`px-4 py-2 grid grid-cols-12 items-center text-xs transition-colors ${
+                        b.won ? 'bg-[#152a1d]/20 hover:bg-[#152a1d]/30' : 'hover:bg-[#1a232f]'
+                      }`}
+                    >
+                      {/* Time */}
+                      <div className="col-span-4 text-[11px] text-neutral-300 font-medium">
+                        {b.time}
+                      </div>
+
+                      {/* Bet GHS */}
+                      <div className="col-span-3 text-right font-medium text-white text-[11px]">
+                        {b.stake.toFixed(2)}
+                      </div>
+
+                      {/* Multiplier X */}
+                      <div className="col-span-2 text-center">
+                        <span
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                            b.won
+                              ? 'bg-[#00df59]/20 text-[#00df59]'
+                              : 'bg-red-500/20 text-red-400'
+                          }`}
+                        >
+                          {b.multiplier.toFixed(2)}x
+                        </span>
+                      </div>
+
+                      {/* Cash out GHS */}
+                      <div className="col-span-3 text-right font-bold text-[11px]">
+                        {b.won ? (
+                          <span className="text-[#00df59]">+{b.payout.toFixed(2)}</span>
+                        ) : (
+                          <span className="text-neutral-500">-</span>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </>
             )}
 
+            {/* 3. TOP TAB (Day / Month / Year Leaderboard) */}
             {bottomTab === 'Top' && (
               <div className="divide-y divide-[#1e2733]">
-                {[
-                  { user: 'k***9', bet: 1200, mult: 42.50, win: 51000 },
-                  { user: '7***e', bet: 800, mult: 28.10, win: 22480 },
-                  { user: 'b***m', bet: 500, mult: 35.00, win: 17500 }
-                ].map((row, i) => (
-                  <div key={i} className="px-4 py-2.5 grid grid-cols-12 items-center text-xs">
-                    <div className="col-span-4 flex items-center space-x-1.5 font-bold text-amber-400">
-                      <span>#{i + 1}</span>
-                      <span>{row.user}</span>
+                {(topTimeFilter === 'Day'
+                  ? [
+                      { rank: 1, user: 'k***9', bet: 1200, mult: 42.5, win: 51000 },
+                      { rank: 2, user: '7***e', bet: 800, mult: 28.1, win: 22480 },
+                      { rank: 3, user: 'b***m', bet: 500, mult: 35.0, win: 17500 },
+                      { rank: 4, user: '0***3', bet: 350, mult: 22.4, win: 7840 }
+                    ]
+                  : topTimeFilter === 'Month'
+                  ? [
+                      { rank: 1, user: 'w***g', bet: 2000, mult: 185.0, win: 370000 },
+                      { rank: 2, user: 'e***2', bet: 1500, mult: 94.2, win: 141300 },
+                      { rank: 3, user: 'd***8', bet: 800, mult: 112.5, win: 90000 },
+                      { rank: 4, user: 'l***1', bet: 500, mult: 78.4, win: 39200 }
+                    ]
+                  : [
+                      { rank: 1, user: 'f***m', bet: 1000, mult: 1250.0, win: 1250000 },
+                      { rank: 2, user: 'a***a', bet: 2500, mult: 480.0, win: 1200000 },
+                      { rank: 3, user: 's***7', bet: 500, mult: 890.0, win: 445000 },
+                      { rank: 4, user: 'm***2', bet: 600, mult: 550.0, win: 330000 }
+                    ]
+                ).map(row => (
+                  <div key={row.rank} className="px-4 py-2.5 grid grid-cols-12 items-center text-xs">
+                    <div className="col-span-4 flex items-center space-x-1.5 font-bold">
+                      <span
+                        className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
+                          row.rank === 1
+                            ? 'bg-amber-400 text-black'
+                            : row.rank === 2
+                            ? 'bg-neutral-300 text-black'
+                            : row.rank === 3
+                            ? 'bg-amber-700 text-white'
+                            : 'bg-neutral-700 text-neutral-300'
+                        }`}
+                      >
+                        {row.rank}
+                      </span>
+                      <span className="text-neutral-300 text-[11px] truncate">{row.user}</span>
                     </div>
-                    <div className="col-span-3 text-right text-white">{row.bet.toFixed(2)}</div>
+                    <div className="col-span-3 text-right text-white font-medium text-[11px]">
+                      {row.bet.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </div>
                     <div className="col-span-2 text-center">
                       <span className="px-1.5 py-0.5 rounded bg-[#e024c3]/20 text-[#e024c3] font-bold text-[10px]">
                         {row.mult.toFixed(2)}x
                       </span>
                     </div>
-                    <div className="col-span-3 text-right font-bold text-[#00df59]">
-                      {row.win.toFixed(2)}
+                    <div className="col-span-3 text-right font-bold text-[#00df59] text-[11px]">
+                      {row.win.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </div>
                   </div>
                 ))}
