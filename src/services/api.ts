@@ -578,7 +578,7 @@ export const api = {
 
   // --- AVIATOR SYNCHRONIZED MULTI-DEVICE MASTER ENGINE ---
   aviator: {
-    async getState(): Promise<{ success: boolean; currentRound?: any; nextRound?: any; upcomingQueue?: any[]; history?: number[]; adminOverrideActive?: boolean; autoRunEnabled?: boolean; serverTime?: number; error?: string }> {
+    async getState(): Promise<{ success: boolean; currentRound?: any; nextRound?: any; upcomingQueue?: any[]; history?: number[]; adminOverrideActive?: boolean; autoRunEnabled?: boolean; serverTime?: number; overrides?: Record<number, { crashPoint: number; speedMultiplier?: number }>; error?: string }> {
       const endpoint = '/api/aviator/state';
       try {
         const res = await fetch(resolveApiUrl(endpoint));

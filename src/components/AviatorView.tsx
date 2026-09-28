@@ -20,7 +20,11 @@ import {
   Sparkles,
   Send,
   CheckCircle2,
-  ChevronDown
+  ChevronDown,
+  Radio,
+  Gauge,
+  Copy,
+  Check
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useBetting } from '../context/BettingContext';
@@ -69,6 +73,11 @@ export const AviatorView: React.FC = () => {
   const [howToPlayOpen, setHowToPlayOpen] = useState(false);
   const [provablyFairOpen, setProvablyFairOpen] = useState(false);
   const [myHistoryOpen, setMyHistoryOpen] = useState(false);
+  const [radarModalOpen, setRadarModalOpen] = useState(false);
+  const [copiedSignal, setCopiedSignal] = useState(false);
+  const [nextRoundInfo, setNextRoundInfo] = useState<any>(null);
+  const [currentRoundId, setCurrentRoundId] = useState<string>('SB-AV-4978');
+  const [upcomingQueue, setUpcomingQueue] = useState<any[]>([]);
 
   // Chat system
   const [chatInput, setChatInput] = useState('');
@@ -305,6 +314,16 @@ export const AviatorView: React.FC = () => {
     const unsubscribe = aviatorEngine.subscribe((engineState) => {
       const cur = engineState.currentRound;
       if (!cur) return;
+
+      if (engineState.nextRound) {
+        setNextRoundInfo(engineState.nextRound);
+      }
+      if (cur.roundId) {
+        setCurrentRoundId(cur.roundId);
+      }
+      if (engineState.upcomingQueue) {
+        setUpcomingQueue(engineState.upcomingQueue);
+      }
 
       const serverStatus = cur.status;
       const serverMultiplier = cur.currentMultiplier;
@@ -630,6 +649,19 @@ export const AviatorView: React.FC = () => {
             </span>
             <span className="leading-none">How to play?</span>
           </button>
+
+          {/* Synchronized Speed Signal & Radar Button */}
+          <button
+            onClick={() => setRadarModalOpen(true)}
+            className="bg-[#1b2533] hover:bg-[#233142] border border-red-500/40 text-white text-[10px] font-black px-2 py-0.5 rounded-full flex items-center space-x-1 shadow-sm transition-transform active:scale-95 cursor-pointer ml-1"
+            title="Authoritative Synchronized Speed Signal & Radar"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-neutral-300">Signal:</span>
+            <span className={`font-black ${nextRoundInfo ? nextRoundInfo.sign.textClass : 'text-sky-400'}`}>
+              {nextRoundInfo ? `${nextRoundInfo.crashPoint.toFixed(2)}x` : '...'}
+            </span>
+          </button>
         </div>
 
         {/* Right: Balance, Audio toggle, Chat, Hamburger Menu */}
@@ -719,6 +751,16 @@ export const AviatorView: React.FC = () => {
             <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-300" />
             <span>More Games</span>
             <span>↑</span>
+          </button>
+
+          {/* Floating '📡 Speed Signal (X.XXx)' pill */}
+          <button
+            onClick={() => setRadarModalOpen(true)}
+            className="absolute top-2.5 right-2.5 z-30 bg-gradient-to-r from-red-600/90 to-amber-600/90 hover:from-red-500 hover:to-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full flex items-center space-x-1.5 backdrop-blur-md shadow-lg border border-amber-300/40 transition-all active:scale-95 cursor-pointer"
+            title="View Synchronized Speed Signal & Flight Radar"
+          >
+            <Radio className="w-3 h-3 text-amber-300 animate-pulse" />
+            <span>Signal: {nextRoundInfo ? `${nextRoundInfo.crashPoint.toFixed(2)}x` : '...'}</span>
           </button>
 
           {/* ===================================================== */}
@@ -960,6 +1002,25 @@ export const AviatorView: React.FC = () => {
                     style={{ width: `${((5 - countdown) / 5) * 100}%` }}
                   />
                 </div>
+
+                {/* Synchronized Speed Signal Indicator Badge */}
+                {nextRoundInfo && (
+                  <div
+                    onClick={() => setRadarModalOpen(true)}
+                    className="mt-2.5 bg-black/60 hover:bg-black/80 border border-white/10 rounded-lg px-2.5 py-1 flex items-center justify-between pointer-events-auto cursor-pointer transition-all active:scale-95 shadow"
+                  >
+                    <div className="flex items-center space-x-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="text-[9px] font-bold text-neutral-300">Next Speed Signal:</span>
+                    </div>
+                    <div className="flex items-center space-x-1.5">
+                      <span className={`text-[10px] font-black ${nextRoundInfo.sign.textClass}`}>
+                        {nextRoundInfo.crashPoint.toFixed(2)}x
+                      </span>
+                      <span className="text-[9px]">{nextRoundInfo.sign.trendIcon}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -2039,6 +2100,167 @@ export const AviatorView: React.FC = () => {
                   {m.toFixed(2)}x
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* 13. SYNCHRONIZED SPEED SIGNAL & FLIGHT RADAR MODAL */}
+      {/* ========================================================= */}
+      {radarModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-3 sm:p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#131b26] text-white rounded-2xl max-w-md w-full p-4 sm:p-5 border border-red-500/40 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-neutral-700/60 pb-3">
+              <div className="flex items-center space-x-2">
+                <div className="w-7 h-7 rounded-lg bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400">
+                  <Radio className="w-4 h-4 animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="font-black text-sm text-white tracking-wide flex items-center space-x-1.5">
+                    <span>Aviator Speed Signal & Radar</span>
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  </h3>
+                  <p className="text-[10px] text-emerald-400 font-bold">
+                    🟢 Authoritative Live Sync • Same Across All Phones
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setRadarModalOpen(false)}
+                className="p-1.5 text-neutral-400 hover:text-white rounded-full bg-white/5 hover:bg-white/10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Current Active Round ID */}
+            <div className="bg-[#0e141d] rounded-xl p-3 border border-white/10 flex items-center justify-between text-xs">
+              <span className="text-neutral-400 font-bold">Current Flight:</span>
+              <span className="font-mono font-black text-sky-400">{currentRoundId}</span>
+              <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                gameState === 'flying' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' :
+                gameState === 'crashed' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40' :
+                'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+              }`}>
+                {gameState}
+              </span>
+            </div>
+
+            {/* NEXT FLIGHT PREDICTION / SIGNAL CARD */}
+            {nextRoundInfo && (
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1c1228] via-[#141b26] to-[#0c121b] border-2 border-red-500/50 p-4 shadow-xl space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    <span className="text-[11px] font-black uppercase tracking-wider text-amber-300">
+                      NEXT FLIGHT SPEED SIGNAL
+                    </span>
+                  </div>
+                  <span className="font-mono text-xs font-bold text-neutral-400">
+                    {nextRoundInfo.roundId}
+                  </span>
+                </div>
+
+                {/* Big Target Multiplier & Sign Tier */}
+                <div className="flex items-end justify-between py-1">
+                  <div>
+                    <div className="text-[10px] uppercase font-bold text-neutral-400">
+                      Target Crash Multiplier
+                    </div>
+                    <div className={`text-4xl sm:text-5xl font-black tracking-tight ${nextRoundInfo.sign.textClass}`}>
+                      {nextRoundInfo.crashPoint.toFixed(2)}x
+                    </div>
+                  </div>
+
+                  <div className="text-right space-y-1">
+                    <span className={`inline-block px-2.5 py-1 rounded-lg text-xs font-black uppercase border ${nextRoundInfo.sign.borderClass} ${nextRoundInfo.sign.bgClass} ${nextRoundInfo.sign.textClass}`}>
+                      {nextRoundInfo.sign.tier.replace('_', ' ')}
+                    </span>
+                    <div className="text-xs font-bold text-white flex items-center justify-end space-x-1">
+                      <span>Trend: {nextRoundInfo.sign.trend}</span>
+                      <span>{nextRoundInfo.sign.trendIcon}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Speed Profile & Duration Details */}
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/10 text-xs">
+                  <div className="bg-black/30 rounded-lg p-2 border border-white/5">
+                    <div className="text-[10px] text-neutral-400 font-bold">Speed Multiplier</div>
+                    <div className="font-black text-sky-400 flex items-center space-x-1 mt-0.5">
+                      <Gauge className="w-3 h-3" />
+                      <span>{nextRoundInfo.speedMultiplier}x Climb Speed</span>
+                    </div>
+                    <div className="text-[9px] text-neutral-400 mt-0.5">{nextRoundInfo.speedLabel}</div>
+                  </div>
+
+                  <div className="bg-black/30 rounded-lg p-2 border border-white/5">
+                    <div className="text-[10px] text-neutral-400 font-bold">Est. Flight Duration</div>
+                    <div className="font-black text-emerald-400 flex items-center space-x-1 mt-0.5">
+                      <Clock className="w-3 h-3" />
+                      <span>~{nextRoundInfo.estimatedDurationSec.toFixed(1)} seconds</span>
+                    </div>
+                    <div className="text-[9px] text-neutral-400 mt-0.5">Until fly-away crash</div>
+                  </div>
+                </div>
+
+                {/* Copy Signal / Share Button */}
+                <button
+                  onClick={() => {
+                    const text = `🚀 SportyBet Aviator Speed Signal for ${nextRoundInfo.roundId}: ${nextRoundInfo.crashPoint.toFixed(2)}x (${nextRoundInfo.sign.tier.replace('_', ' ')}) at ${nextRoundInfo.speedMultiplier}x speed!`;
+                    navigator.clipboard.writeText(text);
+                    setCopiedSignal(true);
+                    showToast('Speed signal copied to clipboard!');
+                    setTimeout(() => setCopiedSignal(false), 2000);
+                  }}
+                  className="w-full py-2 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-bold text-xs rounded-xl flex items-center justify-center space-x-1.5 shadow transition-all active:scale-95 cursor-pointer"
+                >
+                  {copiedSignal ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedSignal ? 'Signal Copied to Clipboard!' : 'Copy & Share This Signal'}</span>
+                </button>
+              </div>
+            )}
+
+            {/* UPCOMING RADAR SCHEDULE (Next 5 Rounds) */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-neutral-300 flex items-center space-x-1">
+                  <Clock className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Upcoming Flight Forecast (Next 5 Games)</span>
+                </span>
+                <span className="text-[10px] text-neutral-400">100% Synced</span>
+              </div>
+
+              <div className="bg-[#0e141d] rounded-xl border border-white/10 divide-y divide-white/5 overflow-hidden text-xs">
+                {upcomingQueue.slice(0, 5).map((q, idx) => (
+                  <div key={q.roundId} className="p-2.5 flex items-center justify-between hover:bg-white/5 transition-colors">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-neutral-500 font-bold text-[10px]">+{idx + 1}</span>
+                      <span className="font-mono text-neutral-300 font-semibold">{q.roundId}</span>
+                    </div>
+                    <div className="flex items-center space-x-2.5">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase border ${q.sign.borderClass} ${q.sign.textClass} bg-black/40`}>
+                        {q.sign.tier.replace('_', ' ')}
+                      </span>
+                      <span className="font-mono font-black text-white w-14 text-right">
+                        {q.crashPoint.toFixed(2)}x
+                      </span>
+                      <span>{q.sign.trendIcon}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Explanatory synchronization note */}
+            <div className="bg-[#121e14] border border-[#1e4620] rounded-xl p-2.5 text-[11px] text-neutral-300 flex items-start space-x-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold text-emerald-400">Multi-Phone Synchronization Active: </span>
+                Every connected phone sees the exact same round ID, speed signal, and crash point at the exact same second. If you share this signal with another phone, it will crash at the exact same number.
+              </div>
             </div>
           </div>
         </div>
