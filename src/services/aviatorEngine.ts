@@ -46,11 +46,14 @@ export interface AviatorEngineState {
     crashPoint: number;
     speedMultiplier: number;
     startedAt?: number;
+    intermissionCountdown?: number;
   };
   nextRound: AviatorRoundInfo;
   upcomingQueue: AviatorRoundInfo[];
   history: number[];
   adminOverrideActive: boolean;
+  autoRunEnabled: boolean;
+  lastRoundUpdated?: number;
 }
 
 const STORAGE_KEY = 'sportybet_aviator_engine_state';
@@ -213,9 +216,12 @@ export function generateRandomRound(roundNum: number, speedMultiplier: number = 
 class AviatorEngineService {
   private state: AviatorEngineState;
   private listeners: Set<(state: AviatorEngineState) => void> = new Set();
+  private loopTimer: any = null;
+  private crashHoldTimestamp: number = 0;
 
   constructor() {
     this.state = this.loadInitialState();
+    this.startAutonomousLoop();
   }
 
   private loadInitialState(): AviatorEngineState {
@@ -224,6 +230,8 @@ class AviatorEngineService {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.nextRound && parsed.upcomingQueue?.length > 0) {
+          if (parsed.autoRunEnabled === undefined) parsed.autoRunEnabled = true;
+          if (!parsed.currentRound.intermissionCountdown) parsed.currentRound.intermissionCountdown = 5;
           return parsed;
         }
       }
@@ -247,13 +255,84 @@ class AviatorEngineService {
         status: 'waiting',
         currentMultiplier: 1.0,
         crashPoint: 2.45,
-        speedMultiplier: 1.0
+        speedMultiplier: 1.0,
+        intermissionCountdown: 5
       },
       nextRound,
       upcomingQueue,
       history,
-      adminOverrideActive: false
+      adminOverrideActive: false,
+      autoRunEnabled: true,
+      lastRoundUpdated: Date.now()
     };
+  }
+
+  private startAutonomousLoop() {
+    if (typeof window === 'undefined') return;
+    if (this.loopTimer) clearInterval(this.loopTimer);
+
+    // Cross-window / cross-tab storage listener
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed && parsed.nextRound) {
+            this.state = parsed;
+            this.notify();
+          }
+        } catch {
+          //
+        }
+      }
+    });
+
+    this.loopTimer = setInterval(() => {
+      this.tick();
+    }, 200);
+  }
+
+  private tick() {
+    if (!this.state.autoRunEnabled) return;
+
+    const cur = this.state.currentRound;
+
+    if (cur.status === 'waiting') {
+      const remaining = Math.max(0, parseFloat(((cur.intermissionCountdown ?? 5) - 0.2).toFixed(1)));
+      cur.intermissionCountdown = remaining;
+
+      if (remaining <= 0) {
+        // Take off!
+        cur.status = 'flying';
+        cur.currentMultiplier = 1.0;
+        cur.startedAt = Date.now();
+        this.notify();
+      } else {
+        // Notify every whole second
+        if (remaining % 1 === 0) {
+          this.notify();
+        }
+      }
+    } else if (cur.status === 'flying') {
+      const elapsed = (Date.now() - (cur.startedAt || Date.now())) / 1000;
+      const speed = cur.speedMultiplier || 1.0;
+      const nextVal = parseFloat((1.0 + Math.pow(elapsed * 0.72 * speed, 1.42)).toFixed(2));
+
+      if (nextVal >= cur.crashPoint) {
+        // Crash / Flew away!
+        cur.currentMultiplier = cur.crashPoint;
+        cur.status = 'crashed';
+        this.crashHoldTimestamp = Date.now();
+        this.persist();
+      } else {
+        cur.currentMultiplier = nextVal;
+        this.notify();
+      }
+    } else if (cur.status === 'crashed') {
+      // Hold crashed state for 2.2 seconds then automatically advance to the next round
+      if (Date.now() - this.crashHoldTimestamp > 2200) {
+        this.advanceToNextRound();
+      }
+    }
   }
 
   private persist() {
@@ -286,6 +365,16 @@ class AviatorEngineService {
     return JSON.parse(JSON.stringify(this.state.nextRound));
   }
 
+  public setAutoRun(enabled: boolean) {
+    this.state.autoRunEnabled = enabled;
+    this.persist();
+  }
+
+  // Force advance to next round immediately (Admin 1-click refresh signal)
+  public forceAdvanceNextSignal(): AviatorRoundInfo {
+    return this.advanceToNextRound();
+  }
+
   // Update real-time status of the current game (e.g. from AviatorView)
   public updateCurrentGameStatus(status: GameStatus, multiplier: number, crashPoint?: number) {
     this.state.currentRound.status = status;
@@ -298,22 +387,23 @@ class AviatorEngineService {
 
   // Called when a round finishes and the next round begins
   public advanceToNextRound(): AviatorRoundInfo {
-    const finishedCrash = this.state.nextRound.crashPoint;
+    const finishedCrash = this.state.currentRound.crashPoint || this.state.nextRound.crashPoint;
     this.state.history.unshift(finishedCrash);
     if (this.state.history.length > 30) {
       this.state.history.pop();
     }
 
-    // Next round becomes current
+    // Scheduled next round becomes the new current round
     const currentRoundInfo = this.state.nextRound;
     this.state.currentRound = {
       roundId: currentRoundInfo.roundId,
       roundNumber: currentRoundInfo.roundNumber,
-      status: 'flying',
+      status: 'waiting',
       currentMultiplier: 1.0,
       crashPoint: currentRoundInfo.crashPoint,
       speedMultiplier: currentRoundInfo.speedMultiplier,
-      startedAt: Date.now()
+      startedAt: Date.now(),
+      intermissionCountdown: 5
     };
 
     // Dequeue next round from queue or generate new
@@ -336,6 +426,7 @@ class AviatorEngineService {
     }
 
     this.state.adminOverrideActive = false;
+    this.state.lastRoundUpdated = Date.now();
     this.persist();
     return currentRoundInfo;
   }

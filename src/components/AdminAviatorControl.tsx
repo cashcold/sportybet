@@ -145,12 +145,40 @@ export const AdminAviatorControl: React.FC<AdminAviatorControlProps> = ({
                 <span>Admin Override Active</span>
               </span>
             )}
+            {/* Generate Next Signal Button */}
+            <button
+              onClick={() => {
+                const res = aviatorEngine.forceAdvanceNextSignal();
+                onShowToast(`Generated New Signal for ${res.roundId}: ${res.crashPoint.toFixed(2)}x!`);
+              }}
+              className="px-3.5 py-1.5 bg-[#00a826] hover:bg-[#009221] active:scale-95 text-white rounded-lg text-xs font-black flex items-center space-x-1.5 shadow transition-all cursor-pointer"
+              title="Instantly generate next round and fresh signal"
+            >
+              <RotateCcw className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Next Signal Now</span>
+            </button>
+            {/* Auto-cycle toggle button */}
+            <button
+              type="button"
+              onClick={() => {
+                const nextState = !engineState.autoRunEnabled;
+                aviatorEngine.setAutoRun(nextState);
+                onShowToast(nextState ? 'Auto-Cycle Rounds enabled (Continuous live rounds)' : 'Auto-Cycle paused');
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer flex items-center space-x-1.5 ${
+                engineState.autoRunEnabled
+                  ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/40 hover:bg-emerald-900/60'
+                  : 'bg-[#1b2533] text-neutral-400 border-[#2a3c50] hover:text-white'
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${engineState.autoRunEnabled ? 'bg-[#00df59] animate-pulse' : 'bg-neutral-500'}`} />
+              <span>{engineState.autoRunEnabled ? 'Auto-Cycle: ON' : 'Auto-Cycle: PAUSED'}</span>
+            </button>
             <button
               onClick={handleResetNatural}
               className="px-3 py-1.5 bg-[#1f2b3b] hover:bg-[#28384d] text-neutral-300 hover:text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 border border-[#2b3a4d] transition-colors cursor-pointer"
               title="Reset to natural random generator"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
               <span>Reset Natural RNG</span>
             </button>
             {onNavigateToGame && (

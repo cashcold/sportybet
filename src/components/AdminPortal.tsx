@@ -367,12 +367,37 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
                   <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30">
                     Next Flight: {aviatorState.nextRound.roundId}
                   </span>
-                  {aviatorState.adminOverrideActive && (
+                  {aviatorState.adminOverrideActive ? (
                     <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40">
                       Rigged
                     </span>
+                  ) : (
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                      Auto-Cycle ON
+                    </span>
                   )}
                 </div>
+
+                {/* Real-time Game Engine Phase Status */}
+                <div className="flex items-center space-x-2 text-[11px] text-neutral-300 mt-1">
+                  <span className="text-neutral-400">Current Round Status:</span>
+                  {aviatorState.currentRound.status === 'waiting' && (
+                    <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 flex items-center space-x-1">
+                      <span>⏳ Intermission: {Math.ceil(aviatorState.currentRound.intermissionCountdown || 5)}s to takeoff</span>
+                    </span>
+                  )}
+                  {aviatorState.currentRound.status === 'flying' && (
+                    <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-extrabold border border-emerald-500/30 flex items-center space-x-1 animate-pulse">
+                      <span>🚀 Flight Active: {aviatorState.currentRound.currentMultiplier.toFixed(2)}x climbing</span>
+                    </span>
+                  )}
+                  {aviatorState.currentRound.status === 'crashed' && (
+                    <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-extrabold border border-rose-500/30 flex items-center space-x-1">
+                      <span>💥 Flew Away ({aviatorState.currentRound.crashPoint.toFixed(2)}x) — Loading Next Round...</span>
+                    </span>
+                  )}
+                </div>
+
                 <div className="text-xs text-neutral-300 flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
                   <span>
                     Next Multiplier Signal:{' '}
@@ -401,12 +426,26 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
             </div>
 
             <div className="flex items-center space-x-2 shrink-0 self-end md:self-center">
+              {/* Force next round / generate new signal button */}
+              <button
+                type="button"
+                onClick={() => {
+                  const newRound = aviatorEngine.forceAdvanceNextSignal();
+                  showToast(`Generated New Signal! Round ${newRound.roundId}: ${newRound.crashPoint.toFixed(2)}x`);
+                }}
+                className="px-3.5 py-2 bg-[#1b2636] hover:bg-[#25354a] active:scale-95 text-white font-black text-xs rounded-xl shadow border border-[#2e425c] flex items-center space-x-1.5 transition-all cursor-pointer"
+                title="Immediately advance to the next round and generate fresh signal"
+              >
+                <RefreshCw className="w-3.5 h-3.5 text-[#00df59]" />
+                <span>Next Round Signal</span>
+              </button>
+
               <button
                 onClick={() => setActiveAdminTab('aviator')}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-extrabold text-xs rounded-xl shadow-lg flex items-center space-x-1.5 transition-all cursor-pointer"
               >
                 <Gauge className="w-4 h-4" />
-                <span>Open Aviator Master Radar</span>
+                <span>Open Aviator Radar</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
