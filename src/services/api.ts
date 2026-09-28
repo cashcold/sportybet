@@ -576,6 +576,57 @@ export const api = {
     }
   },
 
+  // --- AVIATOR SYNCHRONIZED MULTI-DEVICE MASTER ENGINE ---
+  aviator: {
+    async getState(): Promise<{ success: boolean; currentRound?: any; nextRound?: any; upcomingQueue?: any[]; history?: number[]; adminOverrideActive?: boolean; autoRunEnabled?: boolean; serverTime?: number; error?: string }> {
+      const endpoint = '/api/aviator/state';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint));
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    },
+
+    async overrideNextRound(crashPoint?: number, speedMultiplier?: number): Promise<{ success: boolean; nextRound?: any; state?: any; error?: string }> {
+      const endpoint = '/api/aviator/override';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ crashPoint, speedMultiplier })
+        });
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    },
+
+    async forceNextRound(): Promise<{ success: boolean; currentRound?: any; state?: any; error?: string }> {
+      const endpoint = '/api/aviator/force-next';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint), {
+          method: 'POST'
+        });
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    },
+
+    async resetNatural(): Promise<{ success: boolean; state?: any; error?: string }> {
+      const endpoint = '/api/aviator/reset';
+      try {
+        const res = await fetch(resolveApiUrl(endpoint), {
+          method: 'POST'
+        });
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, error: formatFetchError(err, endpoint) };
+      }
+    }
+  },
+
   // --- SYSTEM INFO ---
   system: {
     async getStatus(): Promise<any> {

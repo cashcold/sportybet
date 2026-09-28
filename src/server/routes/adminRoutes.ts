@@ -12,6 +12,7 @@ import {
 } from '../mongodb';
 import { resolveWinningPredictionDetails } from '../../utils/predictionHelper';
 import { BetSelection } from '../../types';
+import { serverAviatorEngine } from '../aviatorServerEngine';
 
 export const adminRouter = Router();
 
@@ -299,61 +300,69 @@ adminRouter.post('/wallet/balance', async (req: Request, res: Response) => {
   }
 });
 
-// In-memory Aviator master control state for backend sync
-let serverAviatorState = {
-  currentRoundNumber: 4892,
-  nextCrashPoint: 2.75,
-  nextSpeedMultiplier: 1.0,
-  nextSignTier: 'PURPLE_SIGN',
-  isOverridden: false,
-  updatedAt: new Date().toISOString()
-};
-
-// 9. GET /api/admin/aviator/next-round - Get planned next Aviator fly speed, crash point, and sign
-adminRouter.get('/aviator/next-round', (req: Request, res: Response) => {
-  const duration = parseFloat((Math.pow(Math.max(0.01, serverAviatorState.nextCrashPoint - 1.0), 1 / 1.42) / (0.72 * serverAviatorState.nextSpeedMultiplier)).toFixed(2));
+// 9. GET /api/admin/aviator/state - Master authoritative engine state (Synced to all phones)
+adminRouter.get('/aviator/state', (req: Request, res: Response) => {
+  const state = serverAviatorEngine.getState();
   return res.json({
     success: true,
-    roundId: `SB-AV-${serverAviatorState.currentRoundNumber + 1}`,
-    crashPoint: serverAviatorState.nextCrashPoint,
-    speedMultiplier: serverAviatorState.nextSpeedMultiplier,
-    estimatedDurationSec: duration,
-    signTier: serverAviatorState.nextSignTier,
-    isOverridden: serverAviatorState.isOverridden,
-    updatedAt: serverAviatorState.updatedAt
+    ...state
   });
 });
 
-// 10. POST /api/admin/aviator/override - Force next Aviator fly speed and crash multiplier
+// 9b. GET /api/admin/aviator/next-round - Backward-compatibility endpoint
+adminRouter.get('/aviator/next-round', (req: Request, res: Response) => {
+  const state = serverAviatorEngine.getState();
+  return res.json({
+    success: true,
+    roundId: state.nextRound.roundId,
+    crashPoint: state.nextRound.crashPoint,
+    speedMultiplier: state.nextRound.speedMultiplier,
+    estimatedDurationSec: state.nextRound.estimatedDurationSec,
+    signTier: state.nextRound.sign.tier,
+    isOverridden: state.adminOverrideActive,
+    updatedAt: new Date(state.serverTime).toISOString()
+  });
+});
+
+// 10. POST /api/admin/aviator/override - Force next Aviator fly speed and crash multiplier across all phones
 adminRouter.post('/aviator/override', (req: Request, res: Response) => {
   const { crashPoint, speedMultiplier } = req.body;
-  if (crashPoint && !isNaN(parseFloat(crashPoint))) {
-    serverAviatorState.nextCrashPoint = parseFloat(parseFloat(crashPoint).toFixed(2));
-    serverAviatorState.isOverridden = true;
-  }
-  if (speedMultiplier && !isNaN(parseFloat(speedMultiplier))) {
-    serverAviatorState.nextSpeedMultiplier = parseFloat(parseFloat(speedMultiplier).toFixed(2));
-  }
-  serverAviatorState.updatedAt = new Date().toISOString();
+  const numCrash = crashPoint !== undefined ? parseFloat(crashPoint) : undefined;
+  const numSpeed = speedMultiplier !== undefined ? parseFloat(speedMultiplier) : undefined;
+
+  const updated = serverAviatorEngine.overrideNextRound({
+    crashPoint: !isNaN(numCrash as number) ? numCrash : undefined,
+    speedMultiplier: !isNaN(numSpeed as number) ? numSpeed : undefined
+  });
+
+  console.log(`[Aviator Master Engine] Next round ${updated.roundId} rigged to ${updated.crashPoint}x at ${updated.speedMultiplier}x speed across all devices.`);
 
   return res.json({
     success: true,
-    message: `Next Aviator flight set to ${serverAviatorState.nextCrashPoint}x at ${serverAviatorState.nextSpeedMultiplier}x speed!`,
-    state: serverAviatorState
+    message: `Next Aviator flight set to ${updated.crashPoint}x (${updated.speedMultiplier}x speed) on all phones!`,
+    nextRound: updated,
+    state: serverAviatorEngine.getState()
   });
 });
 
-// 11. POST /api/admin/aviator/reset - Reset to algorithmic natural Aviator outcome
-adminRouter.post('/aviator/reset', (req: Request, res: Response) => {
-  serverAviatorState.nextCrashPoint = parseFloat((1.15 + Math.random() * 2.8).toFixed(2));
-  serverAviatorState.nextSpeedMultiplier = 1.0;
-  serverAviatorState.isOverridden = false;
-  serverAviatorState.updatedAt = new Date().toISOString();
-
+// 11. POST /api/admin/aviator/force-next - Force advance to next round immediately across all phones
+adminRouter.post('/aviator/force-next', (req: Request, res: Response) => {
+  const advanced = serverAviatorEngine.advanceToNextRound();
   return res.json({
     success: true,
-    message: 'Reset Aviator engine to natural RNG distribution.',
-    state: serverAviatorState
+    message: `Advanced to round ${advanced.roundId} across all connected devices!`,
+    currentRound: advanced,
+    state: serverAviatorEngine.getState()
+  });
+});
+
+// 12. POST /api/admin/aviator/reset - Reset to algorithmic natural Aviator outcome across all phones
+adminRouter.post('/aviator/reset', (req: Request, res: Response) => {
+  serverAviatorEngine.resetNatural();
+  return res.json({
+    success: true,
+    message: 'Reset Aviator engine to natural RNG distribution on all phones.',
+    state: serverAviatorEngine.getState()
   });
 });
 

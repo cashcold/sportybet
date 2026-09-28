@@ -298,183 +298,156 @@ export const AviatorView: React.FC = () => {
     }));
   };
 
-  // Main Game Loop
+  // Main Game Loop - Synchronized with Authoritative Server Engine across ALL phones
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let lastStatus: 'waiting' | 'flying' | 'crashed' = 'waiting';
 
-    if (gameState === 'waiting') {
-      stopEngineSound();
-      // Countdown intermission (Screenshot 4 & video 00:05-00:10)
-      // Accumulate round bets progressively
-      setTotalRoundWinAmount(0);
-      interval = setInterval(() => {
-        setCountdown(prev => {
-          if (prev <= 1) {
-            // Start flight
-            startFlight();
-            return 5;
-          }
-          // Increment total round bets during countdown
-          setTotalRoundBetsCount(b => Math.min(1529, b + Math.floor(250 + Math.random() * 150)));
-          return prev - 1;
-        });
-      }, 1000);
-    } else if (gameState === 'flying') {
-      // Start audio engine
-      startEngineSound();
+    const unsubscribe = aviatorEngine.subscribe((engineState) => {
+      const cur = engineState.currentRound;
+      if (!cur) return;
 
-      // High-frequency flight update loop
-      const startTime = Date.now();
-      const currentCrash = crashPoint;
+      const serverStatus = cur.status;
+      const serverMultiplier = cur.currentMultiplier;
+      const serverCrashPoint = cur.crashPoint;
+      const serverSpeed = cur.speedMultiplier || 1.0;
 
-      interval = setInterval(() => {
-        const elapsed = (Date.now() - startTime) / 1000;
-        const speed = flightSpeedMultiplier || 1.0;
-        // Exponential growth formula with dynamic speed multiplier
-        const nextVal = parseFloat((1.0 + Math.pow(elapsed * 0.72 * speed, 1.42)).toFixed(2));
+      setCrashPoint(serverCrashPoint);
+      setFlightSpeedMultiplier(serverSpeed);
 
-        // Adjust engine drone pitch with climbing multiplier
-        updateEnginePitch(nextVal);
-
-        if (nextVal >= currentCrash) {
-          // CRASH / FLEW AWAY!
-          setMultiplier(currentCrash);
-          handleCrash(currentCrash);
-        } else {
-          setMultiplier(nextVal);
-          aviatorEngine.updateCurrentGameStatus('flying', nextVal, currentCrash);
-
-          // Check Panel 1 auto cashout
-          if (
-            panel1BetState === 'active' &&
-            panel1AutoCashoutEnabled &&
-            nextVal >= panel1AutoCashout
-          ) {
-            handleCashOut(1, nextVal);
-          }
-
-          // Check Panel 2 auto cashout
-          if (
-            panel2BetState === 'active' &&
-            panel2AutoCashoutEnabled &&
-            nextVal >= panel2AutoCashout
-          ) {
-            handleCashOut(2, nextVal);
-          }
-
-          // Update other simulated multiplayer bettors cashing out
-          setLiveBets(prev => {
-            let totalWon = 0;
-            let activeCount = 0;
-            const updated = prev.map(bet => {
-              if (!bet.cashoutMultiplier && nextVal >= bet.targetCashout && bet.targetCashout <= currentCrash) {
-                const win = parseFloat((bet.betAmount * bet.targetCashout).toFixed(2));
-                totalWon += win;
-                return {
-                  ...bet,
-                  cashoutMultiplier: bet.targetCashout,
-                  winAmount: win
-                };
-              }
-              if (bet.winAmount) {
-                totalWon += bet.winAmount;
-              } else {
-                activeCount++;
-              }
-              return bet;
-            });
-            // Update total won amount in real time
-            setTotalRoundWinAmount(parseFloat(totalWon.toFixed(2)));
-            // Dynamic active bettors counter decreasing as players cash out (video 00:11-00:30)
-            const remainingRatio = Math.max(0.35, 1 - (nextVal - 1.0) / (currentCrash + 2.0));
-            setTotalRoundBetsCount(Math.floor(1529 * remainingRatio));
-            return updated;
-          });
+      if (serverStatus === 'waiting') {
+        if (lastStatus !== 'waiting') {
+          stopEngineSound();
+          setGameState('waiting');
+          setTotalRoundBetsCount(0);
+          setTotalRoundWinAmount(0);
+          setPanel1BetState(prev => (prev === 'cashed_out' ? 'idle' : prev));
+          setPanel2BetState(prev => (prev === 'cashed_out' ? 'idle' : prev));
         }
-      }, 50);
-    } else if (gameState === 'crashed') {
-      stopEngineSound();
-    }
+        setCountdown(Math.max(1, Math.ceil(cur.intermissionCountdown ?? 5)));
+        setMultiplier(1.0);
+        setTotalRoundBetsCount(b => Math.min(1529, b + 65));
+      } else if (serverStatus === 'flying') {
+        if (lastStatus !== 'flying') {
+          setGameState('flying');
+          startEngineSound();
+          setLiveBets(generateLiveBets());
+          setTotalRoundBetsCount(1529);
+          setTotalRoundWinAmount(0);
+
+          if (panel1BetState === 'queued') {
+            setPanel1BetState('active');
+          }
+          if (panel2BetState === 'queued') {
+            setPanel2BetState('active');
+          }
+        }
+
+        setMultiplier(serverMultiplier);
+        updateEnginePitch(serverMultiplier);
+
+        // Check Panel 1 auto cashout
+        if (
+          panel1BetState === 'active' &&
+          panel1AutoCashoutEnabled &&
+          serverMultiplier >= panel1AutoCashout
+        ) {
+          handleCashOut(1, serverMultiplier);
+        }
+
+        // Check Panel 2 auto cashout
+        if (
+          panel2BetState === 'active' &&
+          panel2AutoCashoutEnabled &&
+          serverMultiplier >= panel2AutoCashout
+        ) {
+          handleCashOut(2, serverMultiplier);
+        }
+
+        // Update other simulated multiplayer bettors cashing out
+        setLiveBets(prev => {
+          let totalWon = 0;
+          let activeCount = 0;
+          const updated = prev.map(bet => {
+            if (!bet.cashoutMultiplier && serverMultiplier >= bet.targetCashout && bet.targetCashout <= serverCrashPoint) {
+              const win = parseFloat((bet.betAmount * bet.targetCashout).toFixed(2));
+              totalWon += win;
+              return {
+                ...bet,
+                cashoutMultiplier: bet.targetCashout,
+                winAmount: win
+              };
+            }
+            if (bet.winAmount) {
+              totalWon += bet.winAmount;
+            } else {
+              activeCount++;
+            }
+            return bet;
+          });
+          setTotalRoundWinAmount(parseFloat(totalWon.toFixed(2)));
+          const remainingRatio = Math.max(0.35, 1 - (serverMultiplier - 1.0) / (serverCrashPoint + 2.0));
+          setTotalRoundBetsCount(Math.floor(1529 * remainingRatio));
+          return updated;
+        });
+      } else if (serverStatus === 'crashed') {
+        if (lastStatus !== 'crashed') {
+          setGameState('crashed');
+          setMultiplier(serverCrashPoint);
+          stopEngineSound();
+          playSound('crash');
+
+          // Check if user had active bets that crashed
+          if (panel1BetState === 'active') {
+            setPanel1BetState('idle');
+            setUserBetHistory(prev => [
+              {
+                id: `av-${Date.now()}-1`,
+                stake: panel1Stake,
+                multiplier: serverCrashPoint,
+                won: false,
+                payout: 0,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              },
+              ...prev
+            ]);
+          }
+
+          if (panel2BetState === 'active') {
+            setPanel2BetState('idle');
+            setUserBetHistory(prev => [
+              {
+                id: `av-${Date.now()}-2`,
+                stake: panel2Stake,
+                multiplier: serverCrashPoint,
+                won: false,
+                payout: 0,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              },
+              ...prev
+            ]);
+          }
+        }
+      }
+
+      if (engineState.history && engineState.history.length > 0) {
+        setMultiplierHistory(engineState.history);
+      }
+
+      lastStatus = serverStatus;
+    });
 
     return () => {
-      clearInterval(interval);
+      unsubscribe();
       stopEngineSound();
     };
-  }, [gameState, crashPoint, panel1BetState, panel1AutoCashoutEnabled, panel1AutoCashout, panel2BetState, panel2AutoCashoutEnabled, panel2AutoCashout, flightSpeedMultiplier]);
+  }, [panel1BetState, panel1AutoCashoutEnabled, panel1AutoCashout, panel2BetState, panel2AutoCashoutEnabled, panel2AutoCashout, panel1Stake, panel2Stake]);
 
   const startFlight = () => {
-    // Consume scheduled next round plan from the synchronized Aviator engine
-    const nextRoundPlan = aviatorEngine.advanceToNextRound();
-    const finalCrash = nextRoundPlan.crashPoint;
-    const speed = nextRoundPlan.speedMultiplier || 1.0;
-
-    setCrashPoint(finalCrash);
-    setFlightSpeedMultiplier(speed);
-    setMultiplier(1.0);
-    setGameState('flying');
-    setLiveBets(generateLiveBets());
-    setTotalRoundBetsCount(1529);
-    setTotalRoundWinAmount(0);
-
-    // Transition queued bets to active bets
-    if (panel1BetState === 'queued') {
-      setPanel1BetState('active');
-    }
-    if (panel2BetState === 'queued') {
-      setPanel2BetState('active');
-    }
+    // Synchronized automatically with server engine
   };
 
-  const handleCrash = (finalPoint: number) => {
-    setGameState('crashed');
-    stopEngineSound();
-    playSound('crash');
-    aviatorEngine.updateCurrentGameStatus('crashed', finalPoint);
-
-    // Add to history strip
-    setMultiplierHistory(prev => [finalPoint, ...prev.slice(0, 24)]);
-
-    // Check if user had active bets that crashed
-    if (panel1BetState === 'active') {
-      setPanel1BetState('idle');
-      setUserBetHistory(prev => [
-        {
-          id: `av-${Date.now()}-1`,
-          stake: panel1Stake,
-          multiplier: finalPoint,
-          won: false,
-          payout: 0,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        },
-        ...prev
-      ]);
-    }
-
-    if (panel2BetState === 'active') {
-      setPanel2BetState('idle');
-      setUserBetHistory(prev => [
-        {
-          id: `av-${Date.now()}-2`,
-          stake: panel2Stake,
-          multiplier: finalPoint,
-          won: false,
-          payout: 0,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        },
-        ...prev
-      ]);
-    }
-
-    // After 3 seconds of crash screen, go to waiting intermission
-    setTimeout(() => {
-      setGameState('waiting');
-      aviatorEngine.updateCurrentGameStatus('waiting', 1.0);
-      setCountdown(5);
-      setTotalRoundBetsCount(0);
-      // Reset any cashed out states for next round
-      setPanel1BetState(prev => (prev === 'cashed_out' ? 'idle' : prev));
-      setPanel2BetState(prev => (prev === 'cashed_out' ? 'idle' : prev));
-    }, 3000);
+  const handleCrash = (_finalPoint: number) => {
+    // Synchronized automatically with server engine
   };
 
   const handlePlaceBet = (panel: 1 | 2) => {

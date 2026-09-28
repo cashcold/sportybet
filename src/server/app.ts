@@ -6,6 +6,7 @@ import { matchesRouter } from './routes/matchesRoutes';
 import { footballRouter } from './footballApi';
 import { sportsRouter } from './routes/sportsRoutes';
 import { adminRouter } from './routes/adminRoutes';
+import { serverAviatorEngine } from './aviatorServerEngine';
 
 export const app = express();
 
@@ -95,6 +96,46 @@ app.use('/football', footballRouter);
 app.use('/api/sports', sportsRouter);
 app.use('/sports', sportsRouter);
 app.use('/api/admin', adminRouter);
+
+// Public Aviator synchronized multi-device state
+app.get(['/api/aviator/state', '/aviator/state'], (req, res) => {
+  res.json({
+    success: true,
+    ...serverAviatorEngine.getState()
+  });
+});
+
+app.post(['/api/aviator/override', '/aviator/override'], (req, res) => {
+  const { crashPoint, speedMultiplier } = req.body;
+  const numCrash = crashPoint !== undefined ? parseFloat(crashPoint) : undefined;
+  const numSpeed = speedMultiplier !== undefined ? parseFloat(speedMultiplier) : undefined;
+  const updated = serverAviatorEngine.overrideNextRound({
+    crashPoint: !isNaN(numCrash as number) ? numCrash : undefined,
+    speedMultiplier: !isNaN(numSpeed as number) ? numSpeed : undefined
+  });
+  res.json({
+    success: true,
+    nextRound: updated,
+    state: serverAviatorEngine.getState()
+  });
+});
+
+app.post(['/api/aviator/force-next', '/aviator/force-next'], (req, res) => {
+  const advanced = serverAviatorEngine.advanceToNextRound();
+  res.json({
+    success: true,
+    currentRound: advanced,
+    state: serverAviatorEngine.getState()
+  });
+});
+
+app.post(['/api/aviator/reset', '/aviator/reset'], (req, res) => {
+  serverAviatorEngine.resetNatural();
+  res.json({
+    success: true,
+    state: serverAviatorEngine.getState()
+  });
+});
 
 // Error middleware to handle database queries failing gracefully when MongoDB is offline
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
