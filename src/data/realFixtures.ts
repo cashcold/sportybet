@@ -393,6 +393,39 @@ export const REAL_UPCOMING_FIXTURES: Match[] = [
     }
   },
   {
+    "id": "theodds-arsenal-leeds-united",
+    "gameId": "87055",
+    "sport": "football",
+    "league": "Premier League",
+    "countryOrCategory": "England",
+    "homeTeam": "Arsenal",
+    "awayTeam": "Leeds United",
+    "startTime": "17:30",
+    "date": "2026-09-26",
+    "dateLabel": "Today 26/09",
+    "commenceTime": "2026-09-26T17:30:00Z",
+    "isLive": false,
+    "isHot": true,
+    "hasLiveStream": true,
+    "marketsCount": 350,
+    "markets": {
+      "1X2": [
+        { "id": "ars-1", "name": "1", "value": 1.43, "trend": "same" },
+        { "id": "ars-x", "name": "X", "value": 4.88, "trend": "same" },
+        { "id": "ars-2", "name": "2", "value": 7.36, "trend": "same" }
+      ],
+      "O/U": [
+        { "id": "ars-o", "name": "Over 2.5", "value": 1.68, "trend": "same" },
+        { "id": "ars-u", "name": "Under 2.5", "value": 2.15, "trend": "same" }
+      ],
+      "DC": [
+        { "id": "ars-1x", "name": "1X", "value": 1.11, "trend": "same" },
+        { "id": "ars-12", "name": "12", "value": 1.18, "trend": "same" },
+        { "id": "ars-x2", "name": "X2", "value": 2.60, "trend": "same" }
+      ]
+    }
+  },
+  {
     "id": "theodds-far-kaz-45505",
     "gameId": "45505",
     "sport": "football",
