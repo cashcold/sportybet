@@ -68,6 +68,9 @@ interface BettingContextType {
   resetBetsGreenState: () => void;
   deleteBetFromMongo: (betId: string) => Promise<boolean>;
   syncWithMongo: () => Promise<void>;
+  openBetsSubTab: 'open' | 'history';
+  setOpenBetsSubTab: (tab: 'open' | 'history') => void;
+  openBetHistory: () => void;
 }
 
 function normalizeMatchDates(rawMatches: Match[]): Match[] {
@@ -222,6 +225,12 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isAllGreenTriggered, setIsAllGreenTriggered] = useState<boolean>(() => {
     return localStorage.getItem('sportybet_all_green_mode') === 'true';
   });
+  const [openBetsSubTab, setOpenBetsSubTab] = useState<'open' | 'history'>('open');
+
+  const openBetHistory = () => {
+    setOpenBetsSubTab('history');
+    setActiveTab('open_bets');
+  };
 
   // Direct Real-time MongoDB Sync Function
   const syncWithMongo = async () => {
@@ -232,10 +241,10 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         api.auth.getMe()
       ]);
 
-      if (openRes.status === 'fulfilled' && openRes.value?.success && Array.isArray(openRes.value.bets)) {
+      if (openRes.status === 'fulfilled' && openRes.value?.success && Array.isArray(openRes.value.bets) && openRes.value.bets.length > 0) {
         setOpenBets(openRes.value.bets);
       }
-      if (historyRes.status === 'fulfilled' && historyRes.value?.success && Array.isArray(historyRes.value.bets)) {
+      if (historyRes.status === 'fulfilled' && historyRes.value?.success && Array.isArray(historyRes.value.bets) && historyRes.value.bets.length > 0) {
         setBetHistory(historyRes.value.bets);
       }
       if (userRes.status === 'fulfilled' && userRes.value?.success && userRes.value.user) {
@@ -828,10 +837,10 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           api.bets.getOpenBets(),
           api.bets.getBetHistory()
         ]);
-        if (openRes.status === 'fulfilled' && openRes.value.success && openRes.value.bets) {
+        if (openRes.status === 'fulfilled' && openRes.value.success && openRes.value.bets && openRes.value.bets.length > 0) {
           setOpenBets(openRes.value.bets);
         }
-        if (historyRes.status === 'fulfilled' && historyRes.value.success && historyRes.value.bets) {
+        if (historyRes.status === 'fulfilled' && historyRes.value.success && historyRes.value.bets && historyRes.value.bets.length > 0) {
           setBetHistory(historyRes.value.bets);
         }
         return { success: true };
@@ -1254,7 +1263,10 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         markSingleBetGreen,
         resetBetsGreenState,
         deleteBetFromMongo,
-        syncWithMongo
+        syncWithMongo,
+        openBetsSubTab,
+        setOpenBetsSubTab,
+        openBetHistory
       }}
     >
       {children}

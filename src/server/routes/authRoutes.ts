@@ -198,7 +198,21 @@ authRouter.post('/register', async (req: Request, res: Response) => {
   }
 });
 
-// POST /api/auth/login
+// GET & POST /api/auth/login
+authRouter.get('/login', (req: Request, res: Response) => {
+  return res.json({
+    success: false,
+    message: 'Authentication login endpoint is ready. Please submit a POST request with phone and password.'
+  });
+});
+
+authRouter.get('/register', (req: Request, res: Response) => {
+  return res.json({
+    success: false,
+    message: 'Authentication registration endpoint is ready. Please submit a POST request with phone and password.'
+  });
+});
+
 authRouter.post('/login', async (req: Request, res: Response) => {
   try {
     try {

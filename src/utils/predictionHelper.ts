@@ -23,9 +23,22 @@ export function resolveWinningPredictionDetails(sel: BetSelection): {
   // Default game ID and date
   const gameId = sel.gameId || '23888';
   const gameDate = sel.gameDate || sel.liveTime || '26/09 18:45';
+  const lowerTitle = title.toLowerCase();
+
+  // Canonical Aviator game resolution
+  if (lowerTitle.includes('aviator') || mName.toLowerCase().includes('crash')) {
+    return {
+      ftScore: sel.ftScore || 'Crashed @ 3.42x',
+      outcome: sel.outcome || 'Cashed Out Successfully',
+      pickText: sel.selectionName || `Cashed Out @ ${sel.odd.toFixed(2)}x`,
+      isWon: true,
+      gameId: sel.gameId || '4891',
+      gameDate: sel.gameDate || '27/09 14:18',
+      formattedMatchTitle: sel.matchTitle || 'Aviator Crash Radar (Round #4891)'
+    };
+  }
 
   // Specific canonical matches from SportyBet screenshot
-  const lowerTitle = title.toLowerCase();
   if (lowerTitle.includes('albania') && lowerTitle.includes('belarus')) {
     return {
       ftScore: '2:0',

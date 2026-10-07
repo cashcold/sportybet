@@ -26,11 +26,48 @@ async function startServer() {
       server: { middlewareMode: true },
       appType: 'spa',
     });
+
+    // Guard: Prevent unhandled API routes from reaching Vite SPA html fallback
+    app.use((req, res, next) => {
+      if (
+        req.path.startsWith('/api') ||
+        req.path.startsWith('/auth') ||
+        req.path.startsWith('/wallet') ||
+        req.path.startsWith('/bets') ||
+        req.path.startsWith('/matches') ||
+        req.path.startsWith('/football') ||
+        req.path.startsWith('/sports') ||
+        req.path.startsWith('/admin') ||
+        req.path.startsWith('/aviator')
+      ) {
+        return res.status(404).json({
+          success: false,
+          error: `API route not found: ${req.method} ${req.originalUrl}`
+        });
+      }
+      next();
+    });
+
     app.use(vite.middlewares);
   } else {
     app.use(express.static(distPath));
     app.get('*', (req, res, next) => {
-      if (req.path.startsWith('/api')) return next();
+      if (
+        req.path.startsWith('/api') ||
+        req.path.startsWith('/auth') ||
+        req.path.startsWith('/wallet') ||
+        req.path.startsWith('/bets') ||
+        req.path.startsWith('/matches') ||
+        req.path.startsWith('/football') ||
+        req.path.startsWith('/sports') ||
+        req.path.startsWith('/admin') ||
+        req.path.startsWith('/aviator')
+      ) {
+        return res.status(404).json({
+          success: false,
+          error: `API route not found: ${req.method} ${req.originalUrl}`
+        });
+      }
       res.sendFile(indexPath);
     });
   }

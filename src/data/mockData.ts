@@ -152,7 +152,7 @@ export const INITIAL_OPEN_BETS: PlacedBet[] = [
   }
 ];
 
-// Bet History
+// Bet History - Exact SportyBet Settled Clone Tickets
 export const INITIAL_BET_HISTORY: PlacedBet[] = [
   {
     id: 'bet-hist-won-1',
@@ -170,7 +170,12 @@ export const INITIAL_BET_HISTORY: PlacedBet[] = [
         marketName: '1X2',
         selectionName: 'Armenia (1)',
         odd: 1.85,
-        isLive: false
+        isLive: false,
+        ftScore: '2 - 1',
+        outcome: 'Home Win (2 - 1)',
+        isWon: true,
+        predictionStatus: 'won',
+        gameDate: '24/09 17:00'
       },
       {
         matchId: 'theodds-56e89688e8dcce4889162404c8290f50',
@@ -179,14 +184,234 @@ export const INITIAL_BET_HISTORY: PlacedBet[] = [
         marketName: '1X2',
         selectionName: 'Georgia (1)',
         odd: 1.90,
-        isLive: false
+        isLive: false,
+        ftScore: '1 - 0',
+        outcome: 'Home Win (1 - 0)',
+        isWon: true,
+        predictionStatus: 'won',
+        gameDate: '24/09 19:45'
       }
     ],
     stake: 7.00,
     totalOdds: 3.52,
     potentialWin: 24.64,
     status: 'won',
-    cashoutAvailable: false
+    cashoutAvailable: false,
+    canRebet: true,
+    isAllGreen: true,
+    placedAt: '2026-09-24T14:32:00Z',
+    settledAt: '2026-09-24T21:40:00Z',
+    winningsPaid: true
+  },
+  {
+    id: 'bet-hist-won-2',
+    ticketId: 'SBGH-6029-4118',
+    transactionId: 'TX-GH-784019283',
+    bookingCode: 'GH89BK',
+    type: 'Single',
+    date: '25 Sep',
+    isLive: false,
+    selections: [
+      {
+        matchId: 'theodds-ars-che-2026',
+        gameId: '44109',
+        matchTitle: 'Arsenal vs Chelsea',
+        marketName: '1X2',
+        selectionName: 'Arsenal (1)',
+        odd: 1.95,
+        isLive: false,
+        ftScore: '2 - 1',
+        outcome: 'Home Win (2 - 1)',
+        isWon: true,
+        predictionStatus: 'won',
+        gameDate: '25/09 16:30'
+      }
+    ],
+    stake: 50.00,
+    totalOdds: 1.95,
+    potentialWin: 97.50,
+    status: 'won',
+    cashoutAvailable: false,
+    canRebet: true,
+    isAllGreen: true,
+    placedAt: '2026-09-25T13:10:00Z',
+    settledAt: '2026-09-25T18:35:00Z',
+    winningsPaid: true
+  },
+  {
+    id: 'bet-hist-won-3',
+    ticketId: 'SBGH-7731-8840',
+    transactionId: 'TX-GH-991204851',
+    bookingCode: 'CK77PL',
+    type: 'Multiple',
+    date: '26 Sep',
+    isLive: false,
+    selections: [
+      {
+        matchId: 'theodds-rma-esp',
+        gameId: '81042',
+        matchTitle: 'Real Madrid vs RCD Espanyol',
+        marketName: '1X2',
+        selectionName: 'Real Madrid (1)',
+        odd: 1.25,
+        isLive: false,
+        ftScore: '4 - 1',
+        outcome: 'Home Win (4 - 1)',
+        isWon: true,
+        predictionStatus: 'won',
+        gameDate: '26/09 19:00'
+      },
+      {
+        matchId: 'theodds-mci-wat',
+        gameId: '81043',
+        matchTitle: 'Manchester City vs Watford FC',
+        marketName: '1X2',
+        selectionName: 'Man City (1)',
+        odd: 1.18,
+        isLive: false,
+        ftScore: '2 - 1',
+        outcome: 'Home Win (2 - 1)',
+        isWon: true,
+        predictionStatus: 'won',
+        gameDate: '26/09 18:45'
+      },
+      {
+        matchId: 'theodds-bay-lev',
+        gameId: '81044',
+        matchTitle: 'Bayern Munich vs Bayer Leverkusen',
+        marketName: 'Over/Under 2.5',
+        selectionName: 'Over 2.5',
+        odd: 1.62,
+        isLive: false,
+        ftScore: '2 - 2',
+        outcome: 'Over 2.5 Goals (4 Goals)',
+        isWon: true,
+        predictionStatus: 'won',
+        gameDate: '26/09 17:30'
+      },
+      {
+        matchId: 'theodds-bar-get',
+        gameId: '81045',
+        matchTitle: 'FC Barcelona vs Getafe CF',
+        marketName: '1X2',
+        selectionName: 'Barcelona (1)',
+        odd: 1.28,
+        isLive: false,
+        ftScore: '1 - 0',
+        outcome: 'Home Win (1 - 0)',
+        isWon: true,
+        predictionStatus: 'won',
+        gameDate: '26/09 20:00'
+      }
+    ],
+    stake: 25.00,
+    totalOdds: 3.06,
+    potentialWin: 76.50,
+    status: 'won',
+    cashoutAvailable: false,
+    canRebet: true,
+    isAllGreen: true,
+    placedAt: '2026-09-26T15:20:00Z',
+    settledAt: '2026-09-26T22:15:00Z',
+    winningsPaid: true
+  },
+  {
+    id: 'bet-hist-won-4',
+    ticketId: 'SBGH-8819-0294',
+    transactionId: 'TX-GH-339281092',
+    bookingCode: 'AV79RT',
+    type: 'Single',
+    date: '27 Sep',
+    isLive: false,
+    selections: [
+      {
+        matchId: 'spribe-aviator-flight-4891',
+        gameId: '4891',
+        matchTitle: 'Aviator Crash Radar (Round #4891)',
+        marketName: 'Cashout Multiplier',
+        selectionName: 'Cashed Out @ 2.75x',
+        odd: 2.75,
+        isLive: false,
+        ftScore: 'Crashed @ 3.42x',
+        outcome: 'Cashed Out Successfully',
+        isWon: true,
+        predictionStatus: 'won',
+        gameDate: '27/09 14:18'
+      }
+    ],
+    stake: 20.00,
+    totalOdds: 2.75,
+    potentialWin: 55.00,
+    status: 'won',
+    cashoutAvailable: false,
+    canRebet: true,
+    isAllGreen: true,
+    placedAt: '2026-09-27T14:18:00Z',
+    settledAt: '2026-09-27T14:18:25Z',
+    winningsPaid: true
+  },
+  {
+    id: 'bet-hist-won-5',
+    ticketId: 'SBGH-9912-7362',
+    transactionId: 'TX-GH-448291048',
+    bookingCode: 'PL33GH',
+    type: 'Multiple',
+    date: '28 Sep',
+    isLive: false,
+    selections: [
+      {
+        matchId: 'theodds-liv-bou',
+        gameId: '91820',
+        matchTitle: 'Liverpool vs AFC Bournemouth',
+        marketName: '1X2',
+        selectionName: 'Liverpool (1)',
+        odd: 1.28,
+        isLive: false,
+        ftScore: '3 - 0',
+        outcome: 'Home Win (3 - 0)',
+        isWon: true,
+        predictionStatus: 'won',
+        gameDate: '28/09 14:00'
+      },
+      {
+        matchId: 'theodds-juv-nap',
+        gameId: '91821',
+        matchTitle: 'Juventus vs Napoli',
+        marketName: 'Under 2.5 Goals',
+        selectionName: 'Under 2.5',
+        odd: 1.65,
+        isLive: false,
+        ftScore: '0 - 0',
+        outcome: 'Under 2.5 Goals (0 Goals)',
+        isWon: true,
+        predictionStatus: 'won',
+        gameDate: '28/09 17:00'
+      },
+      {
+        matchId: 'theodds-psg-ren',
+        gameId: '91822',
+        matchTitle: 'Paris Saint-Germain vs Stade Rennais',
+        marketName: '1X2',
+        selectionName: 'PSG (1)',
+        odd: 1.35,
+        isLive: false,
+        ftScore: '3 - 1',
+        outcome: 'Home Win (3 - 1)',
+        isWon: true,
+        predictionStatus: 'won',
+        gameDate: '28/09 19:00'
+      }
+    ],
+    stake: 40.00,
+    totalOdds: 2.85,
+    potentialWin: 114.00,
+    status: 'won',
+    cashoutAvailable: false,
+    canRebet: true,
+    isAllGreen: true,
+    placedAt: '2026-09-28T13:45:00Z',
+    settledAt: '2026-09-28T21:10:00Z',
+    winningsPaid: true
   }
 ];
 

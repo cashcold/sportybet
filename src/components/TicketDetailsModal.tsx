@@ -159,6 +159,55 @@ export const TicketDetailsModal: React.FC<TicketDetailsModalProps> = ({
           </div>
         </div>
 
+        {/* 4b. Authentic Barcode & Serial Container */}
+        <div className="mx-3.5 mb-2 bg-[#17202c] rounded-md border border-[#222d3d] p-2.5 text-center space-y-1 shadow-sm">
+          <div className="flex justify-center items-center py-0.5 overflow-hidden">
+            <svg className="w-56 h-8" viewBox="0 0 200 40" fill="none">
+              <rect x="0" y="0" width="3" height="40" fill="#ffffff" />
+              <rect x="6" y="0" width="1" height="40" fill="#ffffff" />
+              <rect x="9" y="0" width="4" height="40" fill="#ffffff" />
+              <rect x="16" y="0" width="2" height="40" fill="#ffffff" />
+              <rect x="21" y="0" width="5" height="40" fill="#ffffff" />
+              <rect x="29" y="0" width="1" height="40" fill="#ffffff" />
+              <rect x="33" y="0" width="3" height="40" fill="#ffffff" />
+              <rect x="39" y="0" width="2" height="40" fill="#ffffff" />
+              <rect x="44" y="0" width="4" height="40" fill="#ffffff" />
+              <rect x="51" y="0" width="1" height="40" fill="#ffffff" />
+              <rect x="55" y="0" width="3" height="40" fill="#ffffff" />
+              <rect x="61" y="0" width="5" height="40" fill="#ffffff" />
+              <rect x="69" y="0" width="2" height="40" fill="#ffffff" />
+              <rect x="74" y="0" width="4" height="40" fill="#ffffff" />
+              <rect x="81" y="0" width="1" height="40" fill="#ffffff" />
+              <rect x="85" y="0" width="3" height="40" fill="#ffffff" />
+              <rect x="91" y="0" width="5" height="40" fill="#ffffff" />
+              <rect x="99" y="0" width="2" height="40" fill="#ffffff" />
+              <rect x="104" y="0" width="4" height="40" fill="#ffffff" />
+              <rect x="111" y="0" width="1" height="40" fill="#ffffff" />
+              <rect x="115" y="0" width="3" height="40" fill="#ffffff" />
+              <rect x="121" y="0" width="5" height="40" fill="#ffffff" />
+              <rect x="129" y="0" width="2" height="40" fill="#ffffff" />
+              <rect x="134" y="0" width="4" height="40" fill="#ffffff" />
+              <rect x="141" y="0" width="1" height="40" fill="#ffffff" />
+              <rect x="145" y="0" width="3" height="40" fill="#ffffff" />
+              <rect x="151" y="0" width="5" height="40" fill="#ffffff" />
+              <rect x="159" y="0" width="2" height="40" fill="#ffffff" />
+              <rect x="164" y="0" width="4" height="40" fill="#ffffff" />
+              <rect x="171" y="0" width="1" height="40" fill="#ffffff" />
+              <rect x="175" y="0" width="3" height="40" fill="#ffffff" />
+              <rect x="181" y="0" width="2" height="40" fill="#ffffff" />
+              <rect x="186" y="0" width="4" height="40" fill="#ffffff" />
+              <rect x="193" y="0" width="2" height="40" fill="#ffffff" />
+              <rect x="198" y="0" width="2" height="40" fill="#ffffff" />
+            </svg>
+          </div>
+          <div className="text-[10px] font-mono tracking-widest text-neutral-300">
+            *{bet.ticketId || 'SBGH-5512-9901'}*
+          </div>
+          <div className="text-[9px] text-neutral-400">
+            Official SportyBet Ghana Wagering Ticket Slip · Verified
+          </div>
+        </div>
+
         {/* 5. Match Legs List (Exact layout of Screenshot_20260927_102225_Chrome.jpg) */}
         <div className="px-3.5 divide-y divide-[#1e2a39] mt-1">
           {bet.selections.map((sel, idx) => {

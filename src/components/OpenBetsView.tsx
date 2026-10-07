@@ -45,15 +45,28 @@ export const OpenBetsView: React.FC = () => {
     setActiveTab: setNavTab,
     isAllGreenTriggered,
     markAllBetsGreen,
-    markSingleBetGreen
+    markSingleBetGreen,
+    openBetsSubTab,
+    setOpenBetsSubTab,
+    login
   } = useBetting();
 
-  const [activeTab, setActiveTab] = useState<'open' | 'history'>('open');
+  const activeTab = openBetsSubTab;
+  const setActiveTab = setOpenBetsSubTab;
   const [filter, setFilter] = useState<'all' | 'cashout' | 'live'>('cashout');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'join'>('login');
   const [recommendedCodesOpen, setRecommendedCodesOpen] = useState(false);
   const [selectedDetailBet, setSelectedDetailBet] = useState<PlacedBet | null>(null);
+
+  // Real Interactive Filters for Bet History (Exact SportyBet clone)
+  const [historyStatusFilter, setHistoryStatusFilter] = useState<'Settled' | 'All' | 'Cashed Out'>('Settled');
+  const [historyResultFilter, setHistoryResultFilter] = useState<'All' | 'Won' | 'Lost'>('All');
+  const [historyCategoryFilter, setHistoryCategoryFilter] = useState<'All' | 'Sports' | 'Aviator'>('All');
+  const [historyDateRange, setHistoryDateRange] = useState<'6M' | '30D' | '7D' | 'Today'>('6M');
+  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const [isResultDropdownOpen, setIsResultDropdownOpen] = useState(false);
+  const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
 
   // Recommended booking codes for Ghana football (matches screenshot)
   const recommendedCodes = [
@@ -156,6 +169,58 @@ export const OpenBetsView: React.FC = () => {
   // Active bets scoped to logged-in user or available tickets
   const activeOpenBets = user.isLoggedIn ? openBets : (openBets.length > 0 ? openBets : []);
   const activeBetHistory = user.isLoggedIn ? betHistory : (betHistory.length > 0 ? betHistory : []);
+
+  // Filtered bet history according to SportyBet interactive filter states
+  const filteredBetHistory = activeBetHistory.filter((item) => {
+    // 1. Status Filter
+    if (historyStatusFilter === 'Settled' && item.status !== 'won' && item.status !== 'lost') {
+      return false;
+    }
+    if (historyStatusFilter === 'Cashed Out' && item.status !== 'cashed_out') {
+      return false;
+    }
+
+    // 2. Result Filter
+    if (historyResultFilter === 'Won' && item.status !== 'won') {
+      return false;
+    }
+    if (historyResultFilter === 'Lost' && item.status !== 'lost') {
+      return false;
+    }
+
+    // 3. Category Filter
+    const isAviator = item.selections.some(
+      (s) =>
+        s.matchTitle.toLowerCase().includes('aviator') ||
+        s.marketName.toLowerCase().includes('crash') ||
+        s.marketName.toLowerCase().includes('cashout multiplier')
+    );
+    if (historyCategoryFilter === 'Sports' && isAviator) {
+      return false;
+    }
+    if (historyCategoryFilter === 'Aviator' && !isAviator) {
+      return false;
+    }
+
+    return true;
+  });
+
+  const sportsCount = activeBetHistory.filter(
+    (item) =>
+      !item.selections.some(
+        (s) =>
+          s.matchTitle.toLowerCase().includes('aviator') ||
+          s.marketName.toLowerCase().includes('crash')
+      )
+  ).length;
+
+  const aviatorCount = activeBetHistory.filter((item) =>
+    item.selections.some(
+      (s) =>
+        s.matchTitle.toLowerCase().includes('aviator') ||
+        s.marketName.toLowerCase().includes('crash')
+    )
+  ).length;
 
   const filteredOpenBets = activeOpenBets.filter((bet) => {
     if (filter === 'cashout') return bet.cashoutAvailable;
@@ -337,34 +402,54 @@ export const OpenBetsView: React.FC = () => {
         {/* =================================================================== */}
         {/* 3. MAIN CONTENT: GUEST PROMPT (Exact match to uploaded screenshot)   */}
         {/* =================================================================== */}
-        {!user.isLoggedIn ? (
+        {!user.isLoggedIn && activeTab === 'open' ? (
           <div className="flex-1 flex flex-col items-center justify-center px-4 py-28 text-center select-none">
             <p className="text-white text-[16px] leading-[1.6] font-normal max-w-sm">
-              {activeTab === 'open' ? (
-                <>
-                  Please Log In to see your Open Bets<br />
-                  and Cashout Bets
-                </>
-              ) : (
-                <>
-                  Please Log In to see your Bet History<br />
-                  and Settled Bets
-                </>
-              )}
+              Please Log In to see your Open Bets<br />
+              and Cashout Bets
             </p>
 
-            <button
-              onClick={() => {
-                setAuthMode('login');
-                setAuthModalOpen(true);
-              }}
-              className="mt-6 px-8 py-1.5 rounded-[4px] border border-[#00df59] bg-transparent text-[#00df59] text-[15px] font-medium hover:bg-[#00df59]/10 active:scale-95 transition-all cursor-pointer"
-            >
-              Login
-            </button>
+            <div className="mt-6 flex flex-col items-center space-y-2.5">
+              <button
+                onClick={() => {
+                  setAuthMode('login');
+                  setAuthModalOpen(true);
+                }}
+                className="px-8 py-1.5 rounded-[4px] border border-[#00df59] bg-transparent text-[#00df59] text-[15px] font-medium hover:bg-[#00df59]/10 active:scale-95 transition-all cursor-pointer"
+              >
+                Login
+              </button>
+              <button
+                onClick={async () => {
+                  await login('0204891235', 'demo1234');
+                  showToast('Logged into Account (0204891235)');
+                }}
+                className="text-xs text-[#00df59] hover:underline"
+              >
+                1-Tap Quick Demo Login (0204891235)
+              </button>
+            </div>
           </div>
         ) : (
         <>
+          {/* Guest notification on History tab */}
+          {!user.isLoggedIn && activeTab === 'history' && (
+            <div className="px-3.5 py-2.5 bg-[#172332] border-b border-[#23354c] flex items-center justify-between text-xs">
+              <div className="flex items-center space-x-2 text-neutral-300">
+                <span className="w-2 h-2 rounded-full bg-[#00df59] animate-pulse shrink-0" />
+                <span>Viewing authentic settled tickets preview</span>
+              </div>
+              <button
+                onClick={async () => {
+                  await login('0204891235', 'demo1234');
+                  showToast('Logged into Account (0204891235)');
+                }}
+                className="text-[11px] font-bold text-[#00df59] bg-[#00df59]/10 px-2 py-0.5 rounded border border-[#00df59]/30 hover:bg-[#00df59]/20 transition-colors"
+              >
+                1-Tap Login
+              </button>
+            </div>
+          )}
           {/* =================================================================== */}
           {/* VIEW A: OPEN BETS (Screenshot 6)                                    */}
           {/* =================================================================== */}
@@ -832,64 +917,207 @@ export const OpenBetsView: React.FC = () => {
       {activeTab === 'history' && (
         <div>
           {/* Dropdown Filters & Actions: Bet Status: Settled ▾ | Bet Result ▾ | 📅 | 🗑 */}
-          <div className="px-3 py-2 bg-[#121922] border-b border-[#212b38] flex items-center justify-between text-xs">
+          <div className="px-3 py-2 bg-[#121922] border-b border-[#212b38] flex items-center justify-between text-xs relative">
             <div className="flex items-center space-x-2">
-              <button
-                onClick={() => showToast('Status: Settled')}
-                className="bg-[#1b2532] text-neutral-200 py-1 px-2 rounded flex items-center space-x-1 border border-[#273648]"
-              >
-                <span>Bet Status: Settled</span>
-                <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
-              </button>
+              {/* Status Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setIsStatusDropdownOpen(!isStatusDropdownOpen);
+                    setIsResultDropdownOpen(false);
+                    setIsDateDropdownOpen(false);
+                  }}
+                  className="bg-[#1b2532] text-neutral-200 py-1 px-2 rounded flex items-center space-x-1 border border-[#273648] hover:border-neutral-500 cursor-pointer"
+                >
+                  <span>Bet Status: {historyStatusFilter}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
+                </button>
 
-              <button
-                onClick={() => showToast('Filter Bet Result')}
-                className="bg-[#1b2532] text-neutral-200 py-1 px-2 rounded flex items-center space-x-1 border border-[#273648]"
-              >
-                <span>Bet Result</span>
-                <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
-              </button>
+                {isStatusDropdownOpen && (
+                  <div className="absolute left-0 top-full mt-1 w-36 bg-[#16212e] border border-[#27384c] rounded shadow-2xl z-40 py-1 text-xs">
+                    {(['Settled', 'All', 'Cashed Out'] as const).map((opt) => (
+                      <button
+                        key={opt}
+                        onClick={() => {
+                          setHistoryStatusFilter(opt);
+                          setIsStatusDropdownOpen(false);
+                          showToast(`Filter: ${opt}`);
+                        }}
+                        className={`w-full text-left px-3 py-1.5 flex items-center justify-between hover:bg-[#1f2e40] ${
+                          historyStatusFilter === opt ? 'text-[#00df59] font-bold' : 'text-neutral-300'
+                        }`}
+                      >
+                        <span>{opt}</span>
+                        {historyStatusFilter === opt && <Check className="w-3 h-3 text-[#00df59]" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Result Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setIsResultDropdownOpen(!isResultDropdownOpen);
+                    setIsStatusDropdownOpen(false);
+                    setIsDateDropdownOpen(false);
+                  }}
+                  className="bg-[#1b2532] text-neutral-200 py-1 px-2 rounded flex items-center space-x-1 border border-[#273648] hover:border-neutral-500 cursor-pointer"
+                >
+                  <span>{historyResultFilter === 'All' ? 'Bet Result: All' : `Result: ${historyResultFilter}`}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
+                </button>
+
+                {isResultDropdownOpen && (
+                  <div className="absolute left-0 top-full mt-1 w-36 bg-[#16212e] border border-[#27384c] rounded shadow-2xl z-40 py-1 text-xs">
+                    {(['All', 'Won', 'Lost'] as const).map((opt) => (
+                      <button
+                        key={opt}
+                        onClick={() => {
+                          setHistoryResultFilter(opt);
+                          setIsResultDropdownOpen(false);
+                          showToast(`Result: ${opt}`);
+                        }}
+                        className={`w-full text-left px-3 py-1.5 flex items-center justify-between hover:bg-[#1f2e40] ${
+                          historyResultFilter === opt ? 'text-[#00df59] font-bold' : 'text-neutral-300'
+                        }`}
+                      >
+                        <span>{opt === 'All' ? 'All Results' : opt === 'Won' ? 'Won Only 🏆' : 'Lost Only'}</span>
+                        {historyResultFilter === opt && <Check className="w-3 h-3 text-[#00df59]" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center space-x-2 text-neutral-400">
+              {/* Date Filter Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setIsDateDropdownOpen(!isDateDropdownOpen);
+                    setIsStatusDropdownOpen(false);
+                    setIsResultDropdownOpen(false);
+                  }}
+                  className="hover:text-white p-1 rounded hover:bg-[#1e2a38] transition-colors cursor-pointer"
+                  title="Date Range"
+                >
+                  <Calendar className="w-4 h-4" />
+                </button>
+
+                {isDateDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-44 bg-[#16212e] border border-[#27384c] rounded shadow-2xl z-40 py-1 text-xs">
+                    <div className="px-3 py-1 text-[10px] text-neutral-400 font-bold uppercase tracking-wider border-b border-[#223142]">
+                      Date Range
+                    </div>
+                    {[
+                      { key: '6M', label: 'Last 6 Months (Default)' },
+                      { key: '30D', label: 'Last 30 Days' },
+                      { key: '7D', label: 'Last 7 Days' },
+                      { key: 'Today', label: 'Today Only' }
+                    ].map((d) => (
+                      <button
+                        key={d.key}
+                        onClick={() => {
+                          setHistoryDateRange(d.key as any);
+                          setIsDateDropdownOpen(false);
+                          showToast(`Date Range: ${d.label}`);
+                        }}
+                        className={`w-full text-left px-3 py-1.5 flex items-center justify-between hover:bg-[#1f2e40] ${
+                          historyDateRange === d.key ? 'text-[#00df59] font-bold' : 'text-neutral-300'
+                        }`}
+                      >
+                        <span>{d.label}</span>
+                        {historyDateRange === d.key && <Check className="w-3 h-3 text-[#00df59]" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Clear Filter button */}
               <button
-                onClick={() => showToast('Filter by date range')}
-                className="hover:text-white p-1"
-                title="Calendar"
-              >
-                <Calendar className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => showToast('Clear history filter')}
-                className="hover:text-white p-1"
-                title="Clear"
+                onClick={() => {
+                  setHistoryStatusFilter('Settled');
+                  setHistoryResultFilter('All');
+                  setHistoryCategoryFilter('All');
+                  setHistoryDateRange('6M');
+                  setIsStatusDropdownOpen(false);
+                  setIsResultDropdownOpen(false);
+                  setIsDateDropdownOpen(false);
+                  showToast('Filters reset to default');
+                }}
+                className="hover:text-white p-1 rounded hover:bg-[#1e2a38] transition-colors cursor-pointer"
+                title="Reset Filters"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </div>
 
+          {/* Sub-Category Navigation Bar: All | Sports | Aviator */}
+          <div className="px-3 py-2 bg-[#0e151e] border-b border-[#1f2a38] flex items-center space-x-1.5 text-xs select-none">
+            <button
+              onClick={() => setHistoryCategoryFilter('All')}
+              className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
+                historyCategoryFilter === 'All'
+                  ? 'bg-[#00a826] text-white shadow'
+                  : 'bg-[#182330] text-neutral-400 hover:text-white'
+              }`}
+            >
+              All ({activeBetHistory.length})
+            </button>
+            <button
+              onClick={() => setHistoryCategoryFilter('Sports')}
+              className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
+                historyCategoryFilter === 'Sports'
+                  ? 'bg-[#00a826] text-white shadow'
+                  : 'bg-[#182330] text-neutral-400 hover:text-white'
+              }`}
+            >
+              Sports ({sportsCount})
+            </button>
+            <button
+              onClick={() => setHistoryCategoryFilter('Aviator')}
+              className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
+                historyCategoryFilter === 'Aviator'
+                  ? 'bg-[#de1a22] text-white shadow'
+                  : 'bg-[#182330] text-neutral-400 hover:text-white'
+              }`}
+            >
+              Aviator ({aviatorCount})
+            </button>
+          </div>
+
           {/* Settled Cards with Date Column (Exact match to Screenshot 9) */}
           <div className="p-3 space-y-4">
-            {activeBetHistory.length === 0 ? (
+            {filteredBetHistory.length === 0 ? (
               <div className="py-12 text-center text-xs text-neutral-400 space-y-3">
                 <div className="w-12 h-12 rounded-full bg-[#1c2635] flex items-center justify-center mx-auto text-neutral-500">
                   <Trophy className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="font-bold text-white text-sm mb-1">No Bet History</p>
-                  <p className="text-neutral-400">Your settled tickets and winning slips will appear here.</p>
+                  <p className="font-bold text-white text-sm mb-1">No Matching Bet History</p>
+                  <p className="text-neutral-400">No settled tickets match the currently selected filter options.</p>
                 </div>
                 <button
-                  onClick={() => setNavTab('sports')}
-                  className="inline-flex items-center space-x-1.5 px-4 py-2 bg-[#00a826] hover:bg-[#009221] active:scale-95 text-white font-bold text-xs rounded uppercase tracking-wide transition-all shadow"
+                  onClick={() => {
+                    setHistoryStatusFilter('Settled');
+                    setHistoryResultFilter('All');
+                    setHistoryCategoryFilter('All');
+                    setHistoryDateRange('6M');
+                    showToast('Filters reset to default');
+                  }}
+                  className="inline-flex items-center space-x-1.5 px-4 py-2 bg-[#00a826] hover:bg-[#009221] active:scale-95 text-white font-bold text-xs rounded uppercase tracking-wide transition-all shadow cursor-pointer"
                 >
-                  <span>Explore Matches</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Reset Filters</span>
                 </button>
               </div>
             ) : (
-              activeBetHistory.map((item) => {
+              filteredBetHistory.map((item) => {
                 const isExpanded = !!expandedHistoryIds[item.id];
                 const dateParts = parseBetDate(item);
 

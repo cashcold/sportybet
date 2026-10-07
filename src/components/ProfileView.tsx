@@ -30,7 +30,7 @@ interface ProfileViewProps {
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
-  const { user, logout, showToast, setActiveTab } = useBetting();
+  const { user, logout, showToast, setActiveTab, openBetHistory } = useBetting();
   const [hideBalance, setHideBalance] = useState(false);
   const [showSubpage, setShowSubpage] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -158,10 +158,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
           <div className="bg-[#19222d] rounded-md border border-[#212d3d] grid grid-cols-3 divide-x divide-[#212d3d] py-3.5 text-center mt-3.5 shadow-xs">
             {/* Column 1: Sports Bet History */}
             <div
-              onClick={() => {
-                setAuthMode('login');
-                setAuthModalOpen(true);
-              }}
+              onClick={() => openBetHistory()}
               className="flex flex-col items-center justify-center cursor-pointer group px-1"
             >
               <svg className="w-5 h-5 text-neutral-300 group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -454,7 +451,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
       <div className="mx-3 bg-[#16212e] border border-[#212d3d] rounded-lg grid grid-cols-3 divide-x divide-[#212d3d]">
         {/* Column 1: Sports Bet History */}
         <button
-          onClick={() => setActiveTab('open_bets')}
+          onClick={() => openBetHistory()}
           className="py-3 px-1.5 flex flex-col items-center justify-center text-center hover:bg-[#1a2636] transition-colors group"
         >
           {/* Betting Ticket / Slip Icon */}
