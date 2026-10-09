@@ -22,8 +22,21 @@ export function resolveWinningPredictionDetails(sel: BetSelection): {
 
   // Default game ID and date
   const gameId = sel.gameId || '23888';
-  const gameDate = sel.gameDate || sel.liveTime || '26/09 18:45';
+  const gameDate = sel.gameDate || sel.liveTime || '04/10 18:30';
   const lowerTitle = title.toLowerCase();
+
+  // If selection explicitly defines settled result (e.g. from real Bet History)
+  if (sel.ftScore && sel.outcome) {
+    return {
+      ftScore: sel.ftScore,
+      outcome: sel.outcome,
+      pickText: `${sName} ${oddStr}`,
+      isWon: sel.isWon ?? true,
+      gameId,
+      gameDate,
+      formattedMatchTitle
+    };
+  }
 
   // Canonical Aviator game resolution
   if (lowerTitle.includes('aviator') || mName.toLowerCase().includes('crash')) {

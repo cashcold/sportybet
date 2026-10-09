@@ -339,69 +339,45 @@ export const OpenBetsView: React.FC = () => {
             <span className="text-[13px] font-normal text-white">How to Cashout?</span>
           </button>
 
-          {/* Profile Avatar + GHS Balance OR Register | Login (screenshot style) */}
-          {user.isLoggedIn ? (
-            <div className="flex items-center space-x-2">
-              <div className="w-6 h-6 rounded-full overflow-hidden border border-white/20 bg-neutral-800">
-                <img
-                  src={user.avatarUrl || '/user_beach_avatar.jpg'}
-                  alt="User"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = 'none';
-                  }}
-                />
-              </div>
-              <span className="text-xs font-black text-[#ffde00] tracking-wide">
-                {user.currency} {user.balance.toFixed(2)}
-              </span>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-2 text-[14px]">
-              <button
-                onClick={() => {
-                  setAuthMode('join');
-                  setAuthModalOpen(true);
+          {/* Profile Avatar + GHS Balance (always shown in screenshot style) */}
+          <div className="flex items-center space-x-2">
+            <div className="w-6 h-6 rounded-full overflow-hidden border border-white/20 bg-neutral-800 shadow-sm">
+              <img
+                src={user.avatarUrl || '/user_beach_avatar.jpg'}
+                alt="User"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = 'none';
                 }}
-                className="text-white hover:text-neutral-200 transition-colors cursor-pointer font-medium"
-              >
-                Register
-              </button>
-              <span className="text-neutral-500 font-normal">|</span>
-              <button
-                onClick={() => {
-                  setAuthMode('login');
-                  setAuthModalOpen(true);
-                }}
-                className="text-white hover:text-neutral-200 transition-colors cursor-pointer font-medium"
-              >
-                Login
-              </button>
+              />
             </div>
-          )}
+            <span className="text-xs font-black text-[#ffde00] tracking-wide">
+              {user.currency || 'GHS'} {(user.isLoggedIn ? user.balance : 0).toFixed(2)}
+            </span>
+          </div>
         </div>
 
         {/* =================================================================== */}
         {/* 2. SEGMENTED TABS: Open Bets | Bet History (Matches screenshot)      */}
         {/* =================================================================== */}
-        <div className="flex text-[15px] font-bold">
+        <div className="px-3 pt-2 pb-2 bg-[#141b24] flex items-center space-x-2">
           <button
             onClick={() => setActiveTab('open')}
-            className={`flex-1 py-3 text-center transition-colors cursor-pointer ${
+            className={`flex-1 py-2 text-center text-[14px] font-bold rounded transition-colors cursor-pointer ${
               activeTab === 'open'
-                ? 'bg-[#151c24] text-white font-black'
-                : 'bg-[#434d5b] text-[#8e9aa9] hover:text-white'
+                ? 'bg-[#2b3543] text-white font-black'
+                : 'bg-[#222a36] text-neutral-300 hover:text-white'
             }`}
           >
-            Open Bets {user.isLoggedIn && activeOpenBets.length > 0 ? `(${activeOpenBets.length})` : ''}
+            Open Bets ({activeOpenBets.length || 5})
           </button>
 
           <button
             onClick={() => setActiveTab('history')}
-            className={`flex-1 py-3 text-center transition-colors cursor-pointer ${
+            className={`flex-1 py-2 text-center text-[14px] font-bold rounded transition-colors cursor-pointer ${
               activeTab === 'history'
-                ? 'bg-[#151c24] text-white font-black'
-                : 'bg-[#434d5b] text-[#8e9aa9] hover:text-white'
+                ? 'bg-[#1a232f] text-white font-black'
+                : 'bg-transparent text-neutral-400 hover:text-white'
             }`}
           >
             Bet History
@@ -570,11 +546,14 @@ export const OpenBetsView: React.FC = () => {
                     className="bg-[#17212d] border border-[#243243] rounded-md overflow-hidden shadow-lg transition-all duration-200"
                   >
                     {/* Top Row: Left = Multiple [Live], Right = Rebet | SIM | Edit Bet */}
-                    <div className="px-3.5 pt-3 pb-2 flex items-center justify-between text-xs select-none">
-                      <div
-                        onClick={() => toggleExpandBet(bet.id)}
-                        className="flex items-center space-x-2 cursor-pointer"
-                      >
+                    <div
+                      onClick={() => toggleExpandBet(bet.id)}
+                      role="button"
+                      tabIndex={0}
+                      title={isExpanded ? "Click to close match details" : "Click to view match details"}
+                      className="px-3.5 pt-3 pb-2 flex items-center justify-between text-xs select-none cursor-pointer hover:bg-[#1a2635] transition-colors"
+                    >
+                      <div className="flex items-center space-x-2">
                         <span className="font-bold text-white text-[15px] tracking-wide">
                           {bet.type}
                         </span>
@@ -585,8 +564,9 @@ export const OpenBetsView: React.FC = () => {
                         )}
                       </div>
 
-                      <div className="flex items-center space-x-3.5 font-bold text-[#00df59] text-[13px]">
+                      <div className="flex items-center space-x-3 font-bold text-[#00df59] text-[13px]">
                         <button
+                          type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleRebet(bet);
@@ -598,6 +578,7 @@ export const OpenBetsView: React.FC = () => {
                         </button>
 
                         <button
+                          type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleOpenSim(bet);
@@ -609,6 +590,7 @@ export const OpenBetsView: React.FC = () => {
                         </button>
 
                         <button
+                          type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedDetailBet(bet);
@@ -621,6 +603,7 @@ export const OpenBetsView: React.FC = () => {
                         </button>
 
                         <button
+                          type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             setEditingBet(bet);
@@ -628,8 +611,14 @@ export const OpenBetsView: React.FC = () => {
                           className="flex items-center space-x-1 hover:text-emerald-300 transition-colors cursor-pointer"
                         >
                           <Share2 className="w-3.5 h-3.5" />
-                          <span>Edit Bet</span>
+                          <span>Edit</span>
                         </button>
+
+                        <ChevronDown
+                          className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${
+                            isExpanded ? 'rotate-180 text-[#00df59]' : ''
+                          }`}
+                        />
                       </div>
                     </div>
 
@@ -954,47 +943,112 @@ export const OpenBetsView: React.FC = () => {
       {/* =================================================================== */}
       {activeTab === 'history' && (
         <div>
-          {/* Sub-Category Navigation Bar: All | Sports | Aviator (Clean SportyBet header without clunky dropdowns) */}
-          <div className="px-3.5 py-2.5 bg-[#121922] border-b border-[#1f2835] flex items-center justify-between text-xs select-none">
-            <div className="flex items-center space-x-1.5">
-              <button
-                onClick={() => setHistoryCategoryFilter('All')}
-                className={`px-3 py-1 rounded font-bold transition-all cursor-pointer ${
-                  historyCategoryFilter === 'All'
-                    ? 'bg-[#79889b] text-[#121922] font-black'
-                    : 'bg-[#242f3d] text-neutral-300 hover:bg-[#2e3b4d]'
-                }`}
-              >
-                All ({activeBetHistory.length})
-              </button>
-              <button
-                onClick={() => setHistoryCategoryFilter('Sports')}
-                className={`px-3 py-1 rounded font-bold transition-all cursor-pointer ${
-                  historyCategoryFilter === 'Sports'
-                    ? 'bg-[#79889b] text-[#121922] font-black'
-                    : 'bg-[#242f3d] text-neutral-300 hover:bg-[#2e3b4d]'
-                }`}
-              >
-                Sports ({sportsCount})
-              </button>
-              <button
-                onClick={() => setHistoryCategoryFilter('Aviator')}
-                className={`px-3 py-1 rounded font-bold transition-all cursor-pointer ${
-                  historyCategoryFilter === 'Aviator'
-                    ? 'bg-[#de1a22] text-white font-black'
-                    : 'bg-[#242f3d] text-neutral-300 hover:bg-[#2e3b4d]'
-                }`}
-              >
-                Aviator ({aviatorCount})
-              </button>
+          {/* Filter Bar from Screenshot_20261004-191226.png */}
+          <div className="px-3 py-2 bg-[#121922] border-b border-[#1f2835] flex items-center justify-between text-xs select-none relative">
+            <div className="flex items-center space-x-2">
+              {/* Bet Status Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setIsStatusDropdownOpen(!isStatusDropdownOpen);
+                    setIsResultDropdownOpen(false);
+                    setIsDateDropdownOpen(false);
+                  }}
+                  className="px-3 py-1.5 rounded-[4px] bg-[#1a2432] border border-[#263446] text-neutral-200 hover:text-white flex items-center space-x-1.5 font-medium cursor-pointer shadow-sm active:scale-95 transition-all text-xs"
+                >
+                  <span>Bet Status: {historyStatusFilter}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
+                </button>
+
+                {isStatusDropdownOpen && (
+                  <div className="absolute left-0 mt-1.5 w-36 bg-[#16212e] border border-[#253549] rounded shadow-xl py-1 z-30 text-xs">
+                    {(['Settled', 'All', 'Cashed Out'] as const).map((status) => (
+                      <button
+                        key={status}
+                        onClick={() => {
+                          setHistoryStatusFilter(status);
+                          setIsStatusDropdownOpen(false);
+                        }}
+                        className={`w-full px-3 py-2 text-left hover:bg-[#1f2e40] transition-colors flex items-center justify-between ${
+                          historyStatusFilter === status ? 'text-[#00df59] font-bold' : 'text-neutral-300'
+                        }`}
+                      >
+                        <span>{status}</span>
+                        {historyStatusFilter === status && <Check className="w-3.5 h-3.5" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Bet Result Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setIsResultDropdownOpen(!isResultDropdownOpen);
+                    setIsStatusDropdownOpen(false);
+                    setIsDateDropdownOpen(false);
+                  }}
+                  className="px-3 py-1.5 rounded-[4px] bg-[#1a2432] border border-[#263446] text-neutral-200 hover:text-white flex items-center space-x-1.5 font-medium cursor-pointer shadow-sm active:scale-95 transition-all text-xs"
+                >
+                  <span>Bet Result {historyResultFilter !== 'All' ? `: ${historyResultFilter}` : ''}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
+                </button>
+
+                {isResultDropdownOpen && (
+                  <div className="absolute left-0 mt-1.5 w-32 bg-[#16212e] border border-[#253549] rounded shadow-xl py-1 z-30 text-xs">
+                    {(['All', 'Won', 'Lost'] as const).map((res) => (
+                      <button
+                        key={res}
+                        onClick={() => {
+                          setHistoryResultFilter(res);
+                          setIsResultDropdownOpen(false);
+                        }}
+                        className={`w-full px-3 py-2 text-left hover:bg-[#1f2e40] transition-colors flex items-center justify-between ${
+                          historyResultFilter === res ? 'text-[#00df59] font-bold' : 'text-neutral-300'
+                        }`}
+                      >
+                        <span>{res}</span>
+                        {historyResultFilter === res && <Check className="w-3.5 h-3.5" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="text-[11px] text-neutral-400 font-medium">
-              Settled Bets
+            {/* Right: Calendar + Trash with Red Dot */}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => {
+                  setIsDateDropdownOpen(!isDateDropdownOpen);
+                  setIsStatusDropdownOpen(false);
+                  setIsResultDropdownOpen(false);
+                }}
+                className="p-1.5 rounded-[4px] bg-[#1a2432] border border-[#263446] text-neutral-300 hover:text-white transition-colors cursor-pointer"
+                title="Filter by Date Range"
+              >
+                <Calendar className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setHistoryStatusFilter('Settled');
+                  setHistoryResultFilter('All');
+                  setHistoryDateRange('6M');
+                  showToast('Bet filters reset');
+                }}
+                className="relative p-1.5 rounded-[4px] bg-[#1a2432] border border-[#263446] text-neutral-300 hover:text-white transition-colors cursor-pointer"
+                title="Clear/Reset Filters"
+              >
+                <Trash2 className="w-4 h-4" />
+                {/* Red Dot indicator from screenshot */}
+                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#e41e26] border border-[#141b24]" />
+              </button>
             </div>
           </div>
 
-          {/* Settled Cards with Date Column (Exact match to Screenshot 9) */}
+          {/* Settled Cards with Date Column (Exact match to Screenshot_20261004-191226.png) */}
           <div className="p-3 space-y-4">
             {filteredBetHistory.length === 0 ? (
               <div className="py-12 text-center text-xs text-neutral-400 space-y-3">
@@ -1009,7 +1063,6 @@ export const OpenBetsView: React.FC = () => {
                   onClick={() => {
                     setHistoryStatusFilter('Settled');
                     setHistoryResultFilter('All');
-                    setHistoryCategoryFilter('All');
                     setHistoryDateRange('6M');
                     showToast('Filters reset to default');
                   }}
@@ -1025,153 +1078,148 @@ export const OpenBetsView: React.FC = () => {
                 const dateParts = parseBetDate(item);
 
                 return (
-                  <div key={item.id} className="flex items-start space-x-3">
-                    {/* Left Date Column: e.g. 24 Sep */}
-                    <div className="text-center shrink-0 w-10 pt-1">
-                      <div className="text-2xl font-black text-white leading-none">
-                        {dateParts.day}
-                      </div>
-                      <div className="text-[11px] text-neutral-400 mt-0.5">
-                        {dateParts.month}
-                      </div>
+                  <div key={item.id} className="flex items-start space-x-2.5">
+                    {/* Left Date Column: e.g. 02 Oct, 19 Sep, or spacer for top card */}
+                    <div className="text-center shrink-0 w-10 pt-1 select-none">
+                      {dateParts.hasDate && (
+                        <>
+                          <div className="text-2xl font-black text-white leading-none tracking-tight">
+                            {dateParts.day}
+                          </div>
+                          <div className="text-[11px] text-neutral-400 mt-0.5 font-medium">
+                            {dateParts.month}
+                          </div>
+                        </>
+                      )}
                     </div>
 
-                    {/* Right Ticket Card: Collapsed by default, drops down details only on click like open bet */}
-                    <div className="flex-1 bg-[#17212d] border border-[#243243] rounded-md overflow-hidden shadow-lg transition-all duration-200">
-                      {/* Top Row: Multiple [Won] on Left | Rebet, Slip, Dropdown Arrow on Right - ENTIRE ROW CLICKABLE TO TOGGLE */}
+                    {/* Right Ticket Card */}
+                    <div className="flex-1 bg-[#141b24] border border-[#202b38] rounded-md overflow-hidden shadow-lg transition-all duration-200">
+                      {/* EXACT SOLID GREEN HEADER BANNER CIRCLED IN RED FROM SCREENSHOT */}
                       <div
                         onClick={() => toggleExpandHistoryBet(item.id)}
-                        className="px-3.5 pt-3 pb-2 flex items-center justify-between text-xs select-none cursor-pointer hover:bg-[#1a2635] transition-colors"
+                        role="button"
+                        tabIndex={0}
+                        aria-expanded={isExpanded}
+                        title={isExpanded ? "Click on top to close bet details" : "Click to view full bet details"}
+                        className="bg-[#00a826] hover:bg-[#009221] text-white px-3.5 py-2.5 flex items-center justify-between cursor-pointer select-none transition-colors active:opacity-95 rounded-t-md"
                       >
-                        <div className="flex flex-col">
-                          <div className="flex items-center space-x-2">
-                            <span className="font-bold text-white text-[15px] tracking-wide">
-                              {item.type}
-                            </span>
-                            {item.status === 'won' ? (
-                              <span className="bg-[#153a23] text-[#00df59] font-black text-[11px] px-2 py-0.5 rounded flex items-center space-x-1 border border-emerald-800/40">
-                                <Trophy className="w-3 h-3 text-[#00df59]" />
-                                <span>Won</span>
-                              </span>
-                            ) : item.status === 'lost' ? (
-                              <span className="bg-red-950/60 text-red-400 font-bold text-[11px] px-2 py-0.5 rounded border border-red-900/40">
-                                Lost
-                              </span>
-                            ) : (
-                              <span className="bg-[#1e2a38] text-neutral-300 font-bold text-[11px] px-2 py-0.5 rounded">
-                                Settled
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-[11px] text-neutral-400 mt-0.5 flex items-center space-x-1">
-                            <span>Ticket ID: {item.ticketId}</span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigator.clipboard?.writeText(item.ticketId);
-                                showToast(`Copied: ${item.ticketId}`);
-                              }}
-                              className="text-neutral-400 hover:text-white transition-colors cursor-pointer"
-                              title="Copy Ticket ID"
-                            >
-                              <Copy className="w-3 h-3 ml-0.5 inline" />
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center space-x-3 text-xs">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRebet(item);
-                            }}
-                            className="flex items-center space-x-1 text-[#00df59] font-bold hover:text-emerald-300 transition-colors cursor-pointer"
-                            title="Rebet this ticket"
-                          >
-                            <RefreshCw className="w-3.5 h-3.5" />
-                            <span>Rebet</span>
-                          </button>
-
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedDetailBet(item);
-                            }}
-                            className="flex items-center space-x-1 text-[#00df59] font-bold hover:text-emerald-300 transition-colors cursor-pointer"
-                            title="View Official Ticket Slip"
-                          >
-                            <FileText className="w-3.5 h-3.5" />
-                            <span>Slip</span>
-                          </button>
-
-                          <div className="text-neutral-400 pl-1">
-                            <ChevronDown
-                              className={`w-4 h-4 transition-transform duration-200 ${
-                                isExpanded ? 'rotate-180 text-[#00df59]' : ''
-                              }`}
-                            />
-                          </div>
+                        <span className="font-extrabold text-[15px] tracking-wide text-white">
+                          {item.type || 'Multiple'}
+                        </span>
+                        <div className="flex items-center space-x-1.5 font-bold text-sm text-white">
+                          {item.iconType === 'lightning' ? (
+                            <Zap className="w-4 h-4 fill-white text-white stroke-none" />
+                          ) : (
+                            <Trophy className="w-4 h-4 fill-white text-white stroke-none" />
+                          )}
+                          <span>{item.status === 'won' ? 'Won' : item.status === 'lost' ? 'Lost' : 'Settled'}</span>
+                          {isExpanded ? (
+                            <ChevronDown className="w-4 h-4 text-white stroke-[2.5]" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4 text-white stroke-[2.5]" />
+                          )}
                         </div>
                       </div>
 
-                      {/* Collapsed State: Match Title & Stake on Left | Total Return on Right */}
+                      {/* COLLAPSED STATE (DEFAULT: DETAILS HIDDEN AS SHOWN IN SCREENSHOT) */}
                       {!isExpanded && (
                         <div
                           onClick={() => toggleExpandHistoryBet(item.id)}
-                          className="px-3.5 pb-3.5 pt-1 flex items-center justify-between cursor-pointer hover:bg-[#1a2634] transition-colors"
+                          className="p-3.5 space-y-2 cursor-pointer hover:bg-[#18222f] transition-colors select-none"
                         >
-                          {/* Left: Match summary & Stake */}
-                          <div className="space-y-1 pr-3 flex-1 min-w-0">
-                            <div className="text-[14px] font-bold text-white truncate">
-                              {item.selections[0]?.matchTitle || 'Match'}
-                              {item.selections.length > 1 && (
-                                <span className="text-neutral-400 font-normal text-xs ml-1.5">
-                                  (+{item.selections.length - 1} more)
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-xs text-neutral-400">
-                              <span>Stake </span>
-                              <strong className="font-bold text-white">{item.stake.toFixed(2)}</strong>
-                            </div>
+                          {/* Total Stake */}
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-neutral-400">Total Stake (GHS)</span>
+                            <span className="text-white font-bold text-sm">{item.stake.toFixed(2)}</span>
                           </div>
 
-                          {/* Right: Total Return / Won Green Area */}
-                          <div className="shrink-0 text-right">
-                            <div className="text-[11px] text-neutral-400">Total Return</div>
-                            <div className="text-[#00df59] font-black text-sm">
-                              GHS {item.potentialWin.toFixed(2)}
+                          {/* Total Return */}
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-neutral-400">Total Return</span>
+                            <span className="text-[#00df59] font-black text-lg leading-tight">
+                              {item.potentialWin.toFixed(2)}
+                            </span>
+                          </div>
+
+                          {/* Match summary and Remix Bet button */}
+                          <div className="pt-1.5 flex items-end justify-between">
+                            <div className="space-y-0.5 text-xs text-neutral-300 flex-1 min-w-0 pr-3">
+                              {item.selections.slice(0, 3).map((sel, sIdx) => {
+                                const formattedTitle = (sel.matchTitle || 'Match').replace(/\s+vs\s+/gi, ' v ');
+                                return (
+                                  <div key={sIdx} className="truncate text-neutral-300 text-[13px] leading-snug">
+                                    {formattedTitle}
+                                  </div>
+                                );
+                              })}
+                              {item.selections.length > 3 && (
+                                <div className="text-neutral-400 text-xs pt-0.5">
+                                  ... (and {item.selections.length - 3} other matches)
+                                </div>
+                              )}
                             </div>
+
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemixBet(item);
+                              }}
+                              className="bg-[#00a826] hover:bg-[#009221] active:scale-95 text-white font-bold text-xs px-3.5 py-1.5 rounded-[3px] shadow transition-transform cursor-pointer shrink-0"
+                            >
+                              Remix Bet
+                            </button>
                           </div>
                         </div>
                       )}
 
-                      {/* DROPPED-DOWN / EXPANDED MATCH DETAILS (When clicked, shows all details) */}
+                      {/* EXPANDED STATE (WHEN USER CLICKS: DISPLAY ALL DETAILS) */}
                       {isExpanded && (
-                        <div className="border-t border-[#232f3e] bg-[#16202c] animate-in slide-in-from-top-2 duration-200">
-                          {/* Top Remix Bet Banner */}
-                          <div className="p-3 bg-[#182330] border-b border-[#243346] flex items-center justify-between">
-                            <div className="flex items-center space-x-2.5">
-                              <div className="w-8 h-8 rounded-full bg-[#1b3a57] border border-[#235682] flex items-center justify-center shrink-0">
-                                <span className="text-base">🤖</span>
-                              </div>
-                              <div className="text-xs font-bold text-white leading-tight">
-                                Bounce back fast —<br />
-                                <span className="text-neutral-300 font-normal text-[11px]">
-                                  remix and retry your bet!
-                                </span>
-                              </div>
+                        <div className="border-t border-[#202b38] bg-[#16202c] animate-in slide-in-from-top-2 duration-200">
+                          {/* Sub-header inside expanded ticket: Ticket ID + Rebet + View Slip */}
+                          <div
+                            onClick={() => toggleExpandHistoryBet(item.id)}
+                            role="button"
+                            tabIndex={0}
+                            title="Click to collapse details"
+                            className="px-3.5 py-2.5 bg-[#192433] border-b border-[#233144] flex items-center justify-between text-xs cursor-pointer select-none hover:bg-[#1e2b3c] transition-colors"
+                          >
+                            <div className="text-[11px] text-neutral-400 flex items-center space-x-1">
+                              <span>Ticket ID: {item.ticketId}</span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigator.clipboard?.writeText(item.ticketId);
+                                  showToast(`Copied: ${item.ticketId}`);
+                                }}
+                                className="text-neutral-400 hover:text-white transition-colors cursor-pointer"
+                                title="Copy Ticket ID"
+                              >
+                                <Copy className="w-3 h-3 ml-0.5 inline" />
+                              </button>
                             </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRebet(item);
-                              }}
-                              className="bg-[#00c853] hover:bg-[#00b34a] text-white font-black text-xs px-3 py-1.5 rounded-md flex items-center space-x-1 shadow active:scale-95 cursor-pointer"
-                            >
-                              <Sparkles className="w-3 h-3 fill-white stroke-none" />
-                              <span>Remix Bet</span>
-                            </button>
+                            <div className="flex items-center space-x-3 text-xs">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemixBet(item);
+                                }}
+                                className="flex items-center space-x-1 text-[#00df59] font-bold hover:underline cursor-pointer"
+                              >
+                                <RefreshCw className="w-3.5 h-3.5" />
+                                <span>Rebet</span>
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedDetailBet(item);
+                                }}
+                                className="flex items-center space-x-1 text-[#00df59] font-bold hover:underline cursor-pointer"
+                              >
+                                <FileText className="w-3.5 h-3.5" />
+                                <span>Slip</span>
+                              </button>
+                            </div>
                           </div>
 
                           {/* Detailed Match Legs */}
@@ -1192,17 +1240,14 @@ export const OpenBetsView: React.FC = () => {
 
                                   {/* Right Content */}
                                   <div className="flex-1 min-w-0 space-y-1.5">
-                                    {/* Game ID | Date */}
                                     <div className="text-neutral-400 text-xs">
                                       Game ID: {details.gameId} | {details.gameDate}
                                     </div>
 
-                                    {/* Team v Team */}
                                     <div className="font-bold text-white text-[15px] tracking-tight">
                                       {details.formattedMatchTitle}
                                     </div>
 
-                                    {/* FT Score | Settled badge */}
                                     <div className="flex items-center space-x-2 text-xs">
                                       <span className="text-neutral-300">
                                         FT Score:{' '}
@@ -1223,7 +1268,6 @@ export const OpenBetsView: React.FC = () => {
                                       </button>
                                     </div>
 
-                                    {/* Inner Dark Box: Pick, Market, Outcome, Trophy Watermark */}
                                     <div className="bg-[#192330] border border-[#243346] rounded-md p-2.5 relative overflow-hidden text-xs space-y-1 shadow-sm">
                                       <Trophy className="w-10 h-10 text-white/[0.07] absolute right-2 bottom-1 pointer-events-none" />
 
@@ -1255,11 +1299,11 @@ export const OpenBetsView: React.FC = () => {
                             })}
                           </div>
 
-                          {/* Bottom inside ticket: Stake / Total Return, and Actions */}
+                          {/* Bottom inside expanded ticket: Stake, Potential Win, and Actions */}
                           <div className="bg-[#17212d] border-t border-[#202b3a] p-3.5 space-y-2.5">
                             <div className="flex justify-between items-center text-xs">
                               <div className="space-y-1 text-neutral-400 text-xs">
-                                <div>Total Stake(GHS)</div>
+                                <div>Total Stake (GHS)</div>
                                 <div>Total Return</div>
                               </div>
                               <div className="space-y-1 text-right font-black text-xs">
@@ -1270,17 +1314,16 @@ export const OpenBetsView: React.FC = () => {
                               </div>
                             </div>
 
-                            {/* Action Buttons: Rebet & View Official Slip */}
                             <div className="pt-1 flex items-center space-x-2">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleRebet(item);
+                                  handleRemixBet(item);
                                 }}
                                 className="flex-1 py-2.5 bg-[#00c853] hover:bg-[#00b34a] active:scale-98 text-white font-black text-xs rounded-md shadow flex items-center justify-center space-x-1.5 transition-all cursor-pointer"
                               >
                                 <RefreshCw className="w-3.5 h-3.5" />
-                                <span>Rebet</span>
+                                <span>Remix Bet</span>
                               </button>
                               <button
                                 onClick={(e) => {
@@ -1298,10 +1341,10 @@ export const OpenBetsView: React.FC = () => {
                           {/* Close details button at bottom */}
                           <button
                             onClick={() => toggleExpandHistoryBet(item.id)}
-                            className="w-full py-2 bg-[#121922] border-t border-[#1d2734] text-center text-xs text-neutral-400 hover:text-white flex items-center justify-center space-x-1 cursor-pointer transition-colors"
+                            className="w-full py-2.5 bg-[#121922] border-t border-[#1d2734] text-center text-xs text-neutral-400 hover:text-white flex items-center justify-center space-x-1 cursor-pointer transition-colors"
                           >
                             <span>Hide Match Details</span>
-                            <ChevronDown className="w-3.5 h-3.5 rotate-180" />
+                            <ChevronUp className="w-4 h-4 text-[#00df59]" />
                           </button>
                         </div>
                       )}

@@ -97,6 +97,17 @@ function normalizeMatchDates(rawMatches: Match[]): Match[] {
       ) {
         return false;
       }
+      const home = (m.homeTeam || '').toLowerCase();
+      const away = (m.awayTeam || '').toLowerCase();
+      const league = (m.league || '').toLowerCase();
+      if (
+        (home.includes('england') && away.includes('spain')) ||
+        (home.includes('spain') && away.includes('england')) ||
+        (league.includes('nations league') && (home.includes('england') || away.includes('england'))) ||
+        home === 'england' || away === 'england' || home === 'spain' || away === 'spain'
+      ) {
+        return false;
+      }
       if (m.isLive) return true;
       if (!m.date) return false;
       return m.date >= todayYMD;
@@ -185,19 +196,14 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   });
 
   const [betHistory, setBetHistory] = useState<PlacedBet[]>(() => {
-    const saved = localStorage.getItem('sportybet_bet_history');
+    const saved = localStorage.getItem('sportybet_bet_history_v3');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          if (parsed[0]?.id === 'bet-hist-won-exact-screenshot' || parsed[0]?.ticketId === 'SBGH-4819-2094') {
-            return parsed;
-          }
-          return INITIAL_BET_HISTORY;
+        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0]?.id === 'bet-hist-sporty-screenshot-1') {
+          return parsed;
         }
-      } catch {
-        return INITIAL_BET_HISTORY;
-      }
+      } catch {}
     }
     return INITIAL_BET_HISTORY;
   });
@@ -604,9 +610,9 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   useEffect(() => {
     if (user.isLoggedIn) {
-      localStorage.setItem('sportybet_bet_history', JSON.stringify(betHistory));
+      localStorage.setItem('sportybet_bet_history_v3', JSON.stringify(betHistory));
     } else {
-      localStorage.removeItem('sportybet_bet_history');
+      localStorage.removeItem('sportybet_bet_history_v3');
     }
   }, [betHistory, user.isLoggedIn]);
 

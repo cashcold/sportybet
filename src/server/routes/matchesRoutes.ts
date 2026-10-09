@@ -55,8 +55,19 @@ matchesRouter.get('/', async (req: Request, res: Response) => {
   }
 
   const todayYMD = new Date().toISOString().split('T')[0];
-  // Filter out any matches from past days that have already been played
+  // Filter out any matches from past days that have already been played, including past England vs Spain fixtures
   result = result.filter(m => {
+    const home = (m.homeTeam || '').toLowerCase();
+    const away = (m.awayTeam || '').toLowerCase();
+    const league = (m.league || '').toLowerCase();
+    if (
+      (home.includes('england') && away.includes('spain')) ||
+      (home.includes('spain') && away.includes('england')) ||
+      (league.includes('nations league') && (home.includes('england') || away.includes('england'))) ||
+      home === 'england' || away === 'england' || home === 'spain' || away === 'spain'
+    ) {
+      return false;
+    }
     if (m.isLive) return true;
     if (!m.date) return false;
     return m.date >= todayYMD;

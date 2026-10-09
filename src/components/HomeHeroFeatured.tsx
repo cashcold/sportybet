@@ -45,13 +45,13 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
   // Exact cards sequence from video (00:00 - 00:03)
   const featuredCards: PromoFeatureItem[] = [
     {
-      id: 'eng_vs_esp',
-      title: 'ENG vs ESP',
-      lines: ['ENG vs ESP'],
+      id: 'dortmund_vs_bremen',
+      title: 'BVB vs SVW',
+      lines: ['BVB vs SVW'],
       image: luckynumbersImg,
       posterImage: '/luckynumbers.jpg',
-      tagline: 'UEFA Nations League Blockbuster',
-      description: 'England takes on European champions Spain! Place your bets on the blockbuster showdown with boosted odds.',
+      tagline: 'Bundesliga Blockbuster Live',
+      description: 'Borussia Dortmund hosts Werder Bremen! Experience boosted odds, live in-play betting, and instant early cashout.',
       actionText: 'Bet Now',
       actionType: 'modal'
     },
@@ -198,28 +198,47 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
     }
   };
 
-  // Featured hero match derived from video (England vs Spain UEFA Nations League)
+  // Dynamically select the current top real fixture (live or hot upcoming match, strictly excluding past played fixtures like England vs Spain)
+  const isExcludedMatch = (m?: Match) => {
+    if (!m) return true;
+    const home = (m.homeTeam || '').toLowerCase();
+    const away = (m.awayTeam || '').toLowerCase();
+    const league = (m.league || '').toLowerCase();
+    if (home.includes('england') && away.includes('spain')) return true;
+    if (home.includes('spain') && away.includes('england')) return true;
+    if (league.includes('nations league') && (home.includes('england') || away.includes('england'))) return true;
+    if (home === 'england' || away === 'england' || home === 'spain' || away === 'spain') return true;
+    return false;
+  };
+
+  const validMatches = matches.filter(m => !isExcludedMatch(m));
+
   const featuredMatch: Match =
-    matches.find(m => m?.id === 'theodds-eng-esp-nations') ||
-    matches.find(m => m?.homeTeam === 'England' && m?.awayTeam === 'Spain') ||
-    matches[0] || {
-      id: 'theodds-eng-esp-nations',
-      gameId: '29810',
+    validMatches.find(m => m?.homeTeam === 'Borussia Dortmund') ||
+    validMatches.find(m => m?.isHot && m?.isLive) ||
+    validMatches.find(m => m?.isLive) ||
+    validMatches.find(m => m?.isHot) ||
+    validMatches[0] || {
+      id: 'theodds-3fb63658405d468954f57745cd115118',
+      gameId: '36365',
       sport: 'football',
-      league: 'UEFA Nations League',
-      countryOrCategory: 'International',
-      homeTeam: 'England',
-      awayTeam: 'Spain',
-      startTime: '18:45',
+      league: 'Bundesliga',
+      countryOrCategory: 'Germany',
+      homeTeam: 'Borussia Dortmund',
+      awayTeam: 'Werder Bremen',
+      startTime: '18:30',
       dateLabel: 'Today',
-      commenceTime: '2026-09-26T18:45:00Z',
-      isLive: false,
-      marketsCount: 145,
+      commenceTime: '2026-10-09T18:30:00Z',
+      isLive: true,
+      homeScore: 2,
+      awayScore: 1,
+      minute: "67' H2",
+      marketsCount: 135,
       markets: {
         '1X2': [
-          { id: 'o1', name: '1', value: 3.45 },
-          { id: 'ox', name: 'X', value: 3.62 },
-          { id: 'o2', name: '2', value: 2.20 }
+          { id: 'o1', name: '1', value: 1.55 },
+          { id: 'ox', name: 'X', value: 3.55 },
+          { id: 'o2', name: '2', value: 7.99 }
         ]
       }
     };
@@ -227,8 +246,8 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
   const tournamentFilters = [
     "TODAY'S FOOTBALL",
     "FOOTBALL IN NEXT 3 HOURS",
-    "AFCON QUALIFIERS",
-    "UEFA NATIONS LEAGUE"
+    "BUNDESLIGA",
+    "PREMIER LEAGUE"
   ];
 
   const quickNavItems = [
@@ -485,50 +504,60 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
       </div>
 
       {/* =================================================================== */}
-      {/* 5. TOURNAMENT CAPSULE PILL (00:02 in video)                         */}
+      {/* 5. TOURNAMENT CAPSULE PILL                                          */}
       {/* =================================================================== */}
       <div className="px-3 pb-2">
-        <div className="bg-[#1b2532] border border-[#273444] rounded-full px-3 py-1.5 flex items-center justify-between shadow-sm">
+        <div
+          onClick={() => onSelectTournament(featuredMatch?.league || 'Bundesliga')}
+          className="bg-[#1b2532] border border-[#273444] rounded-full px-3 py-1.5 flex items-center justify-between shadow-sm cursor-pointer hover:bg-[#222f3f] transition-colors"
+        >
           <div className="flex items-center space-x-2 text-xs font-bold text-neutral-200 truncate">
             <span>🏆</span>
-            <span className="truncate">UEFA Nations League</span>
+            <span className="truncate">{featuredMatch?.league || 'Bundesliga'}</span>
           </div>
 
           <div className="flex items-center space-x-1.5 shrink-0 ml-2">
-            <div className="w-4 h-4 rounded-full bg-blue-600/30 border border-blue-400 flex items-center justify-center text-[9px] text-blue-300">
-              🌐
-            </div>
-            <div className="w-4 h-4 rounded-full bg-rose-600/30 border border-rose-400 flex items-center justify-center text-[9px] text-rose-300">
+            <div className="w-4 h-4 rounded-full bg-emerald-600/30 border border-emerald-400 flex items-center justify-center text-[9px] text-emerald-300 font-bold">
               ⚽
             </div>
+            <span className="text-[11px] text-neutral-400 font-medium">
+              {featuredMatch?.countryOrCategory || 'Top League'}
+            </span>
           </div>
         </div>
       </div>
 
       {/* =================================================================== */}
-      {/* 6. BIG FEATURED MATCH CARD (00:02 - 00:05 in video)                 */}
+      {/* 6. BIG FEATURED MATCH CARD (Dynamically bound to top real fixture)   */}
       {/* =================================================================== */}
       <div className="px-3 pb-3">
         <div className="bg-[#16202c] border border-[#232e3d] rounded-md p-3 shadow-md">
           {/* Card Top: POPULAR 🔥, Tournament Link, Stats Icon */}
           <div className="flex items-center justify-between text-xs pb-2 border-b border-[#1f2936]">
             <div className="flex items-center space-x-2 truncate">
-              {/* POPULAR Badge from video */}
-              <span className="bg-[#de1a22] text-white text-[10px] font-black px-1.5 py-0.5 rounded flex items-center space-x-0.5">
+              {/* POPULAR Badge */}
+              <span className="bg-[#de1a22] text-white text-[10px] font-black px-1.5 py-0.5 rounded flex items-center space-x-0.5 shrink-0">
                 <span>POPULAR</span>
                 <span>🔥</span>
               </span>
 
               {/* Tournament link */}
-              <span className="text-[#00df59] underline font-semibold text-[11px] truncate flex items-center gap-1">
-                <span>Football - International - UEFA Nations League</span>
+              <button
+                onClick={() => onSelectTournament(featuredMatch?.league || 'Bundesliga')}
+                className="text-[#00df59] underline font-semibold text-[11px] truncate flex items-center gap-1 hover:text-emerald-300 transition-colors cursor-pointer text-left"
+              >
+                <span className="truncate">
+                  {featuredMatch?.countryOrCategory ? `${featuredMatch.countryOrCategory} - ` : ''}
+                  {featuredMatch?.league || 'Bundesliga'}
+                </span>
                 <span>&gt;</span>
-              </span>
+              </button>
             </div>
 
             <button
-              onClick={() => showToast(`Opening England vs Spain Statistics`)}
-              className="text-neutral-400 hover:text-white shrink-0 ml-1"
+              onClick={() => showToast(`Opening ${featuredMatch?.homeTeam} vs ${featuredMatch?.awayTeam} Statistics`)}
+              className="text-neutral-400 hover:text-white shrink-0 ml-1 cursor-pointer"
+              title="Match Statistics"
             >
               <BarChart2 className="w-3.5 h-3.5" />
             </button>
@@ -536,49 +565,55 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
 
           {/* Teams, Score and Time */}
           <div className="grid grid-cols-3 items-center py-3 text-center">
-            {/* England */}
-            <div className="flex flex-col items-center space-y-1">
-              <div className="w-10 h-10 rounded-full bg-white border border-neutral-300 flex items-center justify-center shadow-inner relative overflow-hidden">
-                {/* England St George Cross flag */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-full h-2 bg-red-600 absolute" />
-                  <div className="h-full w-2 bg-red-600 absolute" />
-                </div>
+            {/* Home Team */}
+            <div className="flex flex-col items-center space-y-1 px-1">
+              <div className="w-10 h-10 rounded-full bg-[#1e2a38] border border-[#2d3d52] flex items-center justify-center shadow-inner relative overflow-hidden font-black text-xs text-white">
+                {featuredMatch?.homeTeam ? featuredMatch.homeTeam.substring(0, 3).toUpperCase() : 'BVB'}
               </div>
-              <span className="text-xs font-bold text-neutral-200 leading-tight">
-                England
+              <span className="text-xs font-bold text-neutral-200 leading-tight truncate max-w-full">
+                {featuredMatch?.homeTeam || 'Borussia Dortmund'}
               </span>
             </div>
 
-            {/* Center: 18:45 | Today and 1X2 */}
+            {/* Center: Live / Time and Market */}
             <div className="flex flex-col items-center space-y-1">
-              <span className="text-sm font-bold text-neutral-300 tracking-wide">
-                18:45 | Today
-              </span>
+              {featuredMatch?.isLive ? (
+                <div className="flex flex-col items-center">
+                  <span className="bg-[#de1a22] text-white text-[10px] font-black px-1.5 py-0.5 rounded animate-pulse">
+                    LIVE {featuredMatch.minute || "67'"}
+                  </span>
+                  <span className="text-base font-black text-white pt-0.5">
+                    {featuredMatch.homeScore ?? 2} - {featuredMatch.awayScore ?? 1}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-sm font-bold text-neutral-300 tracking-wide">
+                  {featuredMatch?.startTime || '18:30'} | {featuredMatch?.dateLabel || 'Today'}
+                </span>
+              )}
 
               <span className="text-xs font-black text-[#00df59] pt-0.5 tracking-wider">
                 1X2
               </span>
             </div>
 
-            {/* Spain */}
-            <div className="flex flex-col items-center space-y-1">
-              <div className="w-10 h-10 rounded-full bg-red-600 border border-neutral-700 flex items-center justify-center shadow-inner relative overflow-hidden">
-                {/* Spain Red-Gold-Red flag */}
-                <div className="w-full h-4 bg-amber-400" />
+            {/* Away Team */}
+            <div className="flex flex-col items-center space-y-1 px-1">
+              <div className="w-10 h-10 rounded-full bg-[#1e2a38] border border-[#2d3d52] flex items-center justify-center shadow-inner relative overflow-hidden font-black text-xs text-white">
+                {featuredMatch?.awayTeam ? featuredMatch.awayTeam.substring(0, 3).toUpperCase() : 'SVW'}
               </div>
-              <span className="text-xs font-bold text-neutral-200 leading-tight">
-                Spain
+              <span className="text-xs font-bold text-neutral-200 leading-tight truncate max-w-full">
+                {featuredMatch?.awayTeam || 'Werder Bremen'}
               </span>
             </div>
           </div>
 
-          {/* Bottom Odds Row (1: 3.45, X: 3.62, 2: 2.20) */}
+          {/* Bottom Odds Row (1, X, 2) */}
           <div className="grid grid-cols-3 gap-2 pt-1">
             {((featuredMatch?.markets && Array.isArray(featuredMatch.markets['1X2']) && featuredMatch.markets['1X2']) || [
-              { id: 'o1', name: '1', value: 3.45 },
-              { id: 'ox', name: 'X', value: 3.62 },
-              { id: 'o2', name: '2', value: 2.20 },
+              { id: 'o1', name: '1', value: 1.55 },
+              { id: 'ox', name: 'X', value: 3.55 },
+              { id: 'o2', name: '2', value: 7.99 },
             ]).map(odd => {
               const isSelected = Array.isArray(betslip) && betslip.some(
                 s => s?.matchId === featuredMatch?.id && s?.marketName === '1X2' && s?.selectionName === odd?.name

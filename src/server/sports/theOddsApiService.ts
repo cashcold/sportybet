@@ -573,8 +573,19 @@ class TheOddsApiService {
     const tomorrowYMD = tomorrow.toISOString().split('T')[0];
     const tomorrowDayMonth = tomorrow.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
 
-    // Remove any past/already played matches whose date was before today
+    // Remove any past/already played matches whose date was before today, and exclude past England vs Spain fixtures
     matches = matches.filter(m => {
+      const home = (m.homeTeam || '').toLowerCase();
+      const away = (m.awayTeam || '').toLowerCase();
+      const league = (m.league || '').toLowerCase();
+      if (
+        (home.includes('england') && away.includes('spain')) ||
+        (home.includes('spain') && away.includes('england')) ||
+        (league.includes('nations league') && (home.includes('england') || away.includes('england'))) ||
+        home === 'england' || away === 'england' || home === 'spain' || away === 'spain'
+      ) {
+        return false;
+      }
       if (m.isLive) return true;
       if (!m.date) return false;
       return m.date >= todayYMD;

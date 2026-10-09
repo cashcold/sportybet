@@ -69,6 +69,8 @@ export async function seedDefaultDatabase() {
   }
 }
 
+mongoose.set('bufferCommands', false); // CRITICAL: fail fast, don't hang
+
 export async function connectToDatabase(): Promise<typeof mongoose | null> {
   if (isConnected && mongoose.connection.readyState === 1) {
     return mongoose;
@@ -82,25 +84,36 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
     try {
       let targetUri = getMongoUri();
 
-      // If no external MONGODB_URI is provided, launch real embedded MongoDB server
+      // If no external MONGODB_URI is provided, attempt embedded MongoDB server or fallback to mock
       if (!targetUri) {
-        if (!memoryServerInstance) {
-          console.log('[MongoDB] Starting dedicated MongoDB database engine...');
-          memoryServerInstance = await MongoMemoryServer.create({
-            instance: {
-              dbName: 'sportybet_ghana'
-            }
-          });
+        try {
+          if (!memoryServerInstance) {
+            console.log('[MongoDB] Starting dedicated MongoDB database engine...');
+            memoryServerInstance = await MongoMemoryServer.create({
+              instance: {
+                dbName: 'sportybet_ghana'
+              }
+            });
+          }
+          targetUri = memoryServerInstance.getUri();
+          console.log('[MongoDB Engine] Local MongoDB Server active at:', targetUri);
+        } catch (memErr: any) {
+          console.warn('[MongoDB] MongoMemoryServer unavailable, running with in-memory store:', memErr?.message || memErr);
+          isConnected = false;
+          return null;
         }
-        targetUri = memoryServerInstance.getUri();
-        console.log('[MongoDB Engine] Local MongoDB Server active at:', targetUri);
       } else {
         console.log('[MongoDB] Connecting to external MongoDB Cluster at:', targetUri.replace(/\/\/.*@/, '//***:***@'));
       }
 
+      if (!targetUri) {
+        isConnected = false;
+        return null;
+      }
+
       const conn = await mongoose.connect(targetUri, {
-        serverSelectionTimeoutMS: 10000,
-        connectTimeoutMS: 10000,
+        serverSelectionTimeoutMS: 5000,
+        connectTimeoutMS: 5000,
       });
 
       isConnected = true;
@@ -111,7 +124,7 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
 
       return conn;
     } catch (error: any) {
-      console.error('[MongoDB Connection Error]:', error?.message || error);
+      console.warn('[MongoDB Connection Warning - using in-memory store]:', error?.message || error);
       isConnected = false;
       return null;
     } finally {
