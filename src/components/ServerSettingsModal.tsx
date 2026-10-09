@@ -48,6 +48,11 @@ export const ServerSettingsModal: React.FC<ServerSettingsModalProps> = ({ isOpen
 
   useEffect(() => {
     if (isOpen) {
+      // Auto-purge dead sportybet.vercel.app domain
+      const saved = getSavedApiUrl();
+      if (saved && (saved.includes('sportybet.vercel.app') || saved.includes('undefined') || saved.includes('null'))) {
+        clearCustomApiUrl();
+      }
       setUrlInput(getSavedApiUrl() || (isNativePlatform() ? getApiBaseUrl() : ''));
       setTestResult(null);
     }

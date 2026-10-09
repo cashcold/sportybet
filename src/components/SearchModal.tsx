@@ -72,19 +72,22 @@ export const SearchModal: React.FC = () => {
                   {match.homeTeam} vs {match.awayTeam}
                 </div>
                 <div className="flex space-x-2 mt-2">
-                  {match.markets['1X2']?.map(odd => (
-                    <button
-                      key={odd.id}
-                      onClick={() => {
-                        toggleSelection(match, '1X2', odd);
-                        setIsSearchOpen(false);
-                      }}
-                      className="flex-1 py-1.5 bg-[#222b36] hover:bg-[#00a826] hover:text-white text-[#00df59] font-bold text-xs rounded transition-colors text-center"
-                    >
-                      <span className="text-[10px] text-neutral-400 mr-1">{odd.name}:</span>
-                      <span>{odd.value.toFixed(2)}</span>
-                    </button>
-                  ))}
+                  {(match?.markets && Array.isArray(match.markets['1X2']) ? match.markets['1X2'] : []).map(odd => {
+                    const oddVal = typeof odd?.value === 'number' ? odd.value : parseFloat(String(odd?.value)) || 0;
+                    return (
+                      <button
+                        key={odd.id}
+                        onClick={() => {
+                          toggleSelection(match, '1X2', odd);
+                          setIsSearchOpen(false);
+                        }}
+                        className="flex-1 py-1.5 bg-[#222b36] hover:bg-[#00a826] hover:text-white text-[#00df59] font-bold text-xs rounded transition-colors text-center"
+                      >
+                        <span className="text-[10px] text-neutral-400 mr-1">{odd.name}:</span>
+                        <span>{oddVal.toFixed(2)}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))

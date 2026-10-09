@@ -54,13 +54,48 @@ function formatFetchError(err: any, endpoint: string): string {
   return msg;
 }
 
+async function safeFetch(endpoint: string, init?: RequestInit): Promise<Response> {
+  const primaryUrl = resolveApiUrl(endpoint);
+  try {
+    const res = await fetch(primaryUrl, init);
+    // If external primary URL returned 404 or >= 500 and is not local origin:
+    const isCustomRemote = primaryUrl.startsWith('http') && typeof window !== 'undefined' && !primaryUrl.includes(window.location.host);
+    if (!res.ok && isCustomRemote && (res.status === 404 || res.status >= 500)) {
+      const cleanPath = endpoint.startsWith('/api') ? endpoint.slice(4) : endpoint;
+      const localUrl = `/api${cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`}`;
+      try {
+        const localRes = await fetch(localUrl, init);
+        if (localRes.ok || localRes.status < 500) {
+          localStorage.removeItem('sportybet_backend_url');
+          return localRes;
+        }
+      } catch {}
+    }
+    return res;
+  } catch (err: any) {
+    const isCustomRemote = primaryUrl.startsWith('http') && typeof window !== 'undefined' && !primaryUrl.includes(window.location.host);
+    if (isCustomRemote) {
+      const cleanPath = endpoint.startsWith('/api') ? endpoint.slice(4) : endpoint;
+      const localUrl = `/api${cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`}`;
+      try {
+        const localRes = await fetch(localUrl, init);
+        if (localRes.ok || localRes.status < 500) {
+          localStorage.removeItem('sportybet_backend_url');
+          return localRes;
+        }
+      } catch {}
+    }
+    throw err;
+  }
+}
+
 export const api = {
   // --- AUTH ENDPOINTS ---
   auth: {
     async login(phone: string, password?: string): Promise<{ success: boolean; user?: UserProfile; token?: string; error?: string }> {
       const endpoint = '/auth/login';
       try {
-        const res = await fetch(resolveApiUrl(endpoint), {
+        const res = await safeFetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone, password })
@@ -105,7 +140,7 @@ export const api = {
     async register(phone: string, password?: string, firstName?: string, lastName?: string, dateOfBirth?: string): Promise<{ success: boolean; user?: UserProfile; token?: string; message?: string; error?: string }> {
       const endpoint = '/auth/register';
       try {
-        const res = await fetch(resolveApiUrl(endpoint), {
+        const res = await safeFetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone, password, firstName, lastName, dateOfBirth })
@@ -151,7 +186,7 @@ export const api = {
     async getMe(): Promise<{ success: boolean; user?: UserProfile; error?: string }> {
       const endpoint = '/auth/me';
       try {
-        const res = await fetch(resolveApiUrl(endpoint), {
+        const res = await safeFetch(endpoint, {
           headers: getAuthHeader()
         });
         return await parseJsonResponse(res, endpoint);
@@ -163,7 +198,7 @@ export const api = {
     async updateProfile(updates: Partial<UserProfile>): Promise<{ success: boolean; user?: UserProfile; error?: string }> {
       const endpoint = '/auth/profile';
       try {
-        const res = await fetch(resolveApiUrl(endpoint), {
+        const res = await safeFetch(endpoint, {
           method: 'PUT',
           headers: getAuthHeader(),
           body: JSON.stringify(updates)
@@ -177,7 +212,7 @@ export const api = {
     async claimDailyStreak(): Promise<{ success: boolean; dailyStreak?: number; balance?: number; message?: string; error?: string }> {
       const endpoint = '/auth/daily-streak';
       try {
-        const res = await fetch(resolveApiUrl(endpoint), {
+        const res = await safeFetch(endpoint, {
           method: 'POST',
           headers: getAuthHeader()
         });
@@ -190,7 +225,7 @@ export const api = {
     async logout(): Promise<{ success: boolean }> {
       const endpoint = '/auth/logout';
       try {
-        await fetch(resolveApiUrl(endpoint), {
+        await safeFetch(endpoint, {
           method: 'POST',
           headers: getAuthHeader()
         });

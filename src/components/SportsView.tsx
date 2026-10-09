@@ -326,7 +326,12 @@ export const SportsView: React.FC = () => {
         {/* Live Match Cards */}
         <div className="divide-y divide-[#1e2632]">
           {liveMatches.map(match => {
-            const currentOdds = match.markets[liveMarket] || match.markets['1X2'] || [];
+            const matchMarkets = match?.markets || {};
+            const currentOdds = Array.isArray(matchMarkets[liveMarket])
+              ? matchMarkets[liveMarket]
+              : Array.isArray(matchMarkets['1X2'])
+              ? matchMarkets['1X2']
+              : [];
 
             return (
               <div key={match.id} className="p-3 hover:bg-[#18212b] transition-colors">
@@ -550,7 +555,12 @@ export const SportsView: React.FC = () => {
                   {/* Matches within this date group */}
                   <div className="divide-y divide-[#1e2632]">
                     {group.matches.map(match => {
-                      const currentOdds = match.markets[sportsMarket] || match.markets['1X2'] || [];
+                      const matchMarkets = match?.markets || {};
+                      const currentOdds = Array.isArray(matchMarkets[sportsMarket])
+                        ? matchMarkets[sportsMarket]
+                        : Array.isArray(matchMarkets['1X2'])
+                        ? matchMarkets['1X2']
+                        : [];
                       const displayTime = match.commenceTime 
                         ? new Date(match.commenceTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                         : (match.startTime || '18:00');

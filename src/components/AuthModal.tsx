@@ -61,7 +61,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
     if (isOpen) {
       setMode(initialMode);
       setErrorMessage(null);
-      setApiUrlInput(getSavedApiUrl() || getApiBaseUrl());
+      // Auto-purge any broken/dead sportybet.vercel.app URLs
+      const saved = getSavedApiUrl();
+      if (saved && (saved.includes('sportybet.vercel.app') || saved.includes('undefined') || saved.includes('null'))) {
+        clearCustomApiUrl();
+      }
+      setApiUrlInput(getSavedApiUrl() || getApiBaseUrl() || '/api');
       setTestResult(null);
     }
   }, [isOpen, initialMode]);
@@ -75,10 +80,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
       errorMessage.toLowerCase().includes('network'));
 
   const handleTestAndSaveServer = async () => {
-    if (!apiUrlInput.trim()) {
+    if (!apiUrlInput.trim() || apiUrlInput.trim() === '/api') {
       clearCustomApiUrl();
-      setTestResult({ success: true, message: 'Reset to default relative API' });
-      showToast('API URL reset to default');
+      setApiUrlInput('/api');
+      setTestResult({ success: true, message: 'Active: Local Full-Stack Server (/api)' });
+      showToast('API URL set to local server');
+      setErrorMessage(null);
       return;
     }
 
@@ -94,22 +101,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
         success: true,
         message: `Connected successfully! Latency: ${res.latencyMs}ms`
       });
-      showToast('Backend API URL saved!');
+      showToast('Backend API URL verified and saved!');
       setErrorMessage(null);
     } else {
-      setCustomApiUrl(apiUrlInput.trim()); // Save anyway in case of transient offline
+      // Do NOT save broken or unreachable URLs to prevent bricking the app
       setTestResult({
         success: false,
-        message: `Could not verify: ${res.error}. Saved anyway.`
+        message: `Connection failed: ${res.error}. URL was NOT saved.`
       });
+      showToast(`Cannot connect to ${apiUrlInput.trim()}`);
     }
   };
 
   const handleResetServer = () => {
     clearCustomApiUrl();
-    setApiUrlInput(getApiBaseUrl());
-    setTestResult({ success: true, message: 'Reset to default' });
-    showToast('Reset to default');
+    setApiUrlInput('/api');
+    setTestResult({ success: true, message: 'Reset to local backend (/api)' });
+    setErrorMessage(null);
+    showToast('Reset to local server (/api)');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -308,6 +317,33 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               </div>
             )}
 
+            {/* Quick preset chips */}
+            <div className="flex flex-wrap gap-1.5 pt-0.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setApiUrlInput('/api');
+                  clearCustomApiUrl();
+                  setErrorMessage(null);
+                  setTestResult({ success: true, message: 'Active: Local Full-Stack Server (/api)' });
+                  showToast('Set to local server');
+                }}
+                className="px-2 py-1 rounded bg-[#1c2635] hover:bg-[#253448] text-[10px] text-[#00df59] font-bold border border-[#00df59]/40 transition-colors cursor-pointer"
+              >
+                ⚡ Use Local Server (/api)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setApiUrlInput('https://sportybet-sand.vercel.app');
+                  setTestResult(null);
+                }}
+                className="px-2 py-1 rounded bg-[#1c2635] hover:bg-[#253448] text-[10px] text-neutral-300 font-bold border border-neutral-700 transition-colors cursor-pointer"
+              >
+                🌐 Use Live Vercel Backend
+              </button>
+            </div>
+
             <div className="flex items-center space-x-2 pt-1">
               <button
                 type="button"
@@ -343,15 +379,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                 <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                 <span className="leading-snug">{errorMessage}</span>
               </div>
-              {isNetworkFailure && !showServerConfig && (
-                <div className="pt-1 border-t border-red-500/30 flex justify-end">
+              {isNetworkFailure && (
+                <div className="pt-1.5 border-t border-red-500/30 flex items-center justify-between">
+                  <span className="text-[11px] text-amber-200">Switch to local backend:</span>
                   <button
                     type="button"
-                    onClick={() => setShowServerConfig(true)}
-                    className="text-[11px] text-amber-300 hover:underline font-bold flex items-center space-x-1"
+                    onClick={handleResetServer}
+                    className="px-2.5 py-1 bg-[#00a826] hover:bg-[#009221] text-white text-[10px] font-bold rounded cursor-pointer transition-colors"
                   >
-                    <Settings className="w-3 h-3" />
-                    <span>Configure Server API URL</span>
+                    Reset to Local /api
                   </button>
                 </div>
               )}

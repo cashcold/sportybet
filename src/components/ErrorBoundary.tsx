@@ -31,6 +31,7 @@ export class ErrorBoundary extends Component<Props, State> {
     try {
       localStorage.removeItem('sportybet_matches');
       localStorage.removeItem('sportybet_betslip');
+      localStorage.removeItem('sportybet_floating_pos');
     } catch {}
     window.location.reload();
   };

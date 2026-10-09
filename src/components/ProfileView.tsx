@@ -24,6 +24,7 @@ import { ProfileDetailsSubpage } from './ProfileDetailsSubpage';
 import { AuthModal } from './AuthModal';
 import { SportyBetLogo } from './SportyBetLogo';
 import { ServerSettingsModal } from './ServerSettingsModal';
+import { CreatePersonalPageModal } from './CreatePersonalPageModal';
 
 interface ProfileViewProps {
   onOpenWithdraw: () => void;
@@ -36,6 +37,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'join'>('login');
   const [serverSettingsOpen, setServerSettingsOpen] = useState(false);
+  const [personalPageModalOpen, setPersonalPageModalOpen] = useState(false);
 
   // If subpage is open, display Image 3
   if (showSubpage) {
@@ -534,7 +536,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
       <div className="mt-4 border-t border-[#1e2733] divide-y divide-[#1c2633] bg-[#121922]">
         {/* My SportySocial */}
         <button
-          onClick={() => showToast('SportySocial: Connect with other tipsters')}
+          onClick={() => setPersonalPageModalOpen(true)}
           className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-[#16212e] transition-colors"
         >
           <div className="flex items-center space-x-3">
@@ -643,6 +645,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenWithdraw }) => {
       <ServerSettingsModal
         isOpen={serverSettingsOpen}
         onClose={() => setServerSettingsOpen(false)}
+      />
+
+      <CreatePersonalPageModal
+        isOpen={personalPageModalOpen}
+        onClose={() => setPersonalPageModalOpen(false)}
       />
     </div>
   );

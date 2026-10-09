@@ -52,20 +52,30 @@ export function getApiBaseUrl(): string {
   // 1. Saved custom URL from localStorage
   if (typeof window !== 'undefined') {
     const saved = localStorage.getItem(STORAGE_KEY_API_URL);
-    if (saved && saved.trim()) {
-      return normalizeApiUrl(saved);
+    if (saved) {
+      // Auto-purge dead domains or empty/corrupted strings (e.g. sportybet.vercel.app without -sand)
+      if (
+        saved.includes('sportybet.vercel.app') ||
+        saved.includes('undefined') ||
+        saved.includes('null') ||
+        saved.trim() === '/api'
+      ) {
+        localStorage.removeItem(STORAGE_KEY_API_URL);
+      } else if (saved.trim()) {
+        return normalizeApiUrl(saved);
+      }
     }
   }
 
-  // 2. Build-time environment variable (e.g. VITE_API_URL)
+  // 2. Web browsers in development / preview (same-origin relative '/api')
+  if (!isNativePlatform()) {
+    return '/api';
+  }
+
+  // 3. Build-time environment variable (e.g. VITE_API_URL)
   const envUrl = import.meta.env.VITE_API_URL;
   if (envUrl && typeof envUrl === 'string' && envUrl.trim().length > 0) {
     return normalizeApiUrl(envUrl);
-  }
-
-  // 3. Web browsers (same-origin relative '/api')
-  if (!isNativePlatform()) {
-    return '/api';
   }
 
   // 4. Native Capacitor: check if opened from a remote web origin that isn't localhost

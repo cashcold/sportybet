@@ -101,13 +101,15 @@ export const FloatingBetslipButton: React.FC = () => {
   if (isBetslipOpen) return null;
 
   // Active counts
-  const activeOpenBetsCount = user.isLoggedIn ? openBets.length : 0;
-  const totalOdds = betslip.length > 0
-    ? betslip.reduce((acc, curr) => acc * curr.odd, 1)
+  const activeOpenBetsCount = user?.isLoggedIn && Array.isArray(openBets) ? openBets.length : 0;
+  const isBetslipArray = Array.isArray(betslip);
+  const betslipCount = isBetslipArray ? betslip.length : 0;
+  const totalOdds = betslipCount > 0
+    ? betslip.reduce((acc, curr) => acc * (typeof curr?.odd === 'number' && !isNaN(curr.odd) ? curr.odd : 1), 1)
     : 0;
 
   const handleClick = () => {
-    if (betslip.length > 0) {
+    if (betslipCount > 0) {
       setIsBetslipOpen(true);
     } else if (activeOpenBetsCount > 0) {
       setActiveTab('open_bets');
@@ -241,7 +243,7 @@ export const FloatingBetslipButton: React.FC = () => {
     handleClick();
   };
 
-  const displayBadgeCount = betslip.length > 0 ? betslip.length : activeOpenBetsCount;
+  const displayBadgeCount = betslipCount > 0 ? betslipCount : activeOpenBetsCount;
   const isElevated = isHolding || isActivelyMoving;
 
   return (
@@ -280,8 +282,8 @@ export const FloatingBetslipButton: React.FC = () => {
             : 'hover:scale-105 active:scale-95'
         }`}
         aria-label={
-          betslip.length > 0
-            ? `Betslip (${betslip.length}) - Click to open, hold to drag`
+          betslipCount > 0
+            ? `Betslip (${betslipCount}) - Click to open, hold to drag`
             : activeOpenBetsCount > 0
             ? `Open Bets (${activeOpenBetsCount}) - Click to open, hold to drag`
             : 'Open Betslip - Click to open, hold to drag'
@@ -296,9 +298,11 @@ export const FloatingBetslipButton: React.FC = () => {
         </div>
 
         {/* Dynamic Icon / Odds Content */}
-        {betslip.length > 0 ? (
+        {betslipCount > 0 ? (
           <span className="text-[10px] font-black tracking-tighter leading-none px-0.5 truncate max-w-[42px]">
-            {totalOdds >= 1000 ? `${totalOdds.toFixed(0)}...` : totalOdds >= 100 ? `${totalOdds.toFixed(0)}` : totalOdds.toFixed(2)}
+            {typeof totalOdds === 'number' && !isNaN(totalOdds) ? (
+              totalOdds >= 1000 ? `${totalOdds.toFixed(0)}...` : totalOdds >= 100 ? `${totalOdds.toFixed(0)}` : totalOdds.toFixed(2)
+            ) : '1.00'}
           </span>
         ) : activeOpenBetsCount > 0 ? (
           /* Exact Circular Open Bets Arrows with Dollar Symbol */

@@ -30,6 +30,7 @@ import { useBetting } from '../context/BettingContext';
 import { PlacedBet } from '../types';
 import { AuthModal } from './AuthModal';
 import { TicketDetailsModal } from './TicketDetailsModal';
+import { CreatePersonalPageModal } from './CreatePersonalPageModal';
 import { resolveWinningPredictionDetails } from '../utils/predictionHelper';
 
 export const OpenBetsView: React.FC = () => {
@@ -54,6 +55,7 @@ export const OpenBetsView: React.FC = () => {
   const activeTab = openBetsSubTab;
   const setActiveTab = setOpenBetsSubTab;
   const [filter, setFilter] = useState<'all' | 'cashout' | 'live'>('cashout');
+  const [personalPageModalOpen, setPersonalPageModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'join'>('login');
   const [recommendedCodesOpen, setRecommendedCodesOpen] = useState(false);
@@ -492,13 +494,42 @@ export const OpenBetsView: React.FC = () => {
               </button>
             </div>
 
-            <button
-              onClick={() => showToast('Grid view toggle')}
-              className="p-1 text-neutral-400 hover:text-white cursor-pointer"
-              title="Grid View"
-            >
-              <LayoutGrid className="w-4 h-4 stroke-[2]" />
-            </button>
+            {/* Right icons: Green CodeChat/Personal Page button with red dot + 2x2 LayoutGrid (Matches Screenshot) */}
+            <div className="flex items-center space-x-2.5 shrink-0 pl-1">
+              <button
+                onClick={() => setPersonalPageModalOpen(true)}
+                className="relative p-1 text-[#00df59] hover:text-emerald-300 active:scale-95 transition-all cursor-pointer flex items-center justify-center rounded"
+                title="Create Personal Page & Unlock CodeChat"
+                aria-label="Create Personal Page and CodeChat"
+              >
+                {/* Authentic SportyBet ticket-note chat icon from screenshot */}
+                <svg
+                  className="w-5 h-5 text-[#00df59]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="3" y="3" width="13" height="13" rx="2" />
+                  <path d="M7 7h5" />
+                  <path d="M7 10h3" />
+                  <path d="M11 12h5a2 2 0 0 1 2 2v4l-3-2h-4a2 2 0 0 1-2-2v-2" />
+                </svg>
+
+                {/* Red notification dot from screenshot (Screenshot_20261009_130247_Chrome.jpg) */}
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#e41b23] rounded-full ring-2 ring-[#121922]" />
+              </button>
+
+              <button
+                onClick={() => showToast('Grid view toggle')}
+                className="p-1 text-neutral-400 hover:text-white cursor-pointer"
+                title="Grid View"
+              >
+                <LayoutGrid className="w-4 h-4 stroke-[2]" />
+              </button>
+            </div>
           </div>
 
           {/* Open Bets Cards List (Exact match to Screenshot 6) */}
@@ -1800,6 +1831,12 @@ export const OpenBetsView: React.FC = () => {
         isOpen={!!selectedDetailBet}
         onClose={() => setSelectedDetailBet(null)}
         bet={selectedDetailBet}
+      />
+
+      {/* SportyBet Create Personal Page & CodeChat Modal (Matches Screenshot_20261009_130305_Chrome.jpg) */}
+      <CreatePersonalPageModal
+        isOpen={personalPageModalOpen}
+        onClose={() => setPersonalPageModalOpen(false)}
       />
     </div>
   );

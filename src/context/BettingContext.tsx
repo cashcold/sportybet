@@ -74,6 +74,7 @@ interface BettingContextType {
 }
 
 function normalizeMatchDates(rawMatches: Match[]): Match[] {
+  if (!Array.isArray(rawMatches)) return [];
   const now = new Date();
   const todayYMD = now.toISOString().split('T')[0];
   const tomorrow = new Date(now.getTime() + 86400000);
@@ -81,10 +82,11 @@ function normalizeMatchDates(rawMatches: Match[]): Match[] {
   const todayDayMonth = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
   const tomorrowDayMonth = tomorrow.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
 
-  return rawMatches.map((m, idx) => {
+  return rawMatches.filter(Boolean).map((m, idx) => {
     if (m.isLive) {
       return {
         ...m,
+        markets: m.markets || {},
         date: todayYMD,
         dateLabel: 'Live',
         startTime: 'Live',
@@ -100,6 +102,7 @@ function normalizeMatchDates(rawMatches: Match[]): Match[] {
     const isPast = !m.date || m.date < todayYMD;
     return {
       ...m,
+      markets: m.markets || {},
       date: isPast ? matchDateYMD : (m.date || matchDateYMD),
       dateLabel: isPast ? matchDateLabel : (m.dateLabel || matchDateLabel),
       commenceTime: isPast ? `${matchDateYMD}T19:00:00Z` : (m.commenceTime || `${matchDateYMD}T19:00:00Z`)
@@ -142,7 +145,11 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [betslip, setBetslip] = useState<BetSelection[]>(() => {
     try {
       const saved = localStorage.getItem('sportybet_betslip');
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed.filter(Boolean);
+      }
+      return [];
     } catch {
       return [];
     }
@@ -455,20 +462,21 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           }
 
           // 2. Realistic live odds movements (every ~10s for active matches)
-          let newMarkets = m.markets;
+          let newMarkets = m.markets || {};
           if (tickCount % 5 === 0 && Math.random() > 0.4) {
             changed = true;
-            newMarkets = { ...m.markets };
+            newMarkets = { ...newMarkets };
             for (const marketName of ['1X2', 'O/U', 'DC']) {
-              if (newMarkets[marketName]) {
+              if (Array.isArray(newMarkets[marketName])) {
                 newMarkets[marketName] = newMarkets[marketName].map(odd => {
                   if (Math.random() > 0.6) {
                     const delta = (Math.random() * 0.08 - 0.04);
-                    const newVal = Math.max(1.02, parseFloat((odd.value + delta).toFixed(2)));
-                    const trend: 'up' | 'down' | 'same' = newVal > odd.value ? 'up' : newVal < odd.value ? 'down' : 'same';
+                    const oldVal = typeof odd.value === 'number' ? odd.value : parseFloat(String(odd.value)) || 1.5;
+                    const newVal = Math.max(1.02, parseFloat((oldVal + delta).toFixed(2)));
+                    const trend: 'up' | 'down' | 'same' = newVal > oldVal ? 'up' : newVal < oldVal ? 'down' : 'same';
                     return {
                       ...odd,
-                      prevValue: odd.value,
+                      prevValue: oldVal,
                       value: newVal,
                       trend
                     };
@@ -480,17 +488,19 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           } else if (tickCount % 3 === 0) {
             // Reset flashing arrows after a few ticks
             let hasTrends = false;
-            for (const key in m.markets) {
-              if (m.markets[key].some(o => o.trend && o.trend !== 'same')) {
+            for (const key in newMarkets) {
+              if (Array.isArray(newMarkets[key]) && newMarkets[key].some(o => o?.trend && o.trend !== 'same')) {
                 hasTrends = true;
                 break;
               }
             }
             if (hasTrends) {
               changed = true;
-              newMarkets = { ...m.markets };
+              newMarkets = { ...newMarkets };
               for (const key in newMarkets) {
-                newMarkets[key] = newMarkets[key].map(o => ({ ...o, trend: 'same' }));
+                if (Array.isArray(newMarkets[key])) {
+                  newMarkets[key] = newMarkets[key].map(o => ({ ...o, trend: 'same' }));
+                }
               }
             }
           }
@@ -1195,15 +1205,16 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     // Fallback simulation
     const randomMatches = matches.slice(0, 3);
     const loadedSelections: BetSelection[] = randomMatches.map(m => {
-      const odd = m.markets['1X2'] ? m.markets['1X2'][0] : { name: '1', value: 1.5 };
+      const oddsList = (m?.markets && Array.isArray(m.markets['1X2'])) ? m.markets['1X2'] : [];
+      const odd = oddsList[0] || { name: '1', value: 1.5 };
       return {
         matchId: m.id,
         gameId: m.gameId,
         matchTitle: `${m.homeTeam} vs ${m.awayTeam}`,
         marketName: '1X2',
-        selectionName: odd.name,
-        odd: odd.value,
-        isLive: m.isLive
+        selectionName: odd.name || '1',
+        odd: typeof odd.value === 'number' ? odd.value : 1.5,
+        isLive: Boolean(m.isLive)
       };
     });
     setBetslip(loadedSelections);

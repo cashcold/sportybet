@@ -12,9 +12,21 @@ interface OddButtonProps {
 export const OddButton: React.FC<OddButtonProps> = ({ match, marketName, odd }) => {
   const { betslip, toggleSelection } = useBetting();
 
-  const isSelected = betslip.some(
-    s => s.matchId === match.id && s.marketName === marketName && s.selectionName === odd.name
-  );
+  const isSelected = Array.isArray(betslip)
+    ? betslip.some(
+        s => s?.matchId === match?.id && s?.marketName === marketName && s?.selectionName === odd?.name
+      )
+    : false;
+
+  if (!odd || odd.value === undefined || odd.value === null) {
+    return (
+      <div className="flex-1 h-9 rounded-[4px] bg-[#1a212a] flex items-center justify-center text-neutral-600 text-xs">
+        -
+      </div>
+    );
+  }
+
+  const numericValue = typeof odd.value === 'number' ? odd.value : parseFloat(String(odd.value)) || 0;
 
   return (
     <button
@@ -26,7 +38,7 @@ export const OddButton: React.FC<OddButtonProps> = ({ match, marketName, odd }) 
       }`}
     >
       <span className="flex items-center space-x-0.5">
-        <span>{odd.value.toFixed(2)}</span>
+        <span>{numericValue.toFixed(2)}</span>
       </span>
 
       {/* SportyBet corner indicators (seen in video at 00:06 on 2.05 and 2.75) */}

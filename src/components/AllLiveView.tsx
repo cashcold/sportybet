@@ -473,7 +473,12 @@ export const AllLiveView: React.FC<AllLiveViewProps> = ({ onBack }) => {
       {/* 7. LIVE MATCHES LIST */}
       <div className="divide-y divide-[#1e2632]">
         {liveMatches.map((match) => {
-          const currentOdds = match.markets[activeMarket] || match.markets['1X2'] || [];
+          const matchMarkets = match?.markets || {};
+          const currentOdds = Array.isArray(matchMarkets[activeMarket])
+            ? matchMarkets[activeMarket]
+            : Array.isArray(matchMarkets['1X2'])
+            ? matchMarkets['1X2']
+            : [];
 
           return (
             <div key={match.id} className="p-3 hover:bg-[#18212b] transition-colors">

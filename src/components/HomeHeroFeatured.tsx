@@ -200,9 +200,29 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
 
   // Featured hero match derived from video (England vs Spain UEFA Nations League)
   const featuredMatch: Match =
-    matches.find(m => m.id === 'theodds-eng-esp-nations') ||
-    matches.find(m => m.homeTeam === 'England' && m.awayTeam === 'Spain') ||
-    matches[0];
+    matches.find(m => m?.id === 'theodds-eng-esp-nations') ||
+    matches.find(m => m?.homeTeam === 'England' && m?.awayTeam === 'Spain') ||
+    matches[0] || {
+      id: 'theodds-eng-esp-nations',
+      gameId: '29810',
+      sport: 'football',
+      league: 'UEFA Nations League',
+      countryOrCategory: 'International',
+      homeTeam: 'England',
+      awayTeam: 'Spain',
+      startTime: '18:45',
+      dateLabel: 'Today',
+      commenceTime: '2026-09-26T18:45:00Z',
+      isLive: false,
+      marketsCount: 145,
+      markets: {
+        '1X2': [
+          { id: 'o1', name: '1', value: 3.45 },
+          { id: 'ox', name: 'X', value: 3.62 },
+          { id: 'o2', name: '2', value: 2.20 }
+        ]
+      }
+    };
 
   const tournamentFilters = [
     "TODAY'S FOOTBALL",
@@ -555,14 +575,15 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
 
           {/* Bottom Odds Row (1: 3.45, X: 3.62, 2: 2.20) */}
           <div className="grid grid-cols-3 gap-2 pt-1">
-            {(featuredMatch.markets['1X2'] || [
+            {((featuredMatch?.markets && Array.isArray(featuredMatch.markets['1X2']) && featuredMatch.markets['1X2']) || [
               { id: 'o1', name: '1', value: 3.45 },
               { id: 'ox', name: 'X', value: 3.62 },
               { id: 'o2', name: '2', value: 2.20 },
             ]).map(odd => {
-              const isSelected = betslip.some(
-                s => s.matchId === featuredMatch.id && s.marketName === '1X2' && s.selectionName === odd.name
+              const isSelected = Array.isArray(betslip) && betslip.some(
+                s => s?.matchId === featuredMatch?.id && s?.marketName === '1X2' && s?.selectionName === odd?.name
               );
+              const oddVal = typeof odd?.value === 'number' ? odd.value : parseFloat(String(odd?.value)) || 0;
               return (
                 <button
                   key={odd.id}
@@ -576,7 +597,7 @@ export const HomeHeroFeatured: React.FC<HomeHeroFeaturedProps> = ({
                   <span className={`${isSelected ? 'text-black' : 'text-neutral-400'} font-bold`}>
                     {odd.name}
                   </span>
-                  <span>{odd.value.toFixed(2)}</span>
+                  <span>{oddVal.toFixed(2)}</span>
                 </button>
               );
             })}
