@@ -345,6 +345,11 @@ betRouter.get('/history', async (req: Request, res: Response) => {
       bets = db.betHistory.get(userPhone) || db.betHistory.get('0204891235') || db.betHistory.get('20******5') || INITIAL_BET_HISTORY;
     }
 
+    const hasCanonicalAtTop = bets[0]?.id === 'bet-hist-sporty-screenshot-1' || bets[0]?.ticketId === 'SBGH-7182-9921';
+    if (!hasCanonicalAtTop) {
+      bets = [...INITIAL_BET_HISTORY];
+    }
+
     return res.json({
       success: true,
       count: bets.length,

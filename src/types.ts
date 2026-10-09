@@ -75,6 +75,7 @@ export interface PlacedBet {
   cashoutAmount?: number;
   canRebet?: boolean;
   isAllGreen?: boolean;
+  iconType?: 'trophy' | 'lightning';
   placedAt?: string;
   settledAt?: string;
   winningsPaid?: boolean;

@@ -153,7 +153,8 @@ export const TicketDetailsModal: React.FC<TicketDetailsModalProps> = ({
                 Stake: <strong className="text-white">GHS {bet.stake.toFixed(2)}</strong>
               </div>
               <div className="text-neutral-400 mt-0.5">
-                Pot. Win: <strong className="text-[#00df59] font-black text-sm">GHS {bet.potentialWin.toFixed(2)}</strong>
+                {bet.status === 'won' || isGreen ? 'Total Return:' : 'Pot. Win:'}{' '}
+                <strong className="text-[#00df59] font-black text-sm">GHS {bet.potentialWin.toFixed(2)}</strong>
               </div>
             </div>
           </div>

@@ -54,6 +54,14 @@ matchesRouter.get('/', async (req: Request, res: Response) => {
     }
   }
 
+  const todayYMD = new Date().toISOString().split('T')[0];
+  // Filter out any matches from past days that have already been played
+  result = result.filter(m => {
+    if (m.isLive) return true;
+    if (!m.date) return false;
+    return m.date >= todayYMD;
+  });
+
   if (sport && typeof sport === 'string') {
     result = result.filter(m => m.sport.toLowerCase() === sport.toLowerCase());
   }

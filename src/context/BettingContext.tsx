@@ -77,61 +77,69 @@ function normalizeMatchDates(rawMatches: Match[]): Match[] {
   if (!Array.isArray(rawMatches)) return [];
   const now = new Date();
   const todayYMD = now.toISOString().split('T')[0];
-  const tomorrow = new Date(now.getTime() + 86400000);
-  const tomorrowYMD = tomorrow.toISOString().split('T')[0];
-  const todayDayMonth = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
-  const tomorrowDayMonth = tomorrow.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
 
-  return rawMatches.filter(Boolean).map((m, idx) => {
-    if (m.isLive) {
+  // Filter out any past/already played matches whose date is before today
+  return rawMatches
+    .filter(Boolean)
+    .filter(m => {
+      // Exclude legacy obsolete test match IDs from past weeks
+      if (
+        m.id?.includes('rosengard') ||
+        m.id?.includes('trollhattan') ||
+        m.id?.includes('helges') ||
+        m.id?.includes('jonsereds') ||
+        m.id?.includes('viggbyholms') ||
+        m.id?.includes('alg-tun') ||
+        m.id?.includes('elva-kalev') ||
+        m.id?.includes('oman-sur') ||
+        m.id?.includes('sohar-seeb') ||
+        m.id?.includes('uzb-iran')
+      ) {
+        return false;
+      }
+      if (m.isLive) return true;
+      if (!m.date) return false;
+      return m.date >= todayYMD;
+    })
+    .map((m) => {
+      if (m.isLive) {
+        return {
+          ...m,
+          markets: m.markets || {},
+          date: todayYMD,
+          dateLabel: 'Live',
+          startTime: 'Live',
+          commenceTime: m.commenceTime || now.toISOString()
+        };
+      }
       return {
         ...m,
-        markets: m.markets || {},
-        date: todayYMD,
-        dateLabel: 'Live',
-        startTime: 'Live',
-        commenceTime: now.toISOString()
+        markets: m.markets || {}
       };
-    }
-
-    const isTomorrow = idx % 2 === 1;
-    const matchDateYMD = isTomorrow ? tomorrowYMD : todayYMD;
-    const matchDayMonth = isTomorrow ? tomorrowDayMonth : todayDayMonth;
-    const matchDateLabel = isTomorrow ? `Tomorrow ${matchDayMonth}` : `Today ${matchDayMonth}`;
-
-    const isPast = !m.date || m.date < todayYMD;
-    return {
-      ...m,
-      markets: m.markets || {},
-      date: isPast ? matchDateYMD : (m.date || matchDateYMD),
-      dateLabel: isPast ? matchDateLabel : (m.dateLabel || matchDateLabel),
-      commenceTime: isPast ? `${matchDateYMD}T19:00:00Z` : (m.commenceTime || `${matchDateYMD}T19:00:00Z`)
-    };
-  });
+    });
 }
 
 const BettingContext = createContext<BettingContextType | undefined>(undefined);
 
 export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [matches, setMatches] = useState<Match[]>(() => {
+    const now = new Date();
+    const todayYMD = now.toISOString().split('T')[0];
     const saved = localStorage.getItem('sportybet_matches');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const hasFakeMatches = parsed.some(
+          const hasStaleOrPlayedMatches = parsed.some(
             (m: any) =>
-              m.id === 'live-ars-mci' ||
-              m.id === 'live-rma-bar' ||
-              m.id === 'live-liv-che' ||
-              m.id === 'live-bay-dor' ||
-              m.id === 'up-sat-tot-qar' ||
-              m.id === 'up-fri-1' ||
-              m.id === 'unl-ned-ger' ||
-              m.id === 'afcon-cam-com' ||
-              m.id === 'unl-nor-den'
+              m.id?.includes('rosengard') ||
+              m.id?.includes('trollhattan') ||
+              m.id?.includes('helges') ||
+              m.id?.includes('alg-tun') ||
+              m.id?.includes('uzb-iran') ||
+              (!m.isLive && m.date && m.date < todayYMD)
           );
-          if (!hasFakeMatches) {
+          if (!hasStaleOrPlayedMatches) {
             return normalizeMatchDates(parsed);
           } else {
             localStorage.removeItem('sportybet_matches');
@@ -181,7 +189,12 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          if (parsed[0]?.id === 'bet-hist-won-exact-screenshot' || parsed[0]?.ticketId === 'SBGH-4819-2094') {
+            return parsed;
+          }
+          return INITIAL_BET_HISTORY;
+        }
       } catch {
         return INITIAL_BET_HISTORY;
       }

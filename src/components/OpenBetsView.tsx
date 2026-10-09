@@ -108,7 +108,23 @@ export const OpenBetsView: React.FC = () => {
     }));
   };
 
-  // Bet History accordion state: collapsed by default, only drops down details on click like open bets
+  const handleRemixBet = (bet: PlacedBet) => {
+    bet.selections.forEach((sel) => {
+      addSelection({
+        matchId: sel.matchId,
+        gameId: sel.gameId,
+        matchTitle: sel.matchTitle,
+        marketName: sel.marketName,
+        selectionName: sel.selectionName,
+        odd: sel.odd,
+        isLive: false
+      });
+    });
+    setIsBetslipOpen(true);
+    showToast(`Loaded ${bet.selections.length} selections into betslip for Remix!`);
+  };
+
+  // Bet History accordion state: collapsed by default (details hidden until user clicks)
   const [expandedHistoryIds, setExpandedHistoryIds] = useState<Record<string, boolean>>({});
 
   const toggleExpandHistoryBet = (betId: string) => {
@@ -119,22 +135,13 @@ export const OpenBetsView: React.FC = () => {
   };
 
   const parseBetDate = (bet: PlacedBet) => {
-    if (bet.date) {
+    if (bet.date && bet.date.trim()) {
       const parts = bet.date.trim().split(/\s+/);
       if (parts.length >= 2) {
-        return { day: parts[0], month: parts[1] };
+        return { day: parts[0], month: parts[1], hasDate: true };
       }
     }
-    if (bet.placedAt) {
-      const d = new Date(bet.placedAt);
-      if (!isNaN(d.getTime())) {
-        return {
-          day: d.getDate().toString(),
-          month: d.toLocaleString('en-US', { month: 'short' })
-        };
-      }
-    }
-    return { day: '24', month: 'Sep' };
+    return { day: '', month: '', hasDate: false };
   };
 
   // Live Match Simulation (SIM) state matching SportyBet video
@@ -947,179 +954,44 @@ export const OpenBetsView: React.FC = () => {
       {/* =================================================================== */}
       {activeTab === 'history' && (
         <div>
-          {/* Dropdown Filters & Actions: Bet Status: Settled ▾ | Bet Result ▾ | 📅 | 🗑 */}
-          <div className="px-3 py-2 bg-[#121922] border-b border-[#212b38] flex items-center justify-between text-xs relative">
-            <div className="flex items-center space-x-2">
-              {/* Status Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => {
-                    setIsStatusDropdownOpen(!isStatusDropdownOpen);
-                    setIsResultDropdownOpen(false);
-                    setIsDateDropdownOpen(false);
-                  }}
-                  className="bg-[#1b2532] text-neutral-200 py-1 px-2 rounded flex items-center space-x-1 border border-[#273648] hover:border-neutral-500 cursor-pointer"
-                >
-                  <span>Bet Status: {historyStatusFilter}</span>
-                  <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
-                </button>
-
-                {isStatusDropdownOpen && (
-                  <div className="absolute left-0 top-full mt-1 w-36 bg-[#16212e] border border-[#27384c] rounded shadow-2xl z-40 py-1 text-xs">
-                    {(['Settled', 'All', 'Cashed Out'] as const).map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => {
-                          setHistoryStatusFilter(opt);
-                          setIsStatusDropdownOpen(false);
-                          showToast(`Filter: ${opt}`);
-                        }}
-                        className={`w-full text-left px-3 py-1.5 flex items-center justify-between hover:bg-[#1f2e40] ${
-                          historyStatusFilter === opt ? 'text-[#00df59] font-bold' : 'text-neutral-300'
-                        }`}
-                      >
-                        <span>{opt}</span>
-                        {historyStatusFilter === opt && <Check className="w-3 h-3 text-[#00df59]" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Result Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => {
-                    setIsResultDropdownOpen(!isResultDropdownOpen);
-                    setIsStatusDropdownOpen(false);
-                    setIsDateDropdownOpen(false);
-                  }}
-                  className="bg-[#1b2532] text-neutral-200 py-1 px-2 rounded flex items-center space-x-1 border border-[#273648] hover:border-neutral-500 cursor-pointer"
-                >
-                  <span>{historyResultFilter === 'All' ? 'Bet Result: All' : `Result: ${historyResultFilter}`}</span>
-                  <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
-                </button>
-
-                {isResultDropdownOpen && (
-                  <div className="absolute left-0 top-full mt-1 w-36 bg-[#16212e] border border-[#27384c] rounded shadow-2xl z-40 py-1 text-xs">
-                    {(['All', 'Won', 'Lost'] as const).map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => {
-                          setHistoryResultFilter(opt);
-                          setIsResultDropdownOpen(false);
-                          showToast(`Result: ${opt}`);
-                        }}
-                        className={`w-full text-left px-3 py-1.5 flex items-center justify-between hover:bg-[#1f2e40] ${
-                          historyResultFilter === opt ? 'text-[#00df59] font-bold' : 'text-neutral-300'
-                        }`}
-                      >
-                        <span>{opt === 'All' ? 'All Results' : opt === 'Won' ? 'Won Only 🏆' : 'Lost Only'}</span>
-                        {historyResultFilter === opt && <Check className="w-3 h-3 text-[#00df59]" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2 text-neutral-400">
-              {/* Date Filter Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => {
-                    setIsDateDropdownOpen(!isDateDropdownOpen);
-                    setIsStatusDropdownOpen(false);
-                    setIsResultDropdownOpen(false);
-                  }}
-                  className="hover:text-white p-1 rounded hover:bg-[#1e2a38] transition-colors cursor-pointer"
-                  title="Date Range"
-                >
-                  <Calendar className="w-4 h-4" />
-                </button>
-
-                {isDateDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-1 w-44 bg-[#16212e] border border-[#27384c] rounded shadow-2xl z-40 py-1 text-xs">
-                    <div className="px-3 py-1 text-[10px] text-neutral-400 font-bold uppercase tracking-wider border-b border-[#223142]">
-                      Date Range
-                    </div>
-                    {[
-                      { key: '6M', label: 'Last 6 Months (Default)' },
-                      { key: '30D', label: 'Last 30 Days' },
-                      { key: '7D', label: 'Last 7 Days' },
-                      { key: 'Today', label: 'Today Only' }
-                    ].map((d) => (
-                      <button
-                        key={d.key}
-                        onClick={() => {
-                          setHistoryDateRange(d.key as any);
-                          setIsDateDropdownOpen(false);
-                          showToast(`Date Range: ${d.label}`);
-                        }}
-                        className={`w-full text-left px-3 py-1.5 flex items-center justify-between hover:bg-[#1f2e40] ${
-                          historyDateRange === d.key ? 'text-[#00df59] font-bold' : 'text-neutral-300'
-                        }`}
-                      >
-                        <span>{d.label}</span>
-                        {historyDateRange === d.key && <Check className="w-3 h-3 text-[#00df59]" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Clear Filter button */}
+          {/* Sub-Category Navigation Bar: All | Sports | Aviator (Clean SportyBet header without clunky dropdowns) */}
+          <div className="px-3.5 py-2.5 bg-[#121922] border-b border-[#1f2835] flex items-center justify-between text-xs select-none">
+            <div className="flex items-center space-x-1.5">
               <button
-                onClick={() => {
-                  setHistoryStatusFilter('Settled');
-                  setHistoryResultFilter('All');
-                  setHistoryCategoryFilter('All');
-                  setHistoryDateRange('6M');
-                  setIsStatusDropdownOpen(false);
-                  setIsResultDropdownOpen(false);
-                  setIsDateDropdownOpen(false);
-                  showToast('Filters reset to default');
-                }}
-                className="hover:text-white p-1 rounded hover:bg-[#1e2a38] transition-colors cursor-pointer"
-                title="Reset Filters"
+                onClick={() => setHistoryCategoryFilter('All')}
+                className={`px-3 py-1 rounded font-bold transition-all cursor-pointer ${
+                  historyCategoryFilter === 'All'
+                    ? 'bg-[#79889b] text-[#121922] font-black'
+                    : 'bg-[#242f3d] text-neutral-300 hover:bg-[#2e3b4d]'
+                }`}
               >
-                <Trash2 className="w-4 h-4" />
+                All ({activeBetHistory.length})
+              </button>
+              <button
+                onClick={() => setHistoryCategoryFilter('Sports')}
+                className={`px-3 py-1 rounded font-bold transition-all cursor-pointer ${
+                  historyCategoryFilter === 'Sports'
+                    ? 'bg-[#79889b] text-[#121922] font-black'
+                    : 'bg-[#242f3d] text-neutral-300 hover:bg-[#2e3b4d]'
+                }`}
+              >
+                Sports ({sportsCount})
+              </button>
+              <button
+                onClick={() => setHistoryCategoryFilter('Aviator')}
+                className={`px-3 py-1 rounded font-bold transition-all cursor-pointer ${
+                  historyCategoryFilter === 'Aviator'
+                    ? 'bg-[#de1a22] text-white font-black'
+                    : 'bg-[#242f3d] text-neutral-300 hover:bg-[#2e3b4d]'
+                }`}
+              >
+                Aviator ({aviatorCount})
               </button>
             </div>
-          </div>
 
-          {/* Sub-Category Navigation Bar: All | Sports | Aviator */}
-          <div className="px-3 py-2 bg-[#0e151e] border-b border-[#1f2a38] flex items-center space-x-1.5 text-xs select-none">
-            <button
-              onClick={() => setHistoryCategoryFilter('All')}
-              className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
-                historyCategoryFilter === 'All'
-                  ? 'bg-[#00a826] text-white shadow'
-                  : 'bg-[#182330] text-neutral-400 hover:text-white'
-              }`}
-            >
-              All ({activeBetHistory.length})
-            </button>
-            <button
-              onClick={() => setHistoryCategoryFilter('Sports')}
-              className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
-                historyCategoryFilter === 'Sports'
-                  ? 'bg-[#00a826] text-white shadow'
-                  : 'bg-[#182330] text-neutral-400 hover:text-white'
-              }`}
-            >
-              Sports ({sportsCount})
-            </button>
-            <button
-              onClick={() => setHistoryCategoryFilter('Aviator')}
-              className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
-                historyCategoryFilter === 'Aviator'
-                  ? 'bg-[#de1a22] text-white shadow'
-                  : 'bg-[#182330] text-neutral-400 hover:text-white'
-              }`}
-            >
-              Aviator ({aviatorCount})
-            </button>
+            <div className="text-[11px] text-neutral-400 font-medium">
+              Settled Bets
+            </div>
           </div>
 
           {/* Settled Cards with Date Column (Exact match to Screenshot 9) */}
@@ -1166,38 +1038,54 @@ export const OpenBetsView: React.FC = () => {
 
                     {/* Right Ticket Card: Collapsed by default, drops down details only on click like open bet */}
                     <div className="flex-1 bg-[#17212d] border border-[#243243] rounded-md overflow-hidden shadow-lg transition-all duration-200">
-                      {/* Top Row: Multiple [Won] on Left | Rebet, Slip, Dropdown Arrow on Right */}
-                      <div className="px-3.5 pt-3 pb-2 flex items-center justify-between text-xs select-none">
-                        <div
-                          onClick={() => toggleExpandHistoryBet(item.id)}
-                          className="flex items-center space-x-2 cursor-pointer"
-                        >
-                          <span className="font-bold text-white text-[15px] tracking-wide">
-                            {item.type}
-                          </span>
-                          {item.status === 'won' ? (
-                            <span className="bg-[#153a23] text-[#00df59] font-black text-[11px] px-2 py-0.5 rounded flex items-center space-x-1 border border-emerald-800/40">
-                              <Trophy className="w-3 h-3 text-[#00df59]" />
-                              <span>Won</span>
+                      {/* Top Row: Multiple [Won] on Left | Rebet, Slip, Dropdown Arrow on Right - ENTIRE ROW CLICKABLE TO TOGGLE */}
+                      <div
+                        onClick={() => toggleExpandHistoryBet(item.id)}
+                        className="px-3.5 pt-3 pb-2 flex items-center justify-between text-xs select-none cursor-pointer hover:bg-[#1a2635] transition-colors"
+                      >
+                        <div className="flex flex-col">
+                          <div className="flex items-center space-x-2">
+                            <span className="font-bold text-white text-[15px] tracking-wide">
+                              {item.type}
                             </span>
-                          ) : item.status === 'lost' ? (
-                            <span className="bg-red-950/60 text-red-400 font-bold text-[11px] px-2 py-0.5 rounded border border-red-900/40">
-                              Lost
-                            </span>
-                          ) : (
-                            <span className="bg-[#1e2a38] text-neutral-300 font-bold text-[11px] px-2 py-0.5 rounded">
-                              Settled
-                            </span>
-                          )}
+                            {item.status === 'won' ? (
+                              <span className="bg-[#153a23] text-[#00df59] font-black text-[11px] px-2 py-0.5 rounded flex items-center space-x-1 border border-emerald-800/40">
+                                <Trophy className="w-3 h-3 text-[#00df59]" />
+                                <span>Won</span>
+                              </span>
+                            ) : item.status === 'lost' ? (
+                              <span className="bg-red-950/60 text-red-400 font-bold text-[11px] px-2 py-0.5 rounded border border-red-900/40">
+                                Lost
+                              </span>
+                            ) : (
+                              <span className="bg-[#1e2a38] text-neutral-300 font-bold text-[11px] px-2 py-0.5 rounded">
+                                Settled
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[11px] text-neutral-400 mt-0.5 flex items-center space-x-1">
+                            <span>Ticket ID: {item.ticketId}</span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigator.clipboard?.writeText(item.ticketId);
+                                showToast(`Copied: ${item.ticketId}`);
+                              }}
+                              className="text-neutral-400 hover:text-white transition-colors cursor-pointer"
+                              title="Copy Ticket ID"
+                            >
+                              <Copy className="w-3 h-3 ml-0.5 inline" />
+                            </button>
+                          </div>
                         </div>
 
-                        <div className="flex items-center space-x-3 font-bold text-[#00df59] text-[13px]">
+                        <div className="flex items-center space-x-3 text-xs">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleRebet(item);
                             }}
-                            className="flex items-center space-x-1 hover:text-emerald-300 transition-colors cursor-pointer"
+                            className="flex items-center space-x-1 text-[#00df59] font-bold hover:text-emerald-300 transition-colors cursor-pointer"
                             title="Rebet this ticket"
                           >
                             <RefreshCw className="w-3.5 h-3.5" />
@@ -1209,42 +1097,35 @@ export const OpenBetsView: React.FC = () => {
                               e.stopPropagation();
                               setSelectedDetailBet(item);
                             }}
-                            className="flex items-center space-x-1 hover:text-emerald-300 transition-colors cursor-pointer"
+                            className="flex items-center space-x-1 text-[#00df59] font-bold hover:text-emerald-300 transition-colors cursor-pointer"
                             title="View Official Ticket Slip"
                           >
                             <FileText className="w-3.5 h-3.5" />
                             <span>Slip</span>
                           </button>
 
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleExpandHistoryBet(item.id);
-                            }}
-                            className="p-1 text-neutral-400 hover:text-white transition-colors cursor-pointer flex items-center"
-                            title={isExpanded ? 'Hide Details' : 'Show Details'}
-                          >
-                            {isExpanded ? (
-                              <ChevronUp className="w-4 h-4 text-[#00df59]" />
-                            ) : (
-                              <ChevronDown className="w-4 h-4 text-neutral-400" />
-                            )}
-                          </button>
+                          <div className="text-neutral-400 pl-1">
+                            <ChevronDown
+                              className={`w-4 h-4 transition-transform duration-200 ${
+                                isExpanded ? 'rotate-180 text-[#00df59]' : ''
+                              }`}
+                            />
+                          </div>
                         </div>
                       </div>
 
-                      {/* Collapsed State: Match Title preview & Total Stake on Left | Total Return & Details button on Right */}
+                      {/* Collapsed State: Match Title & Stake on Left | Total Return on Right */}
                       {!isExpanded && (
                         <div
                           onClick={() => toggleExpandHistoryBet(item.id)}
                           className="px-3.5 pb-3.5 pt-1 flex items-center justify-between cursor-pointer hover:bg-[#1a2634] transition-colors"
                         >
-                          {/* Left: Match Title preview & Stake */}
+                          {/* Left: Match summary & Stake */}
                           <div className="space-y-1 pr-3 flex-1 min-w-0">
                             <div className="text-[14px] font-bold text-white truncate">
                               {item.selections[0]?.matchTitle || 'Match'}
                               {item.selections.length > 1 && (
-                                <span className="text-xs font-normal text-neutral-400 ml-1.5">
+                                <span className="text-neutral-400 font-normal text-xs ml-1.5">
                                   (+{item.selections.length - 1} more)
                                 </span>
                               )}
@@ -1255,24 +1136,44 @@ export const OpenBetsView: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* Right: Return & Dropdown Click Indicator */}
-                          <div className="shrink-0 flex items-center space-x-2">
-                            <div className="text-right">
-                              <div className="text-[10px] text-neutral-400 leading-tight">Total Return</div>
-                              <div className="text-sm font-black text-[#00df59] leading-tight">
-                                GHS {item.potentialWin.toFixed(2)}
-                              </div>
-                            </div>
-                            <div className="w-6 h-6 rounded bg-[#1f2b3a] flex items-center justify-center text-neutral-400">
-                              <ChevronDown className="w-3.5 h-3.5" />
+                          {/* Right: Total Return / Won Green Area */}
+                          <div className="shrink-0 text-right">
+                            <div className="text-[11px] text-neutral-400">Total Return</div>
+                            <div className="text-[#00df59] font-black text-sm">
+                              GHS {item.potentialWin.toFixed(2)}
                             </div>
                           </div>
                         </div>
                       )}
 
-                      {/* DROPPED-DOWN MATCH DETAILS (Only displays when user clicks, like open bet) */}
+                      {/* DROPPED-DOWN / EXPANDED MATCH DETAILS (When clicked, shows all details) */}
                       {isExpanded && (
                         <div className="border-t border-[#232f3e] bg-[#16202c] animate-in slide-in-from-top-2 duration-200">
+                          {/* Top Remix Bet Banner */}
+                          <div className="p-3 bg-[#182330] border-b border-[#243346] flex items-center justify-between">
+                            <div className="flex items-center space-x-2.5">
+                              <div className="w-8 h-8 rounded-full bg-[#1b3a57] border border-[#235682] flex items-center justify-center shrink-0">
+                                <span className="text-base">🤖</span>
+                              </div>
+                              <div className="text-xs font-bold text-white leading-tight">
+                                Bounce back fast —<br />
+                                <span className="text-neutral-300 font-normal text-[11px]">
+                                  remix and retry your bet!
+                                </span>
+                              </div>
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRebet(item);
+                              }}
+                              className="bg-[#00c853] hover:bg-[#00b34a] text-white font-black text-xs px-3 py-1.5 rounded-md flex items-center space-x-1 shadow active:scale-95 cursor-pointer"
+                            >
+                              <Sparkles className="w-3 h-3 fill-white stroke-none" />
+                              <span>Remix Bet</span>
+                            </button>
+                          </div>
+
                           {/* Detailed Match Legs */}
                           <div className="divide-y divide-[#202b3a]">
                             {item.selections.map((sel, idx) => {
@@ -1310,10 +1211,16 @@ export const OpenBetsView: React.FC = () => {
                                         </strong>
                                       </span>
                                       <span className="text-neutral-600">|</span>
-                                      <span className="text-[#00df59] flex items-center space-x-1 font-bold text-xs">
-                                        <span>📗</span>
-                                        <span>Settled (Won)</span>
-                                      </span>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleOpenSim(item, details.formattedMatchTitle);
+                                        }}
+                                        className="text-[#00df59] hover:underline flex items-center space-x-1 font-bold text-xs cursor-pointer"
+                                      >
+                                        <span className="text-sm">📗</span>
+                                        <span>Match Tracker</span>
+                                      </button>
                                     </div>
 
                                     {/* Inner Dark Box: Pick, Market, Outcome, Trophy Watermark */}
@@ -1348,18 +1255,8 @@ export const OpenBetsView: React.FC = () => {
                             })}
                           </div>
 
-                          {/* Bottom inside dropdown: Hide Match Details ▲, Stake / Total Return, and Actions */}
+                          {/* Bottom inside ticket: Stake / Total Return, and Actions */}
                           <div className="bg-[#17212d] border-t border-[#202b3a] p-3.5 space-y-2.5">
-                            <div className="flex justify-end">
-                              <button
-                                onClick={() => toggleExpandHistoryBet(item.id)}
-                                className="text-[#00df59] text-xs font-bold flex items-center space-x-1 hover:underline cursor-pointer"
-                              >
-                                <span>Hide Match Details</span>
-                                <span className="text-[10px]">▲</span>
-                              </button>
-                            </div>
-
                             <div className="flex justify-between items-center text-xs">
                               <div className="space-y-1 text-neutral-400 text-xs">
                                 <div>Total Stake(GHS)</div>
@@ -1368,7 +1265,7 @@ export const OpenBetsView: React.FC = () => {
                               <div className="space-y-1 text-right font-black text-xs">
                                 <div className="text-white">{item.stake.toFixed(2)}</div>
                                 <div className="text-[#00df59] text-sm">
-                                  {item.potentialWin.toFixed(2)}
+                                  GHS {item.potentialWin.toFixed(2)}
                                 </div>
                               </div>
                             </div>
@@ -1397,6 +1294,15 @@ export const OpenBetsView: React.FC = () => {
                               </button>
                             </div>
                           </div>
+
+                          {/* Close details button at bottom */}
+                          <button
+                            onClick={() => toggleExpandHistoryBet(item.id)}
+                            className="w-full py-2 bg-[#121922] border-t border-[#1d2734] text-center text-xs text-neutral-400 hover:text-white flex items-center justify-center space-x-1 cursor-pointer transition-colors"
+                          >
+                            <span>Hide Match Details</span>
+                            <ChevronDown className="w-3.5 h-3.5 rotate-180" />
+                          </button>
                         </div>
                       )}
                     </div>
@@ -1425,66 +1331,68 @@ export const OpenBetsView: React.FC = () => {
       </div>
 
       {/* =================================================================== */}
-      {/* 4. RECOMMENDED FOOTBALL CODES (Exact match to uploaded screenshot)  */}
+      {/* 4. RECOMMENDED FOOTBALL CODES (Exact match to uploaded screenshot, Open Bets only) */}
       {/* =================================================================== */}
-      <div className="mt-auto border-t border-[#1c2532] bg-[#101720]">
-        <button
-          onClick={() => setRecommendedCodesOpen(!recommendedCodesOpen)}
-          className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-[#151f2b] transition-colors cursor-pointer"
-        >
-          <div className="flex items-center space-x-3 text-left">
-            <div className="w-8 h-8 rounded bg-emerald-500/15 flex items-center justify-center shrink-0">
-              <Bookmark className="w-4 h-4 text-[#00df59] fill-[#00df59]" />
-            </div>
-            <div>
-              <div className="text-[14px] font-bold text-white leading-tight">
-                Recommended Football Codes
+      {activeTab === 'open' && (
+        <div className="mt-auto border-t border-[#1c2532] bg-[#101720]">
+          <button
+            onClick={() => setRecommendedCodesOpen(!recommendedCodesOpen)}
+            className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-[#151f2b] transition-colors cursor-pointer"
+          >
+            <div className="flex items-center space-x-3 text-left">
+              <div className="w-8 h-8 rounded bg-emerald-500/15 flex items-center justify-center shrink-0">
+                <Bookmark className="w-4 h-4 text-[#00df59] fill-[#00df59]" />
               </div>
-              <div className="text-[12px] text-neutral-400 mt-0.5 leading-tight">
-                Save the effort of building it from scratch
-              </div>
-            </div>
-          </div>
-          <ChevronDown
-            className={`w-5 h-5 text-neutral-400 transition-transform duration-200 ${
-              recommendedCodesOpen ? 'rotate-180' : ''
-            }`}
-          />
-        </button>
-
-        {recommendedCodesOpen && (
-          <div className="px-4 pb-4 space-y-2 bg-[#0d131a] border-t border-[#1a232f] pt-3">
-            {recommendedCodes.map((codeItem) => (
-              <div
-                key={codeItem.code}
-                className="p-3 bg-[#151f2b] rounded border border-[#222e3e] flex items-center justify-between"
-              >
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-white font-mono font-black text-sm tracking-wide">
-                      {codeItem.code}
-                    </span>
-                    <span className="text-[11px] px-1.5 py-0.5 rounded bg-white/10 text-neutral-300 font-semibold">
-                      {codeItem.folds} Folds
-                    </span>
-                  </div>
-                  <div className="text-xs text-neutral-400 mt-1">
-                    Odds: <span className="text-[#00df59] font-bold">{codeItem.odds.toFixed(2)}</span>
-                    <span className="mx-1 text-neutral-600">•</span>
-                    <span className="text-neutral-400">{codeItem.title}</span>
-                  </div>
+              <div>
+                <div className="text-[14px] font-bold text-white leading-tight">
+                  Recommended Football Codes
                 </div>
-                <button
-                  onClick={() => handleLoadRecommendedCode(codeItem.code)}
-                  className="px-3 py-1.5 bg-[#00df59] hover:bg-[#00c54e] text-black font-black text-xs rounded transition-colors active:scale-95 cursor-pointer shrink-0 ml-2"
-                >
-                  Load Code
-                </button>
+                <div className="text-[12px] text-neutral-400 mt-0.5 leading-tight">
+                  Save the effort of building it from scratch
+                </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            </div>
+            <ChevronDown
+              className={`w-5 h-5 text-neutral-400 transition-transform duration-200 ${
+                recommendedCodesOpen ? 'rotate-180' : ''
+              }`}
+            />
+          </button>
+
+          {recommendedCodesOpen && (
+            <div className="px-4 pb-4 space-y-2 bg-[#0d131a] border-t border-[#1a232f] pt-3">
+              {recommendedCodes.map((codeItem) => (
+                <div
+                  key={codeItem.code}
+                  className="p-3 bg-[#151f2b] rounded border border-[#222e3e] flex items-center justify-between"
+                >
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-white font-mono font-black text-sm tracking-wide">
+                        {codeItem.code}
+                      </span>
+                      <span className="text-[11px] px-1.5 py-0.5 rounded bg-white/10 text-neutral-300 font-semibold">
+                        {codeItem.folds} Folds
+                      </span>
+                    </div>
+                    <div className="text-xs text-neutral-400 mt-1">
+                      Odds: <span className="text-[#00df59] font-bold">{codeItem.odds.toFixed(2)}</span>
+                      <span className="mx-1 text-neutral-600">•</span>
+                      <span className="text-neutral-400">{codeItem.title}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleLoadRecommendedCode(codeItem.code)}
+                    className="px-3 py-1.5 bg-[#00df59] hover:bg-[#00c54e] text-black font-black text-xs rounded transition-colors active:scale-95 cursor-pointer shrink-0 ml-2"
+                  >
+                    Load Code
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* =================================================================== */}
       {/* DRAWER 1: CASHOUT SLIDER (Screenshot 7)                             */}

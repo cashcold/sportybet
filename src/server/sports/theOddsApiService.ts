@@ -48,8 +48,8 @@ export function getTheOddsApiKey(): string {
 class TheOddsApiService {
   private localMatches: Map<string, Match> = new Map();
   private totalMonthlyCredits = 500;
-  private remainingCredits = 0; // Default to 0 / cached mode if credits were exhausted
-  private usedCredits = 500;
+  private remainingCredits = 490;
+  private usedCredits = 10;
   private requestsToday = 0;
   private dailyBudget = 30; // 30 requests/day
   private currentUtcDay = new Date().toISOString().split('T')[0];
@@ -57,7 +57,7 @@ class TheOddsApiService {
   private lastManualSyncTime = 0;
   private manualSyncCooldownMs = 30 * 1000; // 30-second cooldown
   private isSyncing = false;
-  private quotaExhausted = true; // Mark quota exhausted to seamlessly use local fixtures
+  private quotaExhausted = false; // Quota is available
   private backgroundIntervalId: NodeJS.Timeout | null = null;
 
   constructor() {
@@ -573,23 +573,21 @@ class TheOddsApiService {
     const tomorrowYMD = tomorrow.toISOString().split('T')[0];
     const tomorrowDayMonth = tomorrow.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
 
-    matches = matches.map((m, idx) => {
+    // Remove any past/already played matches whose date was before today
+    matches = matches.filter(m => {
+      if (m.isLive) return true;
+      if (!m.date) return false;
+      return m.date >= todayYMD;
+    });
+
+    matches = matches.map((m) => {
       if (m.isLive) {
         return {
           ...m,
           date: todayYMD,
           dateLabel: 'Live',
           startTime: 'Live',
-          commenceTime: now.toISOString()
-        };
-      }
-      if (!m.date || m.date < todayYMD) {
-        const isTom = idx % 2 === 1;
-        return {
-          ...m,
-          date: isTom ? tomorrowYMD : todayYMD,
-          dateLabel: isTom ? `Tomorrow ${tomorrowDayMonth}` : `Today ${todayDayMonth}`,
-          commenceTime: isTom ? `${tomorrowYMD}T18:00:00Z` : `${todayYMD}T18:00:00Z`
+          commenceTime: m.commenceTime || now.toISOString()
         };
       }
       return m;
