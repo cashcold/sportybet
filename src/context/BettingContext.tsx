@@ -196,15 +196,25 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   });
 
   const [betHistory, setBetHistory] = useState<PlacedBet[]>(() => {
-    const saved = localStorage.getItem('sportybet_bet_history_v3');
+    const saved = localStorage.getItem('sportybet_bet_history_v4');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0]?.id === 'bet-hist-sporty-screenshot-1') {
+        if (
+          Array.isArray(parsed) &&
+          parsed.length > 0 &&
+          parsed[0]?.id === 'bet-hist-sporty-screenshot-1' &&
+          parsed[0]?.selections?.some((s: any) => s.matchTitle?.includes('England'))
+        ) {
           return parsed;
         }
       } catch {}
     }
+    try {
+      localStorage.removeItem('sportybet_bet_history');
+      localStorage.removeItem('sportybet_bet_history_v2');
+      localStorage.removeItem('sportybet_bet_history_v3');
+    } catch {}
     return INITIAL_BET_HISTORY;
   });
 
@@ -610,9 +620,9 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   useEffect(() => {
     if (user.isLoggedIn) {
-      localStorage.setItem('sportybet_bet_history_v3', JSON.stringify(betHistory));
+      localStorage.setItem('sportybet_bet_history_v4', JSON.stringify(betHistory));
     } else {
-      localStorage.removeItem('sportybet_bet_history_v3');
+      localStorage.removeItem('sportybet_bet_history_v4');
     }
   }, [betHistory, user.isLoggedIn]);
 

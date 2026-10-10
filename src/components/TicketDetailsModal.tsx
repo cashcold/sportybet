@@ -5,10 +5,7 @@ import {
   Check,
   Trophy,
   Sparkles,
-  ExternalLink,
-  RotateCcw,
-  Zap,
-  CheckCircle2
+  Copy
 } from 'lucide-react';
 import { PlacedBet } from '../types';
 import { useBetting } from '../context/BettingContext';
@@ -48,20 +45,20 @@ export const TicketDetailsModal: React.FC<TicketDetailsModalProps> = ({
     onClose();
   };
 
-  const handleAdminMarkGreen = () => {
-    markSingleBetGreen(bet.id, false);
-    showToast('Admin: All predictions on this ticket marked GREEN!');
-  };
-
-  const handleAdminSettleWon = () => {
-    markSingleBetGreen(bet.id, true);
-    showToast(`Admin: Ticket settled as WON! Payout credited.`);
-  };
+  const formattedDate = bet.placedAt
+    ? new Date(bet.placedAt).toLocaleString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).replace(',', '')
+    : `${bet.date || '26/09'} 17:20`;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/85 flex flex-col justify-start overflow-y-auto animate-in fade-in select-none">
-      <div className="w-full max-w-lg mx-auto bg-[#141b24] min-h-screen text-white flex flex-col pb-16">
-        {/* 1. Header (Sticky Top Bar) */}
+      <div className="w-full max-w-lg mx-auto bg-[#141b24] min-h-screen text-white flex flex-col pb-20">
+        {/* 1. Header (Sticky Top Bar - Exact Crimson Red) */}
         <div className="sticky top-0 z-30 bg-[#de1a22] text-white px-3.5 py-3 flex items-center justify-between shadow-md">
           <div className="flex items-center space-x-3">
             <button
@@ -76,7 +73,10 @@ export const TicketDetailsModal: React.FC<TicketDetailsModalProps> = ({
 
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => showToast('Ticket copied to clipboard')}
+              onClick={() => {
+                navigator.clipboard?.writeText(bet.ticketId);
+                showToast('Ticket copied to clipboard');
+              }}
               className="p-1.5 text-white hover:bg-white/10 rounded-full transition-colors cursor-pointer"
               title="Share Ticket"
             >
@@ -85,139 +85,130 @@ export const TicketDetailsModal: React.FC<TicketDetailsModalProps> = ({
           </div>
         </div>
 
-        {/* 2. Admin Quick Action Bar */}
-        <div className="bg-[#1b2532] px-3.5 py-2 border-b border-[#253344] flex items-center justify-between text-xs">
-          <div className="flex items-center space-x-1.5 text-[#00df59] font-bold">
-            <Zap className="w-3.5 h-3.5 fill-[#00df59]" />
-            <span>Admin Trigger:</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={handleAdminMarkGreen}
-              className="px-2.5 py-1 bg-[#00a826] hover:bg-[#009221] active:scale-95 text-white font-bold text-[11px] rounded shadow transition-all cursor-pointer flex items-center space-x-1"
-            >
-              <Check className="w-3 h-3 stroke-[3]" />
-              <span>Mark All Green</span>
-            </button>
-            <button
-              onClick={handleAdminSettleWon}
-              className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-extrabold text-[11px] rounded shadow transition-all cursor-pointer flex items-center space-x-1"
-            >
-              <Trophy className="w-3 h-3" />
-              <span>Settle Won</span>
-            </button>
-          </div>
-        </div>
+        {/* 2. Top Overview Section (Exact SportyBet Clone - Circled in Yellow from Screenshot) */}
+        <div className="p-3.5 space-y-3">
+          {/* Unified Bet Won / Status Card */}
+          <div className="bg-[#17222e] border border-[#233245] rounded-lg overflow-hidden shadow-md">
+            {/* Top Ribbon: Bet Won badge + Return + Remix Bet Button */}
+            <div className={`p-3.5 flex items-center justify-between ${
+              isGreen || bet.status === 'won'
+                ? 'bg-[#102717] border-b border-[#1b4329]'
+                : 'bg-[#182330] border-b border-[#243346]'
+            }`}>
+              <div className="flex items-center space-x-3 min-w-0 pr-2">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-inner ${
+                  isGreen || bet.status === 'won'
+                    ? 'bg-[#00df59]/20 border border-[#00df59]/40 text-[#00df59]'
+                    : 'bg-[#1b3a57] border border-[#235682] text-white'
+                }`}>
+                  {isGreen || bet.status === 'won' ? (
+                    <Trophy className="w-5 h-5 fill-current" />
+                  ) : (
+                    <span className="text-xl">🤖</span>
+                  )}
+                </div>
+                <div className="text-[13px] font-bold text-white leading-snug">
+                  {isGreen || bet.status === 'won' ? (
+                    <>
+                      <span className="text-[#00df59] font-black text-sm block">Bet Won</span>
+                      <span className="text-neutral-300 font-medium text-xs">
+                        Return: <strong className="text-white font-extrabold text-sm ml-0.5">GHS {bet.potentialWin.toFixed(2)}</strong>
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-white font-black text-sm block">Bounce back fast</span>
+                      <span className="text-neutral-300 font-medium text-xs">
+                        Remix and retry your bet!
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
 
-        {/* 3. Top Banner: "Bounce back fast — remix and retry your bet!" (Exact Match to Screenshot) */}
-        <div className="px-3.5 pt-3.5 pb-2">
-          <div className="bg-[#182330] border border-[#27374b] rounded-lg p-3 flex items-center justify-between shadow-md">
-            {/* Robot Avatar and Text */}
-            <div className="flex items-center space-x-3 min-w-0 pr-2">
-              {/* Blue robot icon */}
-              <div className="w-10 h-10 rounded-full bg-[#1b3a57] border border-[#235682] flex items-center justify-center shrink-0 shadow-inner">
-                <span className="text-xl">🤖</span>
-              </div>
-              <div className="text-[13px] font-bold text-white leading-snug">
-                Bounce back fast —<br />
-                <span className="text-neutral-200 font-medium text-xs">
-                  remix and retry your bet!
-                </span>
-              </div>
+              <button
+                onClick={handleRemixBet}
+                className="bg-[#00c853] hover:bg-[#00b34a] active:scale-95 text-white font-black text-xs px-3.5 py-2 rounded shadow flex items-center space-x-1.5 shrink-0 transition-transform cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 fill-white stroke-none" />
+                <span>Remix Bet</span>
+              </button>
             </div>
 
-            {/* Green Remix Bet Button */}
-            <button
-              onClick={handleRemixBet}
-              className="bg-[#00c853] hover:bg-[#00b34a] active:scale-95 text-white font-black text-xs px-3.5 py-2 rounded-md shadow flex items-center space-x-1.5 shrink-0 transition-transform cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5 fill-white stroke-none" />
-              <span>Remix Bet</span>
-            </button>
-          </div>
-        </div>
-
-        {/* 4. Ticket Overview Bar */}
-        <div className="px-3.5 py-2">
-          <div className="bg-[#17202c] rounded-md border border-[#222d3d] p-3 text-xs flex items-center justify-between">
-            <div>
-              <div className="text-neutral-400">
-                Ticket ID: <span className="text-white font-mono font-bold">{bet.ticketId}</span>
+            {/* Ticket Metadata & Verify Code (Directly below the yellow circle from Screenshot) */}
+            <div className="p-3.5 space-y-2 text-xs">
+              <div className="flex justify-between items-center">
+                <div className="text-neutral-400 flex items-center space-x-1">
+                  <span>Ticket ID:</span>
+                  <span className="text-white font-mono font-bold">{bet.ticketId}</span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard?.writeText(bet.ticketId);
+                      showToast(`Copied Ticket ID: ${bet.ticketId}`);
+                    }}
+                    className="text-neutral-400 hover:text-white transition-colors cursor-pointer p-0.5"
+                    title="Copy Ticket ID"
+                  >
+                    <Copy className="w-3 h-3 inline" />
+                  </button>
+                </div>
+                <div className="text-neutral-400">
+                  Placed: <span className="text-neutral-200 font-medium">{formattedDate}</span>
+                </div>
               </div>
-              <div className="text-neutral-400 mt-0.5">
-                Type: <span className="text-white font-bold">{bet.type}</span> ({bet.selections.length} Legs)
+
+              <div className="flex justify-between items-center">
+                <div className="text-neutral-400 flex items-center space-x-1">
+                  <span>Verify Code:</span>
+                  <span className="text-[#00df59] font-mono font-bold tracking-wide">
+                    {bet.bookingCode || 'BC8821'}
+                  </span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard?.writeText(bet.bookingCode || 'BC8821');
+                      showToast(`Copied Verify Code: ${bet.bookingCode || 'BC8821'}`);
+                    }}
+                    className="text-neutral-400 hover:text-white transition-colors cursor-pointer p-0.5"
+                    title="Copy Verify Code"
+                  >
+                    <Copy className="w-3 h-3 inline" />
+                  </button>
+                </div>
+                <div className="text-neutral-400">
+                  Type: <span className="text-white font-bold">{bet.type}</span> ({bet.selections.length} Legs)
+                </div>
+              </div>
+
+              {/* Stake & Return summary strip */}
+              <div className="bg-[#121922] rounded border border-[#1f2b3a] p-2.5 flex justify-between items-center text-xs mt-1">
+                <div>
+                  <span className="text-neutral-400">Stake: </span>
+                  <strong className="text-white font-bold">GHS {bet.stake.toFixed(2)}</strong>
+                </div>
+                <div>
+                  <span className="text-neutral-400">Total Odds: </span>
+                  <strong className="text-white font-bold">{bet.totalOdds.toFixed(2)}</strong>
+                </div>
+                <div>
+                  <span className="text-neutral-400">Total Return: </span>
+                  <strong className="text-[#00df59] font-black text-sm">
+                    GHS {bet.potentialWin.toFixed(2)}
+                  </strong>
+                </div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-neutral-400">
-                Stake: <strong className="text-white">GHS {bet.stake.toFixed(2)}</strong>
-              </div>
-              <div className="text-neutral-400 mt-0.5">
-                {bet.status === 'won' || isGreen ? 'Total Return:' : 'Pot. Win:'}{' '}
-                <strong className="text-[#00df59] font-black text-sm">GHS {bet.potentialWin.toFixed(2)}</strong>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* 4b. Authentic Barcode & Serial Container */}
-        <div className="mx-3.5 mb-2 bg-[#17202c] rounded-md border border-[#222d3d] p-2.5 text-center space-y-1 shadow-sm">
-          <div className="flex justify-center items-center py-0.5 overflow-hidden">
-            <svg className="w-56 h-8" viewBox="0 0 200 40" fill="none">
-              <rect x="0" y="0" width="3" height="40" fill="#ffffff" />
-              <rect x="6" y="0" width="1" height="40" fill="#ffffff" />
-              <rect x="9" y="0" width="4" height="40" fill="#ffffff" />
-              <rect x="16" y="0" width="2" height="40" fill="#ffffff" />
-              <rect x="21" y="0" width="5" height="40" fill="#ffffff" />
-              <rect x="29" y="0" width="1" height="40" fill="#ffffff" />
-              <rect x="33" y="0" width="3" height="40" fill="#ffffff" />
-              <rect x="39" y="0" width="2" height="40" fill="#ffffff" />
-              <rect x="44" y="0" width="4" height="40" fill="#ffffff" />
-              <rect x="51" y="0" width="1" height="40" fill="#ffffff" />
-              <rect x="55" y="0" width="3" height="40" fill="#ffffff" />
-              <rect x="61" y="0" width="5" height="40" fill="#ffffff" />
-              <rect x="69" y="0" width="2" height="40" fill="#ffffff" />
-              <rect x="74" y="0" width="4" height="40" fill="#ffffff" />
-              <rect x="81" y="0" width="1" height="40" fill="#ffffff" />
-              <rect x="85" y="0" width="3" height="40" fill="#ffffff" />
-              <rect x="91" y="0" width="5" height="40" fill="#ffffff" />
-              <rect x="99" y="0" width="2" height="40" fill="#ffffff" />
-              <rect x="104" y="0" width="4" height="40" fill="#ffffff" />
-              <rect x="111" y="0" width="1" height="40" fill="#ffffff" />
-              <rect x="115" y="0" width="3" height="40" fill="#ffffff" />
-              <rect x="121" y="0" width="5" height="40" fill="#ffffff" />
-              <rect x="129" y="0" width="2" height="40" fill="#ffffff" />
-              <rect x="134" y="0" width="4" height="40" fill="#ffffff" />
-              <rect x="141" y="0" width="1" height="40" fill="#ffffff" />
-              <rect x="145" y="0" width="3" height="40" fill="#ffffff" />
-              <rect x="151" y="0" width="5" height="40" fill="#ffffff" />
-              <rect x="159" y="0" width="2" height="40" fill="#ffffff" />
-              <rect x="164" y="0" width="4" height="40" fill="#ffffff" />
-              <rect x="171" y="0" width="1" height="40" fill="#ffffff" />
-              <rect x="175" y="0" width="3" height="40" fill="#ffffff" />
-              <rect x="181" y="0" width="2" height="40" fill="#ffffff" />
-              <rect x="186" y="0" width="4" height="40" fill="#ffffff" />
-              <rect x="193" y="0" width="2" height="40" fill="#ffffff" />
-              <rect x="198" y="0" width="2" height="40" fill="#ffffff" />
-            </svg>
-          </div>
-          <div className="text-[10px] font-mono tracking-widest text-neutral-300">
-            *{bet.ticketId || 'SBGH-5512-9901'}*
-          </div>
-          <div className="text-[9px] text-neutral-400">
-            Official SportyBet Ghana Wagering Ticket Slip · Verified
-          </div>
-        </div>
-
-        {/* 5. Match Legs List (Exact layout of Screenshot_20260927_102225_Chrome.jpg) */}
-        <div className="px-3.5 divide-y divide-[#1e2a39] mt-1">
+        {/* 3. Match Legs List (Exact SportyBet layout with Green Circles & Checkmarks) */}
+        <div className="px-3.5 divide-y divide-[#1e2a39]">
           {bet.selections.map((sel, idx) => {
             const details = resolveWinningPredictionDetails(sel);
             const isMatchWon = isGreen || sel.isWon;
 
             return (
               <div key={idx} className="py-4 flex items-start space-x-3.5">
-                {/* Left Side: Green Circle with White Checkmark (Exact Match to Screenshot) */}
+                {/* Left Side: Solid Green Circle with White/Black Checkmark */}
                 <div className="pt-1 shrink-0">
                   {isMatchWon ? (
                     <div className="w-5 h-5 rounded-full bg-[#00df59] flex items-center justify-center shadow-md">
@@ -298,7 +289,7 @@ export const TicketDetailsModal: React.FC<TicketDetailsModalProps> = ({
           })}
         </div>
 
-        {/* 6. Footer Summary */}
+        {/* 4. Footer Summary */}
         <div className="px-3.5 pt-6 pb-4 border-t border-[#222f40] mt-4 space-y-2 text-xs">
           <div className="flex justify-between text-neutral-400">
             <span>Booking Code</span>
@@ -314,6 +305,23 @@ export const TicketDetailsModal: React.FC<TicketDetailsModalProps> = ({
               {isGreen ? 'Won (All Predictions Correct)' : bet.status}
             </span>
           </div>
+        </div>
+
+        {/* 5. Sticky Bottom Action Bar */}
+        <div className="sticky bottom-0 z-30 bg-[#121922] border-t border-[#1f2b3a] px-3.5 py-3 flex items-center justify-between shadow-2xl">
+          <div>
+            <div className="text-[11px] text-neutral-400">Total Return (GHS)</div>
+            <div className="text-[#00df59] font-black text-lg leading-tight">
+              GHS {bet.potentialWin.toFixed(2)}
+            </div>
+          </div>
+          <button
+            onClick={handleRemixBet}
+            className="bg-[#00c853] hover:bg-[#00b34a] active:scale-95 text-white font-black text-xs px-5 py-2.5 rounded shadow-lg flex items-center space-x-1.5 transition-transform cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 fill-white stroke-none" />
+            <span>Remix Bet</span>
+          </button>
         </div>
       </div>
     </div>
