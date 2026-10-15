@@ -37,38 +37,25 @@ export async function seedDefaultDatabase() {
       console.log('[MongoDB Seed] Initial User created in MongoDB.');
     }
 
-    // 2. Ensure Initial Bets exist in MongoDB
-    const allInitialBets = [...INITIAL_OPEN_BETS, ...INITIAL_BET_HISTORY];
-    for (const b of allInitialBets) {
-      try {
-        const exists = await BetModel.findOne({ $or: [{ id: b.id }, { ticketId: b.ticketId }] });
-        if (!exists) {
-          await BetModel.create({
-            id: b.id,
-            ticketId: b.ticketId,
-            transactionId: b.transactionId || `TX-GH-${Math.floor(100000000 + Math.random() * 900000000)}`,
-            userPhone: '20******5',
-            type: b.type,
-            date: b.date,
-            isLive: b.isLive,
-            selections: b.selections,
-            stake: b.stake,
-            totalOdds: b.totalOdds,
-            potentialWin: b.potentialWin,
-            status: b.status,
-            cashoutAvailable: b.cashoutAvailable,
-            cashoutAmount: b.cashoutAmount || b.stake * 0.9,
-            bookingCode: b.bookingCode || 'BD9812',
-            canRebet: b.canRebet ?? true,
-            isAllGreen: b.isAllGreen || false,
-            settledAt: b.settledAt,
-            winningsPaid: b.winningsPaid || false
-          });
+    // 2. Remove legacy hardcoded mock bets so ONLY the user's real MongoDB bets remain
+    try {
+      await BetModel.deleteMany({
+        id: {
+          $in: [
+            'bet-sporty-screenshot-1',
+            'bet-sporty-screenshot-2',
+            'bet-hist-sporty-screenshot-1',
+            'bet-hist-sporty-screenshot-2',
+            'bet-hist-sporty-screenshot-3',
+            'bet-hist-won-1',
+            'bet-hist-won-2',
+            'bet-hist-won-3',
+            'bet-hist-won-4',
+            'bet-hist-won-5'
+          ]
         }
-      } catch (e: any) {
-        // Ignore single duplicate key
-      }
-    }
+      });
+    } catch {}
   } catch (err: any) {
     console.warn('[MongoDB Seed Notice]', err?.message || err);
   }
