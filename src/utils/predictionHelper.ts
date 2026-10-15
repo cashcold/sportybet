@@ -21,17 +21,17 @@ export function resolveWinningPredictionDetails(sel: BetSelection): {
   gameDate: string;
   formattedMatchTitle: string;
 } {
-  const title = sel.matchTitle || 'Match';
+  const title = sel?.matchTitle || 'Match';
   // Use "v" between teams as shown in SportyBet screenshot (e.g. Albania v Belarus)
-  const formattedMatchTitle = title.replace(/\s+vs\s+/gi, ' v ');
-  const mName = (sel.marketName || '1X2').trim();
-  const sName = (sel.selectionName || '1').trim();
-  const oddStr = `@${sel.odd.toFixed(2)}`;
+  const formattedMatchTitle = (title || 'Match').replace(/\s+vs\s+/gi, ' v ');
+  const mName = (sel?.marketName || '1X2').trim();
+  const sName = (sel?.selectionName || '1').trim();
+  const oddStr = `@${typeof sel?.odd === 'number' && !isNaN(sel.odd) ? sel.odd.toFixed(2) : '1.00'}`;
 
   // Default game ID and date
-  const gameId = sel.gameId || '23888';
-  const gameDate = sel.gameDate || sel.liveTime || '04/10 18:30';
-  const lowerTitle = title.toLowerCase();
+  const gameId = sel?.gameId || '23888';
+  const gameDate = sel?.gameDate || sel?.liveTime || '04/10 18:30';
+  const lowerTitle = (title || '').toLowerCase();
 
   // Canonical Official Result: Slovan Bratislava vs VfB Stuttgart (Finished 0 - 3)
   if (isSlovanStuttgartMatch(title)) {

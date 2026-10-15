@@ -10,10 +10,10 @@ export const SearchModal: React.FC = () => {
   if (!isSearchOpen) return null;
 
   const filtered = matches.filter(m =>
-    m.homeTeam.toLowerCase().includes(query.toLowerCase()) ||
-    m.awayTeam.toLowerCase().includes(query.toLowerCase()) ||
-    m.league.toLowerCase().includes(query.toLowerCase()) ||
-    m.gameId.includes(query)
+    (m.homeTeam || '').toLowerCase().includes(query.toLowerCase()) ||
+    (m.awayTeam || '').toLowerCase().includes(query.toLowerCase()) ||
+    (m.league || '').toLowerCase().includes(query.toLowerCase()) ||
+    (m.gameId || '').includes(query)
   );
 
   return (

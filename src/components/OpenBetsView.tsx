@@ -198,11 +198,11 @@ export const OpenBetsView: React.FC = () => {
     }
 
     // 3. Category Filter
-    const isAviator = item.selections.some(
+    const isAviator = Array.isArray(item.selections) && item.selections.some(
       (s) =>
-        s.matchTitle.toLowerCase().includes('aviator') ||
-        s.marketName.toLowerCase().includes('crash') ||
-        s.marketName.toLowerCase().includes('cashout multiplier')
+        (s?.matchTitle || '').toLowerCase().includes('aviator') ||
+        (s?.marketName || '').toLowerCase().includes('crash') ||
+        (s?.marketName || '').toLowerCase().includes('cashout multiplier')
     );
     if (historyCategoryFilter === 'Sports' && isAviator) {
       return false;
@@ -216,18 +216,20 @@ export const OpenBetsView: React.FC = () => {
 
   const sportsCount = activeBetHistory.filter(
     (item) =>
+      !Array.isArray(item.selections) ||
       !item.selections.some(
         (s) =>
-          s.matchTitle.toLowerCase().includes('aviator') ||
-          s.marketName.toLowerCase().includes('crash')
+          (s?.matchTitle || '').toLowerCase().includes('aviator') ||
+          (s?.marketName || '').toLowerCase().includes('crash')
       )
   ).length;
 
   const aviatorCount = activeBetHistory.filter((item) =>
+    Array.isArray(item.selections) &&
     item.selections.some(
       (s) =>
-        s.matchTitle.toLowerCase().includes('aviator') ||
-        s.marketName.toLowerCase().includes('crash')
+        (s?.matchTitle || '').toLowerCase().includes('aviator') ||
+        (s?.marketName || '').toLowerCase().includes('crash')
     )
   ).length;
 
@@ -267,8 +269,8 @@ export const OpenBetsView: React.FC = () => {
   }, [simulatingBet]);
 
   const handleOpenSim = (bet: PlacedBet, matchTitle?: string) => {
-    const title = matchTitle || bet.selections[0]?.matchTitle || 'England vs Spain';
-    const lowerTitle = title.toLowerCase();
+    const title = matchTitle || (bet?.selections && bet.selections[0]?.matchTitle) || 'England vs Spain';
+    const lowerTitle = (title || '').toLowerCase();
 
     if ((lowerTitle.includes('slovan') || lowerTitle.includes('bratislava')) && lowerTitle.includes('stuttgart')) {
       setSimMatchData({
@@ -711,7 +713,7 @@ export const OpenBetsView: React.FC = () => {
                         </div>
 
                         <div className="divide-y divide-[#202b3a]">
-                          {bet.selections.map((sel, idx) => {
+                          {(bet.selections || []).map((sel, idx) => {
                             const isGreen = bet.isAllGreen || isAllGreenTriggered || bet.status === 'won';
                             const details = resolveWinningPredictionDetails(sel);
                             const isMatchLive = sel.isLive ?? bet.isLive;
@@ -1190,15 +1192,15 @@ export const OpenBetsView: React.FC = () => {
                           {/* Match summary and Remix Bet button */}
                           <div className="pt-1.5 flex items-end justify-between">
                             <div className="space-y-0.5 text-xs text-neutral-300 flex-1 min-w-0 pr-3">
-                              {item.selections.slice(0, 3).map((sel, sIdx) => {
-                                const formattedTitle = (sel.matchTitle || 'Match').replace(/\s+vs\s+/gi, ' v ');
+                              {(item.selections || []).slice(0, 3).map((sel, sIdx) => {
+                                const formattedTitle = (sel?.matchTitle || 'Match').replace(/\s+vs\s+/gi, ' v ');
                                 return (
                                   <div key={sIdx} className="truncate text-neutral-300 text-[13px] leading-snug">
                                     {formattedTitle}
                                   </div>
                                 );
                               })}
-                              {item.selections.length > 3 && (
+                              {Array.isArray(item.selections) && item.selections.length > 3 && (
                                 <div className="text-neutral-400 text-xs pt-0.5">
                                   ... (and {item.selections.length - 3} other matches)
                                 </div>
@@ -1285,7 +1287,7 @@ export const OpenBetsView: React.FC = () => {
 
                           {/* Detailed Match Legs */}
                           <div className="divide-y divide-[#202b3a]">
-                            {item.selections.map((sel, idx) => {
+                            {(item.selections || []).map((sel, idx) => {
                               const details = resolveWinningPredictionDetails(sel);
                               return (
                                 <div

@@ -76,7 +76,7 @@ export const MatchDetailsModal: React.FC<MatchDetailsModalProps> = ({ match, onC
 
   // Flag Emoji helper
   const getFlagEmoji = (countryOrTeam: string) => {
-    const c = countryOrTeam.toLowerCase();
+    const c = (countryOrTeam || '').toLowerCase();
     if (c.includes('brazil') || c.includes('serie b')) return '🇧🇷';
     if (c.includes('scotland')) return '🏴󠁧󠁢󠁳󠁣󠁴󠁿';
     if (c.includes('spain') || c.includes('madrid') || c.includes('barcelona')) return '🇪🇸';
@@ -100,12 +100,12 @@ export const MatchDetailsModal: React.FC<MatchDetailsModalProps> = ({ match, onC
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
-      const matchName = market.name.toLowerCase().includes(q);
+      const matchName = (market.name || '').toLowerCase().includes(q);
       const matchOdds =
-        market.odds?.some(o => o.name.toLowerCase().includes(q)) ||
-        market.lines?.some(l => l.line.toLowerCase().includes(q)) ||
-        market.handicaps?.some(h => h.line.toLowerCase().includes(q)) ||
-        market.asianHandicaps?.some(ah => ah.hLine.toLowerCase().includes(q) || ah.aLine.toLowerCase().includes(q));
+        market.odds?.some(o => (o.name || '').toLowerCase().includes(q)) ||
+        market.lines?.some(l => (l.line || '').toLowerCase().includes(q)) ||
+        market.handicaps?.some(h => (h.line || '').toLowerCase().includes(q)) ||
+        market.asianHandicaps?.some(ah => (ah.hLine || '').toLowerCase().includes(q) || (ah.aLine || '').toLowerCase().includes(q));
 
       if (!matchName && !matchOdds) return false;
     }

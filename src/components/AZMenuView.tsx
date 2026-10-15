@@ -25,7 +25,7 @@ export const AZMenuView: React.FC = () => {
 
   const filteredLeagues = LEAGUES_LIST.filter(l => {
     if (searchQuery.trim()) {
-      return l.name.toLowerCase().includes(searchQuery.toLowerCase());
+      return (l.name || '').toLowerCase().includes(searchQuery.toLowerCase());
     }
     if (selectedSportItem === 'popular') return true;
     if (selectedSportItem === 'football') return l.sport === 'football';

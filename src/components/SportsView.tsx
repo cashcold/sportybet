@@ -213,11 +213,11 @@ export const SportsView: React.FC = () => {
           <div className="flex items-center space-x-4 overflow-x-auto no-scrollbar text-xs font-semibold flex-1">
             <span className="text-[17px] font-black tracking-wide text-white mr-1 shrink-0">Live</span>
             {sportsList.map(sport => {
-              const isActive = selectedSport.toLowerCase() === sport.toLowerCase();
+              const isActive = (selectedSport || 'football').toLowerCase() === (sport || '').toLowerCase();
               return (
                 <button
                   key={sport}
-                  onClick={() => setSelectedSport(sport.toLowerCase())}
+                  onClick={() => setSelectedSport((sport || 'football').toLowerCase())}
                   className={`shrink-0 transition-colors pb-1 ${
                     isActive ? 'text-[#00df59] font-bold' : 'text-neutral-400 hover:text-white'
                   }`}
@@ -427,11 +427,11 @@ export const SportsView: React.FC = () => {
             <span className="text-[17px] font-black tracking-wide text-white shrink-0">Sports</span>
             <div className="flex items-center space-x-4 text-xs font-semibold">
               {sportsList.map(sport => {
-                const isActive = selectedSport.toLowerCase() === sport.toLowerCase();
+                const isActive = (selectedSport || 'football').toLowerCase() === (sport || '').toLowerCase();
                 return (
                   <button
                     key={sport}
-                    onClick={() => setSelectedSport(sport.toLowerCase())}
+                    onClick={() => setSelectedSport((sport || 'football').toLowerCase())}
                     className={`shrink-0 transition-colors pb-1 ${
                       isActive ? 'text-[#00df59] font-bold' : 'text-neutral-400 hover:text-white'
                     }`}
