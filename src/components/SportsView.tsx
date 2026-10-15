@@ -582,6 +582,8 @@ export const SportsView: React.FC = () => {
                         dateBadge = match.dateLabel;
                       }
 
+                      const isMatchFinished = match.minute === 'Finished' || match.period === 'FT' || (match.homeScore !== undefined && !match.isLive);
+
                       return (
                         <div key={match.id} className="p-3 hover:bg-[#18212b] transition-colors">
                           {/* Meta header */}
@@ -592,9 +594,15 @@ export const SportsView: React.FC = () => {
                                    HOT🔥
                                 </span>
                               )}
-                              <span className="text-neutral-300 font-semibold shrink-0">
-                                {dateBadge ? `${dateBadge} • ` : ''}{displayTime} ID {match.gameId}
-                              </span>
+                              {isMatchFinished ? (
+                                <span className="bg-[#1b2b3a] border border-[#2b415a] text-[#00df59] text-[10px] font-extrabold px-1.5 py-0.5 rounded shrink-0">
+                                  Finished (FT)
+                                </span>
+                              ) : (
+                                <span className="text-neutral-300 font-semibold shrink-0">
+                                  {dateBadge ? `${dateBadge} • ` : ''}{displayTime} ID {match.gameId}
+                                </span>
+                              )}
                               <span className="text-neutral-400 truncate">
                                 {match.countryOrCategory} - {match.league}
                               </span>
@@ -609,11 +617,21 @@ export const SportsView: React.FC = () => {
                               className="w-1/2 pr-2 cursor-pointer"
                               onClick={() => setDetailMatch(match)}
                             >
-                              <div className="text-xs font-semibold text-neutral-100 truncate">
-                                {match.homeTeam}
+                              <div className="flex justify-between items-center text-xs font-semibold text-neutral-100">
+                                <span className="truncate pr-1">{match.homeTeam}</span>
+                                {match.homeScore !== undefined && (
+                                  <span className="font-extrabold text-white shrink-0 ml-1 bg-[#1a2533] px-1.5 py-0.5 rounded text-xs">
+                                    {match.homeScore}
+                                  </span>
+                                )}
                               </div>
-                              <div className="text-xs font-semibold text-neutral-100 truncate mt-0.5">
-                                {match.awayTeam}
+                              <div className="flex justify-between items-center text-xs font-semibold text-neutral-100 mt-0.5">
+                                <span className="truncate pr-1">{match.awayTeam}</span>
+                                {match.awayScore !== undefined && (
+                                  <span className="font-extrabold text-white shrink-0 ml-1 bg-[#1a2533] px-1.5 py-0.5 rounded text-xs">
+                                    {match.awayScore}
+                                  </span>
+                                )}
                               </div>
                               <button
                                 onClick={(e) => {
@@ -626,17 +644,31 @@ export const SportsView: React.FC = () => {
                               </button>
                             </div>
 
-                            {/* Right: 3 Odds Buttons */}
-                            <div className="w-1/2 flex items-center space-x-1.5">
-                              {currentOdds.slice(0, 3).map(odd => (
-                                <OddButton
-                                  key={odd.id}
-                                  match={match}
-                                  marketName={sportsMarket}
-                                  odd={odd}
-                                />
-                              ))}
-                            </div>
+                            {/* Right: 3 Odds Buttons or Final Score */}
+                            {isMatchFinished ? (
+                              <div 
+                                className="w-1/2 flex items-center justify-end pr-1 cursor-pointer"
+                                onClick={() => setDetailMatch(match)}
+                              >
+                                <div className="bg-[#172230] border border-[#23354b] rounded px-3 py-1.5 text-center min-w-[120px]">
+                                  <div className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">Final Score</div>
+                                  <div className="text-base font-black text-white tracking-widest">
+                                    {match.homeScore ?? 0} : {match.awayScore ?? 0}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="w-1/2 flex items-center space-x-1.5">
+                                {currentOdds.slice(0, 3).map(odd => (
+                                  <OddButton
+                                    key={odd.id}
+                                    match={match}
+                                    marketName={sportsMarket}
+                                    odd={odd}
+                                  />
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       );

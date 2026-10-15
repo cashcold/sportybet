@@ -237,6 +237,15 @@ export const MatchDetailsModal: React.FC<MatchDetailsModalProps> = ({ match, onC
                     <span>Live {match.minute || "76'"}</span>
                   </div>
                 </>
+              ) : (match.minute === 'Finished' || match.period === 'FT' || match.homeScore !== undefined) ? (
+                <>
+                  <div className="text-2xl font-black text-white tracking-wider">
+                    {match.homeScore ?? 0} - {match.awayScore ?? 0}
+                  </div>
+                  <div className="inline-flex items-center space-x-1 mt-1 bg-[#1e2a39] border border-[#2d4057] text-[#00df59] text-[10px] font-extrabold px-2 py-0.5 rounded">
+                    <span>Match Ended (FT)</span>
+                  </div>
+                </>
               ) : (
                 (() => {
                   const matchDateObj = match.commenceTime

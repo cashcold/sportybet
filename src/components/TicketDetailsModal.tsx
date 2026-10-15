@@ -238,7 +238,7 @@ export const TicketDetailsModal: React.FC<TicketDetailsModalProps> = ({
                     <span className="text-neutral-300">
                       FT Score:{' '}
                       <strong className="text-white font-extrabold text-[13px] ml-1">
-                        {isMatchWon ? details.ftScore : (sel.liveScore || '0:0')}
+                        {details.ftScore || sel.ftScore || sel.liveScore || '0:0'}
                       </strong>
                     </span>
                     <span className="text-neutral-600">|</span>

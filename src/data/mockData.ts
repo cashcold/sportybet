@@ -37,30 +37,30 @@ export const INITIAL_OPEN_BETS: PlacedBet[] = [
         hasStats: true
       },
       {
-        matchId: 'theodds-aston-villa-fenerbahce-ucl',
-        gameId: '33745',
-        matchTitle: 'Aston Villa v Fenerbahce',
+        matchId: 'theodds-d7576351b8cb2396e32cc3de0446f3de',
+        gameId: '75763',
+        matchTitle: 'ŠK Slovan Bratislava v VfB Stuttgart',
         marketName: 'Correct Score',
-        selectionName: '2:1',
-        odd: 8.50,
+        selectionName: '0:3',
+        odd: 14.50,
         isLive: false,
-        liveOdds: 8.50,
+        liveOdds: 14.50,
         liveOddsTrend: 'same',
-        liveScore: '2:1',
+        liveScore: '0:3',
         liveTime: 'Finished',
-        ftScore: '2:1',
-        outcome: '2:1',
-        isWon: false,
-        predictionStatus: 'pending',
-        gameDate: '14/10 20:00',
+        ftScore: '0:3',
+        outcome: '0:3',
+        isWon: true,
+        predictionStatus: 'won',
+        gameDate: '14/10 19:00',
         hasStream: true,
         hasTracker: true,
         hasStats: true
       }
     ],
     stake: 10.00,
-    totalOdds: 93.50,
-    potentialWin: 935.00,
+    totalOdds: 159.50,
+    potentialWin: 1595.00,
     status: 'open',
     cashoutAvailable: true,
     cashoutAmount: 9.50,
@@ -69,7 +69,49 @@ export const INITIAL_OPEN_BETS: PlacedBet[] = [
 ];
 
 // Bet History - Exact SportyBet Settled Clone Tickets
-export const INITIAL_BET_HISTORY: PlacedBet[] = [];
+export const INITIAL_BET_HISTORY: PlacedBet[] = [
+  {
+    id: 'bet-hist-ucl-slovan-stuttgart',
+    ticketId: 'SBGH-9182-7722',
+    transactionId: 'TX-GH-918277221',
+    bookingCode: 'GH7722',
+    type: 'Single',
+    date: '14/10 18:45',
+    isLive: false,
+    selections: [
+      {
+        matchId: 'theodds-d7576351b8cb2396e32cc3de0446f3de',
+        gameId: '75763',
+        matchTitle: 'ŠK Slovan Bratislava v VfB Stuttgart',
+        marketName: 'Correct Score',
+        selectionName: '0:3',
+        odd: 14.50,
+        isLive: false,
+        liveOdds: 14.50,
+        liveOddsTrend: 'same',
+        liveScore: '0:3',
+        liveTime: 'Finished',
+        ftScore: '0:3',
+        outcome: '0:3',
+        isWon: true,
+        predictionStatus: 'won',
+        gameDate: '14/10 19:00',
+        hasStream: true,
+        hasTracker: true,
+        hasStats: true
+      }
+    ],
+    stake: 50.00,
+    totalOdds: 14.50,
+    potentialWin: 725.00,
+    status: 'won',
+    isAllGreen: true,
+    cashoutAvailable: false,
+    canRebet: true,
+    settledAt: '2026-10-14T21:00:00Z',
+    winningsPaid: true
+  }
+];
 
 export const GUEST_USER: UserProfile = {
   username: '',

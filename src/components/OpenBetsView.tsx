@@ -894,8 +894,15 @@ export const OpenBetsView: React.FC = () => {
                                       </div>
                                     </div>
                                   ) : (
-                                    <div className="text-neutral-400 text-xs pt-0.5">
-                                      <span>{sel.liveTime || '26/09 20:30'}</span>
+                                    <div className="text-xs pt-0.5 flex items-center justify-between">
+                                      {sel.liveTime === 'Finished' || sel.ftScore ? (
+                                        <span className="text-[#00df59] font-bold flex items-center space-x-1.5">
+                                          <span className="bg-[#1b2b3a] border border-[#2b415a] px-1.5 py-0.5 rounded text-[10px]">Finished</span>
+                                          <span>FT Score: {details.ftScore || sel.ftScore || '0:3'}</span>
+                                        </span>
+                                      ) : (
+                                        <span className="text-neutral-400">{sel.liveTime || sel.gameDate || '26/09 20:30'}</span>
+                                      )}
                                     </div>
                                   )}
                                 </div>

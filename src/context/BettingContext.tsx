@@ -181,6 +181,34 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       let hasChange = false;
       const updatedSelections = bet.selections?.map(sel => {
         const title = (sel.matchTitle || '').toLowerCase();
+        // Replace legacy Aston Villa UCL match on 14/10 that had placeholder 2:1
+        if (
+          (title.includes('aston villa') && (title.includes('fenerbahce') || sel.ftScore === '2:1' || sel.selectionName === '2:1')) ||
+          (bet.id === 'bet-ucl-cs-lask-villa' && !title.includes('lask'))
+        ) {
+          hasChange = true;
+          return {
+            ...sel,
+            matchId: 'theodds-d7576351b8cb2396e32cc3de0446f3de',
+            gameId: '75763',
+            matchTitle: 'ŠK Slovan Bratislava v VfB Stuttgart',
+            marketName: 'Correct Score',
+            selectionName: '0:3',
+            odd: 14.50,
+            isLive: false,
+            liveOdds: 14.50,
+            liveOddsTrend: 'same' as const,
+            liveScore: '0:3',
+            liveTime: 'Finished',
+            ftScore: '0:3',
+            outcome: '0:3',
+            isWon: true,
+            predictionStatus: 'won' as const,
+            gameDate: '14/10 19:00'
+          };
+        }
+
+        // Slovan Bratislava vs Stuttgart official finished 0:3
         if ((title.includes('slovan') || title.includes('bratislava')) && title.includes('stuttgart')) {
           hasChange = true;
           return {
@@ -188,7 +216,9 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             ftScore: '0:3',
             liveScore: '0:3',
             liveTime: 'Finished',
-            outcome: sel.outcome === '2:1' || sel.outcome === 'Home' ? 'Away' : (sel.outcome || 'Away')
+            outcome: sel.outcome === '2:1' || sel.outcome === 'Home' ? 'Away' : (sel.outcome || '0:3'),
+            isWon: true,
+            predictionStatus: 'won' as const
           };
         }
         return sel;
@@ -197,6 +227,8 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (hasChange) {
         return {
           ...bet,
+          totalOdds: bet.id === 'bet-ucl-cs-lask-villa' ? 159.50 : bet.totalOdds,
+          potentialWin: bet.id === 'bet-ucl-cs-lask-villa' ? 1595.00 : bet.potentialWin,
           selections: updatedSelections
         };
       }
@@ -210,13 +242,25 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return normalizeBetsWithRealScores(parsed);
+          const normalized = normalizeBetsWithRealScores(parsed);
+          try {
+            localStorage.setItem('sportybet_open_bets', JSON.stringify(normalized));
+          } catch {}
+          return normalized;
         }
       } catch {
-        return normalizeBetsWithRealScores(INITIAL_OPEN_BETS);
+        const initial = normalizeBetsWithRealScores(INITIAL_OPEN_BETS);
+        try {
+          localStorage.setItem('sportybet_open_bets', JSON.stringify(initial));
+        } catch {}
+        return initial;
       }
     }
-    return normalizeBetsWithRealScores(INITIAL_OPEN_BETS);
+    const initial = normalizeBetsWithRealScores(INITIAL_OPEN_BETS);
+    try {
+      localStorage.setItem('sportybet_open_bets', JSON.stringify(initial));
+    } catch {}
+    return initial;
   });
 
   const [betHistory, setBetHistory] = useState<PlacedBet[]>(() => {
@@ -225,11 +269,19 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return normalizeBetsWithRealScores(parsed);
+          const normalized = normalizeBetsWithRealScores(parsed);
+          try {
+            localStorage.setItem('sportybet_bet_history_v4', JSON.stringify(normalized));
+          } catch {}
+          return normalized;
         }
       } catch {}
     }
-    return normalizeBetsWithRealScores(INITIAL_BET_HISTORY);
+    const initial = normalizeBetsWithRealScores(INITIAL_BET_HISTORY);
+    try {
+      localStorage.setItem('sportybet_bet_history_v4', JSON.stringify(initial));
+    } catch {}
+    return initial;
   });
 
   const [user, setUser] = useState<UserProfile>(() => {
