@@ -84,3 +84,28 @@ footballRouter.get('/fixtures', async (req: Request, res: Response) => {
     return res.status(500).json({ success: false, error: err.message });
   }
 });
+
+// 4. End Match Results Endpoint: /results (mounted at /api/football/results and /football/results)
+footballRouter.get('/results', async (req: Request, res: Response) => {
+  const { date, league, season } = req.query;
+  try {
+    const result = await sportsService.getFinishedResults('football', {
+      date: typeof date === 'string' ? date : undefined,
+      league: typeof league === 'string' ? league : undefined,
+      season: typeof season === 'string' ? season : undefined
+    });
+
+    return res.json({
+      success: true,
+      source: result.source,
+      cached: result.cached,
+      stale: result.stale,
+      lastUpdated: result.lastUpdated,
+      count: result.results.length,
+      data: result.results
+    });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+

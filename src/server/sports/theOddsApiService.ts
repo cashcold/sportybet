@@ -42,7 +42,7 @@ export const SUPPORTED_LEAGUES: TheOddsSportDef[] = [
 ];
 
 export function getTheOddsApiKey(): string {
-  return (process.env.THE_ODDS_API_KEY || 'cae042eb472e9a12bf139e8dc5369281').trim();
+  return (process.env.THE_ODDS_API_KEY || '').trim();
 }
 
 class TheOddsApiService {

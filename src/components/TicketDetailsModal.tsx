@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   Share2,
   Check,
+  X,
   Trophy,
   Sparkles,
   Copy
@@ -204,19 +205,19 @@ export const TicketDetailsModal: React.FC<TicketDetailsModalProps> = ({
         <div className="px-3.5 divide-y divide-[#1e2a39]">
           {bet.selections.map((sel, idx) => {
             const details = resolveWinningPredictionDetails(sel);
-            const isMatchWon = isGreen || sel.isWon;
+            const isMatchWon = isGreen ? true : details.isWon;
 
             return (
               <div key={idx} className="py-4 flex items-start space-x-3.5">
-                {/* Left Side: Solid Green Circle with White/Black Checkmark */}
+                {/* Left Side: Solid Green Circle (Won) or Red Circle (Lost) */}
                 <div className="pt-1 shrink-0">
                   {isMatchWon ? (
                     <div className="w-5 h-5 rounded-full bg-[#00df59] flex items-center justify-center shadow-md">
                       <Check className="w-3.5 h-3.5 text-black stroke-[3.5]" />
                     </div>
                   ) : (
-                    <div className="w-5 h-5 rounded-full border-2 border-neutral-500 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-neutral-400" />
+                    <div className="w-5 h-5 rounded-full bg-[#e41b23] flex items-center justify-center shadow-md">
+                      <X className="w-3.5 h-3.5 text-white stroke-[3.5]" />
                     </div>
                   )}
                 </div>
@@ -233,7 +234,7 @@ export const TicketDetailsModal: React.FC<TicketDetailsModalProps> = ({
                     {details.formattedMatchTitle}
                   </div>
 
-                  {/* Row 3: FT Score: 2:0 | 📗 Match Tracker */}
+                  {/* Row 3: FT Score | 📗 Match Tracker */}
                   <div className="flex items-center space-x-2 text-xs">
                     <span className="text-neutral-300">
                       FT Score:{' '}
@@ -258,14 +259,19 @@ export const TicketDetailsModal: React.FC<TicketDetailsModalProps> = ({
                       <Trophy className="w-12 h-12 stroke-[1.2]" />
                     </div>
 
-                    {/* Pick Row: Pick: Home @1.69 ✔ */}
+                    {/* Pick Row: Pick: Home @1.69 ✔ or ✕ */}
                     <div className="flex items-center space-x-1.5 text-neutral-300">
                       <span className="text-neutral-400">Pick:</span>
                       <strong className="text-white font-bold tracking-tight">
                         {details.pickText}
                       </strong>
-                      {isMatchWon && (
+                      {isMatchWon ? (
                         <Check className="w-3.5 h-3.5 text-[#00df59] stroke-[3] ml-0.5" />
+                      ) : (
+                        <span className="text-[#ff4d4f] text-[11px] font-bold ml-1.5 flex items-center space-x-0.5">
+                          <X className="w-3 h-3 stroke-[3]" />
+                          <span>(Lost)</span>
+                        </span>
                       )}
                     </div>
 
@@ -279,8 +285,13 @@ export const TicketDetailsModal: React.FC<TicketDetailsModalProps> = ({
                     <div className="flex items-center space-x-1.5 text-neutral-300">
                       <span className="text-neutral-400">Outcome:</span>
                       <strong className="text-white font-bold">
-                        {isMatchWon ? details.outcome : 'Pending'}
+                        {details.outcome}
                       </strong>
+                      {isMatchWon ? (
+                        <span className="text-[#00df59] text-[10px] font-bold bg-[#143220] px-1.5 py-0.5 rounded ml-1">Won</span>
+                      ) : (
+                        <span className="text-[#ff4d4f] text-[10px] font-bold bg-[#331416] px-1.5 py-0.5 rounded ml-1">Lost</span>
+                      )}
                     </div>
                   </div>
                 </div>

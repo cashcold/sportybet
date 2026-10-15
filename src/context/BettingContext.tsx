@@ -208,7 +208,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           };
         }
 
-        // Slovan Bratislava vs Stuttgart official finished 0:3
+        // Slovan Bratislava vs Stuttgart official finished 0:3 (Correct pick)
         if ((title.includes('slovan') || title.includes('bratislava')) && title.includes('stuttgart')) {
           hasChange = true;
           return {
@@ -216,19 +216,39 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             ftScore: '0:3',
             liveScore: '0:3',
             liveTime: 'Finished',
-            outcome: sel.outcome === '2:1' || sel.outcome === 'Home' ? 'Away' : (sel.outcome || '0:3'),
+            outcome: '0:3',
             isWon: true,
             predictionStatus: 'won' as const
           };
         }
+
+        // LASK vs Liverpool official finished 1:3
+        if (title.includes('lask') || title.includes('liverpool')) {
+          hasChange = true;
+          const isLaskPickCorrect = sel.selectionName === '1:3' || sel.selectionName === '2' || sel.selectionName?.toLowerCase() === 'away';
+          return {
+            ...sel,
+            selectionName: sel.selectionName === '1:3' ? '2:1' : (sel.selectionName || '2:1'),
+            ftScore: '1:3',
+            liveScore: '1:3',
+            liveTime: 'Finished',
+            outcome: '1:3',
+            isWon: false,
+            predictionStatus: 'lost' as const
+          };
+        }
+
         return sel;
       });
 
       if (hasChange) {
+        const hasLostLeg = updatedSelections?.some(s => s.isWon === false || s.predictionStatus === 'lost');
         return {
           ...bet,
           totalOdds: bet.id === 'bet-ucl-cs-lask-villa' ? 159.50 : bet.totalOdds,
           potentialWin: bet.id === 'bet-ucl-cs-lask-villa' ? 1595.00 : bet.potentialWin,
+          status: hasLostLeg ? 'lost' : bet.status,
+          isAllGreen: !hasLostLeg,
           selections: updatedSelections
         };
       }

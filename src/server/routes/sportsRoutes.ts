@@ -126,6 +126,36 @@ sportsRouter.get('/:sport/fixtures', async (req: Request, res: Response) => {
   }
 });
 
+// 4b. GET /api/sports/:sport/results - Finished End Match Results (45-minute cache)
+sportsRouter.get('/:sport/results', async (req: Request, res: Response) => {
+  const { sport } = req.params;
+  const { date, league, season } = req.query;
+
+  try {
+    const result = await sportsService.getFinishedResults(sport, {
+      date: typeof date === 'string' ? date : undefined,
+      league: typeof league === 'string' ? league : undefined,
+      season: typeof season === 'string' ? season : undefined
+    });
+
+    res.json({
+      success: true,
+      sport,
+      count: result.results.length,
+      cached: result.cached,
+      stale: result.stale,
+      lastUpdated: result.lastUpdated,
+      source: result.source,
+      data: result.results
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
 // 5. GET /api/sports/:sport/standings - Standings (45-minute cache)
 sportsRouter.get('/:sport/standings', async (req: Request, res: Response) => {
   const { sport } = req.params;

@@ -1,80 +1,26 @@
 import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
-import { createServer as createViteServer } from 'vite';
-import express from 'express';
-import { app } from './src/server/app';
-import { connectToDatabase } from './src/server/mongodb';
+import { spawn } from 'child_process';
 
-const PORT = 3000;
+const isTsxEnvironment = Boolean(
+  process.env.TSX_READY ||
+  process.env.npm_lifecycle_script?.includes('tsx') ||
+  process.execArgv.some(arg => arg.includes('tsx'))
+);
 
-async function startServer() {
-  // Connect to MongoDB if configured
-  try {
-    await connectToDatabase();
-  } catch (err: any) {
-    console.warn('[MongoDB Startup Notice]', err?.message || err);
-  }
-
-  const distPath = path.join(process.cwd(), 'dist');
-  const indexPath = path.join(distPath, 'index.html');
-  const hasDist = fs.existsSync(indexPath);
-
-  // Mount Vite middleware in development or when dist bundle is missing
-  if (process.env.NODE_ENV !== 'production' || !hasDist) {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-
-    // Guard: Prevent unhandled API routes from reaching Vite SPA html fallback
-    app.use((req, res, next) => {
-      if (
-        req.path.startsWith('/api') ||
-        req.path.startsWith('/auth') ||
-        req.path.startsWith('/wallet') ||
-        req.path.startsWith('/bets') ||
-        req.path.startsWith('/matches') ||
-        req.path.startsWith('/football') ||
-        req.path.startsWith('/sports') ||
-        req.path.startsWith('/admin') ||
-        req.path.startsWith('/aviator')
-      ) {
-        return res.status(404).json({
-          success: false,
-          error: `API route not found: ${req.method} ${req.originalUrl}`
-        });
-      }
-      next();
-    });
-
-    app.use(vite.middlewares);
+if (!isTsxEnvironment) {
+  const distServer = path.join(process.cwd(), 'dist', 'server.cjs');
+  if (fs.existsSync(distServer) && process.env.NODE_ENV === 'production') {
+    const child = spawn('node', [distServer], { stdio: 'inherit', env: process.env });
+    child.on('exit', (code) => process.exit(code ?? 0));
   } else {
-    app.use(express.static(distPath));
-    app.get('*', (req, res, next) => {
-      if (
-        req.path.startsWith('/api') ||
-        req.path.startsWith('/auth') ||
-        req.path.startsWith('/wallet') ||
-        req.path.startsWith('/bets') ||
-        req.path.startsWith('/matches') ||
-        req.path.startsWith('/football') ||
-        req.path.startsWith('/sports') ||
-        req.path.startsWith('/admin') ||
-        req.path.startsWith('/aviator')
-      ) {
-        return res.status(404).json({
-          success: false,
-          error: `API route not found: ${req.method} ${req.originalUrl}`
-        });
-      }
-      res.sendFile(indexPath);
+    const child = spawn('node', ['--import', 'tsx', 'server.ts', ...process.argv.slice(2)], {
+      stdio: 'inherit',
+      env: { ...process.env, TSX_READY: '1' }
     });
+    child.on('exit', (code) => process.exit(code ?? 0));
   }
-
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`SportyBet Ghana Full-Stack Server running on port ${PORT}`);
-  });
+} else {
+  await import('./src/server/startServer');
 }
-
-startServer();

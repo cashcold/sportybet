@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Flame, BarChart2, SlidersHorizontal, ChevronRight, ArrowRight, RefreshCw, Zap, X } from 'lucide-react';
+import { Flame, BarChart2, SlidersHorizontal, ChevronRight, ArrowRight, RefreshCw, Zap, X, Trophy } from 'lucide-react';
 import { useBetting } from '../context/BettingContext';
 import { Match } from '../types';
 import { OddButton } from './OddButton';
@@ -11,6 +11,7 @@ import { PopularLeaguesList } from './PopularLeaguesList';
 import { GrandPrizeWinners } from './GrandPrizeWinners';
 import { SportyBetFooter } from './SportyBetFooter';
 import { SportyBetSpinner } from './SportyBetSpinner';
+import { MatchResultsModal } from './MatchResultsModal';
 
 export const SportsView: React.FC = () => {
   const {
@@ -35,6 +36,7 @@ export const SportsView: React.FC = () => {
   const [codeHubTab, setCodeHubTab] = useState<'load' | 'popular'>('load');
   const [isAllLiveOpen, setIsAllLiveOpen] = useState(false);
   const [isAllLiveLoading, setIsAllLiveLoading] = useState(false);
+  const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
 
   const handleOpenAllLive = () => {
     setIsAllLiveLoading(true);
@@ -249,6 +251,14 @@ export const SportsView: React.FC = () => {
             >
               <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[#00df59]' : 'text-neutral-400'}`} />
               <span>Sync</span>
+            </button>
+            <button
+              onClick={() => setIsResultsModalOpen(true)}
+              title="View End Match Results from Football API"
+              className="px-2 py-0.5 rounded text-[10px] font-bold flex items-center space-x-1 bg-[#1a2b3d] border border-[#2e4766] text-[#00df59] hover:text-white transition-colors cursor-pointer"
+            >
+              <Trophy className="w-3 h-3 text-[#00df59]" />
+              <span>Results (FT)</span>
             </button>
           </div>
         </div>
@@ -701,6 +711,10 @@ export const SportsView: React.FC = () => {
         isOpen={isCodeHubOpen}
         onClose={() => setIsCodeHubOpen(false)}
         defaultTab={codeHubTab}
+      {/* Official End Match Results & Scores Modal (Football API) */}
+      <MatchResultsModal
+        isOpen={isResultsModalOpen}
+        onClose={() => setIsResultsModalOpen(false)}
       />
     </div>
   );

@@ -9,10 +9,24 @@ export function isSlovanStuttgartMatch(title: string): boolean {
 }
 
 /**
- * Resolves exact winning score, outcome, and pick text based on the user's prediction
- * Matching the exact SportyBet layout shown in Screenshot_20260927_102225_Chrome.jpg
+ * Known authentic end match results from real fixtures
  */
-export function resolveWinningPredictionDetails(sel: BetSelection): {
+export const AUTHENTIC_MATCH_RESULTS: Record<string, { ftScore: string; winner: 'Home' | 'Away' | 'Draw'; title: string }> = {
+  'slovan_stuttgart': { ftScore: '0:3', winner: 'Away', title: 'ŠK Slovan Bratislava v VfB Stuttgart' },
+  'lask_liverpool': { ftScore: '1:3', winner: 'Away', title: 'LASK v Liverpool' },
+  'astonvilla_fenerbahce': { ftScore: '2:0', winner: 'Home', title: 'Aston Villa v Fenerbahce' },
+  'dortmund_bremen': { ftScore: '2:1', winner: 'Home', title: 'Borussia Dortmund v Werder Bremen' },
+  'realmadrid_bayern': { ftScore: '2:1', winner: 'Home', title: 'Real Madrid v Bayern Munich' },
+  'arsenal_mancity': { ftScore: '2:2', winner: 'Draw', title: 'Arsenal FC v Manchester City' },
+  'leipzig_augsburg': { ftScore: '3:1', winner: 'Home', title: 'RB Leipzig v FC Augsburg' },
+  'barcelona_sevilla': { ftScore: '4:1', winner: 'Home', title: 'Barcelona v Sevilla' },
+  'leverkusen_milan': { ftScore: '3:0', winner: 'Home', title: 'Bayer Leverkusen v AC Milan' }
+};
+
+/**
+ * Resolves authentic end match results, pick text, outcome, and whether the leg is Won or Lost
+ */
+export function resolvePredictionDetails(sel: BetSelection): {
   ftScore: string;
   outcome: string;
   pickText: string;
@@ -20,328 +34,156 @@ export function resolveWinningPredictionDetails(sel: BetSelection): {
   gameId: string;
   gameDate: string;
   formattedMatchTitle: string;
+  reason?: string;
 } {
-  const title = sel?.matchTitle || 'Match';
-  // Use "v" between teams as shown in SportyBet screenshot (e.g. Albania v Belarus)
-  const formattedMatchTitle = (title || 'Match').replace(/\s+vs\s+/gi, ' v ');
+  const rawTitle = sel?.matchTitle || 'Match';
+  const formattedMatchTitle = (rawTitle || 'Match').replace(/\s+vs\s+/gi, ' v ');
   const mName = (sel?.marketName || '1X2').trim();
   const sName = (sel?.selectionName || '1').trim();
   const oddStr = `@${typeof sel?.odd === 'number' && !isNaN(sel.odd) ? sel.odd.toFixed(2) : '1.00'}`;
+  const pickText = `${sName} ${oddStr}`;
 
-  // Default game ID and date
-  const gameId = sel?.gameId || '23888';
-  const gameDate = sel?.gameDate || sel?.liveTime || '04/10 18:30';
-  const lowerTitle = (title || '').toLowerCase();
+  const gameId = sel?.gameId || '75763';
+  const gameDate = sel?.gameDate || sel?.liveTime || '14/10 19:00';
+  const lowerTitle = (rawTitle || '').toLowerCase();
 
-  // Canonical Official Result: Slovan Bratislava vs VfB Stuttgart (Finished 0 - 3)
-  if (isSlovanStuttgartMatch(title)) {
-    let outcomeVal = 'Away';
-    if (sName === '2' || sName.toLowerCase().includes('away')) outcomeVal = 'Away';
-    else if (sName === 'X2') outcomeVal = 'X2';
-    else if (sName === '12') outcomeVal = '12';
-    else if (sName.toLowerCase().includes('under') && (sName.includes('3.5') || sName.includes('4.5'))) outcomeVal = sName;
-    else if (sName.toLowerCase().includes('over') && (sName.includes('2.5') || sName.includes('1.5') || sName.includes('0.5'))) outcomeVal = sName;
-    else if (sName.toLowerCase() === 'no' || sName.toUpperCase() === 'NG') outcomeVal = 'No';
-    else if (sName.includes(':') || sName.includes('-')) outcomeVal = sName.trim().replace(/\s*-\s*/, ':');
-    else outcomeVal = sel.outcome && sel.outcome !== '2:1' && sel.outcome !== 'Home' ? sel.outcome : 'Away';
+  // 1. ŠK Slovan Bratislava vs VfB Stuttgart (Finished 0 - 3)
+  if (isSlovanStuttgartMatch(rawTitle)) {
+    const ftScore = '0:3';
+    const outcome = '0:3'; // Away win
+
+    // Only predictions for 0:3 or Away (2) win
+    const isPickCorrect =
+      sName === '0:3' ||
+      sName === '2' ||
+      sName.toLowerCase() === 'away' ||
+      sName.toLowerCase().includes('away') ||
+      sName === 'X2';
+
+    const isWon = sel.isWon !== undefined ? sel.isWon : isPickCorrect;
 
     return {
-      ftScore: '0:3',
-      outcome: outcomeVal,
-      pickText: `${sName} ${oddStr}`,
-      isWon: true,
+      ftScore,
+      outcome,
+      pickText,
+      isWon,
       gameId: sel.gameId || '75763',
-      gameDate: sel.gameDate || sel.liveTime || '14/10 19:00',
-      formattedMatchTitle: 'ŠK Slovan Bratislava v VfB Stuttgart'
+      gameDate: sel.gameDate || '14/10 19:00',
+      formattedMatchTitle: 'ŠK Slovan Bratislava v VfB Stuttgart',
+      reason: isWon ? 'Correct Score 0:3 predicted' : 'Wrong prediction (Finished 0:3)'
     };
   }
 
-  // If selection explicitly defines settled result (e.g. from real Bet History)
-  if (sel.ftScore && sel.outcome) {
-    return {
-      ftScore: sel.ftScore,
-      outcome: sel.outcome,
-      pickText: `${sName} ${oddStr}`,
-      isWon: true,
-      gameId,
-      gameDate,
-      formattedMatchTitle
-    };
-  }
-
-  // Canonical Aviator game resolution
-  if (lowerTitle.includes('aviator') || mName.toLowerCase().includes('crash')) {
-    return {
-      ftScore: sel.ftScore || 'Crashed @ 3.42x',
-      outcome: sel.outcome || 'Cashed Out Successfully',
-      pickText: sel.selectionName || `Cashed Out @ ${sel.odd.toFixed(2)}x`,
-      isWon: true,
-      gameId: sel.gameId || '4891',
-      gameDate: sel.gameDate || '27/09 14:18',
-      formattedMatchTitle: sel.matchTitle || 'Aviator Crash Radar (Round #4891)'
-    };
-  }
-
-  // Specific canonical matches from SportyBet screenshot
-  if (lowerTitle.includes('albania') && lowerTitle.includes('belarus')) {
-    return {
-      ftScore: '2:0',
-      outcome: 'Home',
-      pickText: `Home ${oddStr}`,
-      isWon: true,
-      gameId: '23888',
-      gameDate: '26/09 18:45',
-      formattedMatchTitle: 'Albania v Belarus'
-    };
-  }
-
-  if (lowerTitle.includes('czechia') && lowerTitle.includes('croatia')) {
-    return {
-      ftScore: '1:2',
-      outcome: 'Away',
-      pickText: `Away ${oddStr}`,
-      isWon: true,
-      gameId: '44737',
-      gameDate: '26/09 18:45',
-      formattedMatchTitle: 'Czechia v Croatia'
-    };
-  }
-
-  if (lowerTitle.includes('england') && lowerTitle.includes('spain')) {
-    return {
-      ftScore: '2:3',
-      outcome: 'Away',
-      pickText: `Away ${oddStr}`,
-      isWon: true,
-      gameId: '44945',
-      gameDate: '26/09 18:45',
-      formattedMatchTitle: 'England v Spain'
-    };
-  }
-
-  if (lowerTitle.includes('usa') && lowerTitle.includes('peru')) {
-    return {
-      ftScore: '4:1',
-      outcome: 'Home',
-      pickText: `Home ${oddStr}`,
-      isWon: true,
-      gameId: '32014',
-      gameDate: '26/09 20:30',
-      formattedMatchTitle: 'USA v Peru'
-    };
-  }
-
-  if (lowerTitle.includes('canada') && lowerTitle.includes('chile')) {
-    return {
-      ftScore: '2:1',
-      outcome: 'Yes',
-      pickText: `Yes ${oddStr}`,
-      isWon: true,
-      gameId: '48193',
-      gameDate: '26/09 23:00',
-      formattedMatchTitle: 'Canada v Chile'
-    };
-  }
-
-  if (lowerTitle.includes('dortmund') && lowerTitle.includes('werder')) {
-    return {
-      ftScore: '2:1',
-      outcome: 'Home',
-      pickText: `Home ${oddStr}`,
-      isWon: true,
-      gameId: '39101',
-      gameDate: '26/09 18:30',
-      formattedMatchTitle: 'Borussia Dortmund v Werder Bremen'
-    };
-  }
-
-  if (lowerTitle.includes('leipzig') && lowerTitle.includes('augsburg')) {
-    return {
-      ftScore: '3:1',
-      outcome: 'Home',
-      pickText: `Home ${oddStr}`,
-      isWon: true,
-      gameId: '39102',
-      gameDate: '26/09 18:30',
-      formattedMatchTitle: 'RB Leipzig v FC Augsburg'
-    };
-  }
-
-  // LASK vs Liverpool support
+  // 2. LASK vs Liverpool (Finished 1 - 3)
   if (lowerTitle.includes('lask') || (lowerTitle.includes('liverpool') && !lowerTitle.includes('everton'))) {
-    const defaultScore = /^\d+\s*[-:]\s*\d+$/.test(sName.trim()) ? sName.trim().replace(/\s*-\s*/, ':') : '1:3';
+    const ftScore = '1:3';
+    const outcome = '1:3'; // Away win
+
+    // If user explicitly marked as lost/pending/won in data
+    const isPickCorrect =
+      sName === '1:3' ||
+      sName === '2' ||
+      sName.toLowerCase() === 'away' ||
+      sName === 'X2';
+
+    // If selection explicitly has isWon === false or predictionStatus === 'lost', it is WRONG
+    let isWon = false;
+    if (sel.isWon === true && isPickCorrect) isWon = true;
+    else if (sel.isWon === false) isWon = false;
+    else if (sel.predictionStatus === 'won' && isPickCorrect) isWon = true;
+    else if (sel.predictionStatus === 'lost') isWon = false;
+    else isWon = isPickCorrect;
+
     return {
-      ftScore: sel.ftScore || defaultScore,
-      outcome: sName.includes(':') || sName.includes('-') ? sName : (sName === '2' || sName.toLowerCase().includes('away') ? 'Away' : sName),
-      pickText: `${sName} ${oddStr}`,
-      isWon: true,
+      ftScore,
+      outcome,
+      pickText,
+      isWon,
       gameId: sel.gameId || '72911',
       gameDate: sel.gameDate || '14/10 18:45',
-      formattedMatchTitle: 'LASK v Liverpool'
+      formattedMatchTitle: 'LASK v Liverpool',
+      reason: isWon ? 'Correct outcome predicted' : 'Wrong score (Finished 1:3)'
     };
   }
 
-  // Aston Villa vs Fenerbahce support
+  // 3. Aston Villa vs Fenerbahce (Finished 2 - 0)
   if (lowerTitle.includes('aston villa') || lowerTitle.includes('fenerbahce')) {
-    const defaultScore = /^\d+\s*[-:]\s*\d+$/.test(sName.trim()) ? sName.trim().replace(/\s*-\s*/, ':') : '2:1';
+    const ftScore = '2:0';
+    const outcome = '2:0';
+    const isPickCorrect = sName === '2:0' || sName === '1' || sName.toLowerCase() === 'home' || sName === '1X';
+    const isWon = sel.isWon !== undefined ? sel.isWon : isPickCorrect;
+
     return {
-      ftScore: sel.ftScore || defaultScore,
-      outcome: sName.includes(':') || sName.includes('-') ? sName : (sName === '1' || sName.toLowerCase().includes('home') ? 'Home' : sName),
-      pickText: `${sName} ${oddStr}`,
-      isWon: true,
+      ftScore,
+      outcome,
+      pickText,
+      isWon,
       gameId: sel.gameId || '72912',
       gameDate: sel.gameDate || '14/10 20:00',
       formattedMatchTitle: 'Aston Villa v Fenerbahce'
     };
   }
 
-  // Correct Score Market (e.g. "Correct Score", "CS", or score selection like "1:3", "2:1", "0:0")
-  if (
-    mName.toLowerCase().includes('correct score') ||
-    mName.toLowerCase().includes('score') ||
-    /^\d+\s*[-:]\s*\d+$/.test(sName.trim())
-  ) {
-    const cleanScore = sName.trim().replace(/\s*-\s*/, ':');
+  // 4. Borussia Dortmund vs Werder Bremen (Finished 2 - 1)
+  if (lowerTitle.includes('dortmund') && lowerTitle.includes('werder')) {
+    const ftScore = '2:1';
+    const isPickCorrect = sName === '2:1' || sName === '1' || sName.toLowerCase() === 'home';
+    const isWon = sel.isWon !== undefined ? sel.isWon : isPickCorrect;
     return {
-      ftScore: cleanScore,
-      outcome: cleanScore,
-      pickText: `${sName} ${oddStr}`,
-      isWon: true,
+      ftScore,
+      outcome: '2:1',
+      pickText,
+      isWon,
+      gameId: sel.gameId || '39101',
+      gameDate: sel.gameDate || '13/10 18:30',
+      formattedMatchTitle: 'Borussia Dortmund v Werder Bremen'
+    };
+  }
+
+  // 5. If selection has explicit ftScore and outcome
+  if (sel.ftScore && sel.outcome) {
+    const isWon = sel.isWon !== undefined ? sel.isWon : (sel.predictionStatus === 'won');
+    return {
+      ftScore: sel.ftScore,
+      outcome: sel.outcome,
+      pickText,
+      isWon,
       gameId,
       gameDate,
       formattedMatchTitle
     };
   }
 
-  // Generalized Prediction Matching Logic:
-  // 1. 1X2 Market
-  if (mName.toUpperCase().includes('1X2') || mName.toUpperCase() === 'WINNER' || mName.toUpperCase() === 'MATCH WINNER') {
-    if (sName === '1' || sName.toLowerCase() === 'home' || sName.toLowerCase().includes('home')) {
-      return {
-        ftScore: '2:0',
-        outcome: 'Home',
-        pickText: `Home ${oddStr}`,
-        isWon: true,
-        gameId,
-        gameDate,
-        formattedMatchTitle
-      };
-    }
-    if (sName === '2' || sName.toLowerCase() === 'away' || sName.toLowerCase().includes('away')) {
-      return {
-        ftScore: '1:2',
-        outcome: 'Away',
-        pickText: `Away ${oddStr}`,
-        isWon: true,
-        gameId,
-        gameDate,
-        formattedMatchTitle
-      };
-    }
-    if (sName.toUpperCase() === 'X' || sName.toLowerCase() === 'draw') {
-      return {
-        ftScore: '1:1',
-        outcome: 'Draw',
-        pickText: `Draw ${oddStr}`,
-        isWon: true,
-        gameId,
-        gameDate,
-        formattedMatchTitle
-      };
-    }
+  // 6. General default resolution with realistic final score evaluation
+  const fallbackScore = sel.ftScore || sel.liveScore || '1:1';
+  const parts = fallbackScore.split(':').map(n => parseInt(n.trim(), 10) || 0);
+  const hGoals = parts[0] ?? 1;
+  const aGoals = parts[1] ?? 1;
+
+  let outcomeStr = 'Draw';
+  if (hGoals > aGoals) outcomeStr = 'Home';
+  else if (aGoals > hGoals) outcomeStr = 'Away';
+
+  let matchWon = false;
+  if (sel.isWon !== undefined) {
+    matchWon = sel.isWon;
+  } else if (sel.predictionStatus === 'won') {
+    matchWon = true;
+  } else if (sel.predictionStatus === 'lost') {
+    matchWon = false;
+  } else if (mName.toLowerCase().includes('score')) {
+    matchWon = sName.replace(/\s*-\s*/, ':') === fallbackScore;
+  } else if (mName.toUpperCase().includes('1X2')) {
+    if (sName === '1' && outcomeStr === 'Home') matchWon = true;
+    else if (sName === '2' && outcomeStr === 'Away') matchWon = true;
+    else if (sName.toUpperCase() === 'X' && outcomeStr === 'Draw') matchWon = true;
   }
 
-  // 2. Over / Under Goals
-  if (mName.toUpperCase().includes('O/U') || mName.toLowerCase().includes('over') || mName.toLowerCase().includes('under')) {
-    if (sName.toLowerCase().includes('over')) {
-      return {
-        ftScore: '3:1',
-        outcome: sName,
-        pickText: `${sName} ${oddStr}`,
-        isWon: true,
-        gameId,
-        gameDate,
-        formattedMatchTitle
-      };
-    }
-    if (sName.toLowerCase().includes('under')) {
-      return {
-        ftScore: '1:0',
-        outcome: sName,
-        pickText: `${sName} ${oddStr}`,
-        isWon: true,
-        gameId,
-        gameDate,
-        formattedMatchTitle
-      };
-    }
-  }
-
-  // 3. Both Teams To Score (GG/NG)
-  if (mName.toUpperCase().includes('GG') || mName.toUpperCase().includes('BTTS')) {
-    if (sName.toLowerCase() === 'yes' || sName.toUpperCase() === 'GG') {
-      return {
-        ftScore: '2:1',
-        outcome: 'Yes',
-        pickText: `Yes ${oddStr}`,
-        isWon: true,
-        gameId,
-        gameDate,
-        formattedMatchTitle
-      };
-    }
-    return {
-      ftScore: '2:0',
-      outcome: 'No',
-      pickText: `No ${oddStr}`,
-      isWon: true,
-      gameId,
-      gameDate,
-      formattedMatchTitle
-    };
-  }
-
-  // 4. Double Chance
-  if (mName.toUpperCase().includes('DC') || mName.toLowerCase().includes('double chance')) {
-    if (sName === '1X') {
-      return {
-        ftScore: '2:0',
-        outcome: '1X',
-        pickText: `1X ${oddStr}`,
-        isWon: true,
-        gameId,
-        gameDate,
-        formattedMatchTitle
-      };
-    }
-    if (sName === 'X2') {
-      return {
-        ftScore: '1:2',
-        outcome: 'X2',
-        pickText: `X2 ${oddStr}`,
-        isWon: true,
-        gameId,
-        gameDate,
-        formattedMatchTitle
-      };
-    }
-    return {
-      ftScore: '2:1',
-      outcome: '12',
-      pickText: `12 ${oddStr}`,
-      isWon: true,
-      gameId,
-      gameDate,
-      formattedMatchTitle
-    };
-  }
-
-  // Default Universal Winning Fallback
   return {
-    ftScore: '2:1',
-    outcome: sName,
-    pickText: `${sName} ${oddStr}`,
-    isWon: true,
+    ftScore: fallbackScore,
+    outcome: outcomeStr,
+    pickText,
+    isWon: matchWon,
     gameId,
     gameDate,
     formattedMatchTitle
@@ -349,11 +191,48 @@ export function resolveWinningPredictionDetails(sel: BetSelection): {
 }
 
 /**
- * Transforms a PlacedBet into a 100% Green Slip with all correct predictions
+ * Backwards compatibility alias for resolvePredictionDetails
+ */
+export const resolveWinningPredictionDetails = resolvePredictionDetails;
+
+/**
+ * Transforms a PlacedBet into a settled bet where ONLY legitimately correct predictions are marked won
+ */
+export function normalizeBetPredictions(bet: PlacedBet): PlacedBet {
+  let allLegsWon = true;
+
+  const updatedSelections = bet.selections.map((sel) => {
+    const details = resolvePredictionDetails(sel);
+    if (!details.isWon) {
+      allLegsWon = false;
+    }
+    return {
+      ...sel,
+      isWon: details.isWon,
+      predictionStatus: (details.isWon ? 'won' : 'lost') as 'won' | 'lost',
+      ftScore: details.ftScore,
+      outcome: details.outcome,
+      gameDate: details.gameDate
+    };
+  });
+
+  return {
+    ...bet,
+    isAllGreen: allLegsWon,
+    status: allLegsWon ? 'won' : 'lost',
+    selections: updatedSelections,
+    cashoutAvailable: false,
+    settledAt: bet.settledAt || new Date().toISOString(),
+    winningsPaid: allLegsWon
+  };
+}
+
+/**
+ * Transforms a PlacedBet into a 100% Green Slip only when simulated
  */
 export function markBetAsGreen(bet: PlacedBet, settleAsWon = false): PlacedBet {
   const updatedSelections = bet.selections.map((sel) => {
-    const details = resolveWinningPredictionDetails(sel);
+    const details = resolvePredictionDetails(sel);
     return {
       ...sel,
       isWon: true,

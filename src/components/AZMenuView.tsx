@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Search, Trophy, Flame, Star, Flag, Gift, Calendar, ChevronRight } from 'lucide-react';
 import { SPORTS_LIST, LEAGUES_LIST } from '../data/mockData';
 import { useBetting } from '../context/BettingContext';
+import { MatchResultsModal } from './MatchResultsModal';
 
 export const AZMenuView: React.FC = () => {
   const { setSelectedSport, setSelectedLeagueFilter, setActiveTab, showToast } = useBetting();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSportItem, setSelectedSportItem] = useState('popular');
   const [azSubTab, setAzSubTab] = useState<'sports' | 'live' | 'promotions' | 'fixtures'>('sports');
+  const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
 
   const quickIcons = [
     { id: 'virtuals', label: 'Virtuals', icon: <span className="font-black italic text-lg">V</span>, color: 'text-white' },
@@ -64,8 +66,14 @@ export const AZMenuView: React.FC = () => {
           {quickIcons.map(item => (
             <button
               key={item.id}
-              onClick={() => showToast(`Opening ${item.label}...`)}
-              className="flex flex-col items-center justify-center p-1 hover:bg-white/10 rounded transition-colors"
+              onClick={() => {
+                if (item.id === 'results' || item.id === 'livescore') {
+                  setIsResultsModalOpen(true);
+                } else {
+                  showToast(`Opening ${item.label}...`);
+                }
+              }}
+              className="flex flex-col items-center justify-center p-1 hover:bg-white/10 rounded transition-colors cursor-pointer"
             >
               <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center mb-1">
                 {item.icon}
@@ -151,6 +159,13 @@ export const AZMenuView: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Official End Match Results & Scores Modal (Football API) */}
+      <MatchResultsModal
+        isOpen={isResultsModalOpen}
+        onClose={() => setIsResultsModalOpen(false)}
+      />
     </div>
   );
 };
+

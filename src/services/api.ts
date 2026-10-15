@@ -487,6 +487,30 @@ export const api = {
       }
     },
 
+    async getResults(sport: string = 'football', params?: { date?: string; league?: string; season?: string }): Promise<{
+      success: boolean;
+      count?: number;
+      data?: any[];
+      cached?: boolean;
+      stale?: boolean;
+      lastUpdated?: string;
+      source?: string;
+      error?: string;
+    }> {
+      const query = new URLSearchParams();
+      if (params?.date) query.append('date', params.date);
+      if (params?.league) query.append('league', params.league);
+      if (params?.season) query.append('season', params.season);
+
+      const endpoint = `/sports/${encodeURIComponent(sport)}/results?${query.toString()}`;
+      try {
+        const res = await fetch(resolveApiUrl(endpoint));
+        return await parseJsonResponse(res, endpoint);
+      } catch (err: any) {
+        return { success: false, data: [], error: formatFetchError(err, endpoint) };
+      }
+    },
+
     async clearCache(): Promise<{ success: boolean; message?: string }> {
       const endpoint = '/sports/clear-cache';
       try {

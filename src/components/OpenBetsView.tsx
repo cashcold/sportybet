@@ -32,6 +32,7 @@ import { AuthModal } from './AuthModal';
 import { TicketDetailsModal } from './TicketDetailsModal';
 import { CreatePersonalPageModal } from './CreatePersonalPageModal';
 import { resolveWinningPredictionDetails } from '../utils/predictionHelper';
+import { MatchResultsModal } from './MatchResultsModal';
 
 export const OpenBetsView: React.FC = () => {
   const {
@@ -60,6 +61,8 @@ export const OpenBetsView: React.FC = () => {
   const [authMode, setAuthMode] = useState<'login' | 'join'>('login');
   const [recommendedCodesOpen, setRecommendedCodesOpen] = useState(false);
   const [selectedDetailBet, setSelectedDetailBet] = useState<PlacedBet | null>(null);
+  const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
+  const [resultsSearchTeam, setResultsSearchTeam] = useState('');
 
   // Real Interactive Filters for Bet History (Exact SportyBet clone)
   const [historyStatusFilter, setHistoryStatusFilter] = useState<'Settled' | 'All' | 'Cashed Out'>('Settled');
@@ -528,6 +531,18 @@ export const OpenBetsView: React.FC = () => {
               </button>
 
               <button
+                onClick={() => {
+                  setResultsSearchTeam('');
+                  setIsResultsModalOpen(true);
+                }}
+                className="flex items-center space-x-1 px-2 py-1 bg-[#1a2b3d] hover:bg-[#23384f] border border-[#2e4766] text-[#00df59] rounded text-[11px] font-bold cursor-pointer transition-colors shadow-sm"
+                title="View End Match Results from Football API"
+              >
+                <Trophy className="w-3 h-3 text-[#00df59]" />
+                <span>Results</span>
+              </button>
+
+              <button
                 onClick={() => showToast('Grid view toggle')}
                 className="p-1 text-neutral-400 hover:text-white cursor-pointer"
                 title="Grid View"
@@ -714,24 +729,31 @@ export const OpenBetsView: React.FC = () => {
 
                         <div className="divide-y divide-[#202b3a]">
                           {(bet.selections || []).map((sel, idx) => {
-                            const isGreen = bet.isAllGreen || isAllGreenTriggered || bet.status === 'won';
                             const details = resolveWinningPredictionDetails(sel);
+                            const isMatchWon = isAllGreenTriggered ? true : details.isWon;
+                            const isGreen = bet.isAllGreen || isAllGreenTriggered || isMatchWon;
                             const isMatchLive = sel.isLive ?? bet.isLive;
                             const matchTimeStr = sel.liveTime || "16' H1";
                             const matchScoreStr = sel.liveScore || "0:1";
 
-                            // If Green Mode is active (or ticket marked won), render exact layout from Screenshot_20260927_102225_Chrome.jpg
-                            if (isGreen) {
+                            // Finished or settled leg (or green mode active)
+                            if (isGreen || sel.liveTime === 'Finished' || !!sel.ftScore || details.ftScore !== '1:1') {
                               return (
                                 <div
                                   key={idx}
                                   className="px-3.5 py-3.5 flex items-start space-x-3.5 hover:bg-[#1a2636] transition-colors"
                                 >
-                                  {/* Left: Solid Green Circle with White Checkmark */}
+                                  {/* Left: Solid Green Circle (Won) or Red Circle (Lost) */}
                                   <div className="pt-0.5 shrink-0">
-                                    <div className="w-5 h-5 rounded-full bg-[#00df59] flex items-center justify-center text-black shadow-md">
-                                      <Check className="w-3.5 h-3.5 stroke-[3.5]" />
-                                    </div>
+                                    {isMatchWon ? (
+                                      <div className="w-5 h-5 rounded-full bg-[#00df59] flex items-center justify-center text-black shadow-md">
+                                        <Check className="w-3.5 h-3.5 stroke-[3.5]" />
+                                      </div>
+                                    ) : (
+                                      <div className="w-5 h-5 rounded-full bg-[#e41b23] flex items-center justify-center text-white shadow-md">
+                                        <X className="w-3.5 h-3.5 stroke-[3.5]" />
+                                      </div>
+                                    )}
                                   </div>
 
                                   {/* Right Content */}
@@ -747,10 +769,21 @@ export const OpenBetsView: React.FC = () => {
                                     </div>
 
                                     {/* FT Score | Match Tracker */}
-                                    <div className="flex items-center space-x-2 text-xs">
+                                    <div className="flex items-center space-x-2 text-xs flex-wrap gap-y-1">
                                       <span className="text-neutral-300">
                                         FT Score: <strong className="text-white font-extrabold text-[13px] ml-1">{details.ftScore}</strong>
                                       </span>
+                                      <span className="text-neutral-600">|</span>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setResultsSearchTeam(details.formattedMatchTitle.split(' v ')[0]);
+                                          setIsResultsModalOpen(true);
+                                        }}
+                                        className="text-amber-400 hover:underline flex items-center space-x-1 font-bold text-xs cursor-pointer"
+                                      >
+                                        <span>⚽ Official Result</span>
+                                      </button>
                                       <span className="text-neutral-600">|</span>
                                       <button
                                         onClick={(e) => {
@@ -773,15 +806,28 @@ export const OpenBetsView: React.FC = () => {
                                         <strong className="text-white font-bold tracking-tight">
                                           {details.pickText}
                                         </strong>
-                                        <Check className="w-3.5 h-3.5 text-[#00df59] stroke-[3]" />
+                                        {isMatchWon ? (
+                                          <Check className="w-3.5 h-3.5 text-[#00df59] stroke-[3]" />
+                                        ) : (
+                                          <span className="text-[#ff4d4f] text-[11px] font-bold ml-1 flex items-center space-x-0.5">
+                                            <X className="w-3 h-3 stroke-[3]" />
+                                            <span>(Lost)</span>
+                                          </span>
+                                        )}
                                       </div>
 
                                       <div className="text-neutral-400">
                                         Market: <span className="text-neutral-200 font-semibold">{sel.marketName || '1X2'}</span>
                                       </div>
 
-                                      <div className="text-neutral-400">
-                                        Outcome: <strong className="text-white font-bold">{details.outcome}</strong>
+                                      <div className="flex items-center space-x-1.5 text-neutral-300">
+                                        <span className="text-neutral-400">Outcome:</span>
+                                        <strong className="text-white font-bold">{details.outcome}</strong>
+                                        {isMatchWon ? (
+                                          <span className="text-[#00df59] text-[10px] font-bold bg-[#143220] px-1.5 py-0.5 rounded ml-1">Won</span>
+                                        ) : (
+                                          <span className="text-[#ff4d4f] text-[10px] font-bold bg-[#331416] px-1.5 py-0.5 rounded ml-1">Lost</span>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -1296,16 +1342,24 @@ export const OpenBetsView: React.FC = () => {
                           <div className="divide-y divide-[#202b3a]">
                             {(item.selections || []).map((sel, idx) => {
                               const details = resolveWinningPredictionDetails(sel);
+                              const isLegWon = isAllGreenTriggered ? true : details.isWon;
+
                               return (
                                 <div
                                   key={idx}
                                   className="px-3.5 py-3.5 flex items-start space-x-3.5 hover:bg-[#1a2636] transition-colors"
                                 >
-                                  {/* Left: Solid Green Circle with White Checkmark */}
+                                  {/* Left: Solid Green Circle (Won) or Red Circle (Lost) */}
                                   <div className="pt-0.5 shrink-0">
-                                    <div className="w-5 h-5 rounded-full bg-[#00df59] flex items-center justify-center text-black shadow-md">
-                                      <Check className="w-3.5 h-3.5 stroke-[3.5]" />
-                                    </div>
+                                    {isLegWon ? (
+                                      <div className="w-5 h-5 rounded-full bg-[#00df59] flex items-center justify-center text-black shadow-md">
+                                        <Check className="w-3.5 h-3.5 stroke-[3.5]" />
+                                      </div>
+                                    ) : (
+                                      <div className="w-5 h-5 rounded-full bg-[#e41b23] flex items-center justify-center text-white shadow-md">
+                                        <X className="w-3.5 h-3.5 stroke-[3.5]" />
+                                      </div>
+                                    )}
                                   </div>
 
                                   {/* Right Content */}
@@ -1318,13 +1372,24 @@ export const OpenBetsView: React.FC = () => {
                                       {details.formattedMatchTitle}
                                     </div>
 
-                                    <div className="flex items-center space-x-2 text-xs">
+                                    <div className="flex items-center space-x-2 text-xs flex-wrap gap-y-1">
                                       <span className="text-neutral-300">
                                         FT Score:{' '}
                                         <strong className="text-white font-extrabold text-[13px] ml-1">
                                           {details.ftScore}
                                         </strong>
                                       </span>
+                                      <span className="text-neutral-600">|</span>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setResultsSearchTeam(details.formattedMatchTitle.split(' v ')[0]);
+                                          setIsResultsModalOpen(true);
+                                        }}
+                                        className="text-amber-400 hover:underline flex items-center space-x-1 font-bold text-xs cursor-pointer"
+                                      >
+                                        <span>⚽ Official Result</span>
+                                      </button>
                                       <span className="text-neutral-600">|</span>
                                       <button
                                         onClick={(e) => {
@@ -1346,7 +1411,14 @@ export const OpenBetsView: React.FC = () => {
                                         <strong className="text-white font-bold tracking-tight">
                                           {details.pickText}
                                         </strong>
-                                        <Check className="w-3.5 h-3.5 text-[#00df59] stroke-[3]" />
+                                        {isLegWon ? (
+                                          <Check className="w-3.5 h-3.5 text-[#00df59] stroke-[3]" />
+                                        ) : (
+                                          <span className="text-[#ff4d4f] text-[11px] font-bold ml-1 flex items-center space-x-0.5">
+                                            <X className="w-3 h-3 stroke-[3]" />
+                                            <span>(Lost)</span>
+                                          </span>
+                                        )}
                                       </div>
 
                                       <div className="text-neutral-400">
@@ -1356,11 +1428,16 @@ export const OpenBetsView: React.FC = () => {
                                         </span>
                                       </div>
 
-                                      <div className="text-neutral-400">
-                                        Outcome:{' '}
+                                      <div className="flex items-center space-x-1.5 text-neutral-300">
+                                        <span className="text-neutral-400">Outcome:</span>
                                         <strong className="text-white font-bold">
                                           {details.outcome}
                                         </strong>
+                                        {isLegWon ? (
+                                          <span className="text-[#00df59] text-[10px] font-bold bg-[#143220] px-1.5 py-0.5 rounded ml-1">Won</span>
+                                        ) : (
+                                          <span className="text-[#ff4d4f] text-[10px] font-bold bg-[#331416] px-1.5 py-0.5 rounded ml-1">Lost</span>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -1852,6 +1929,13 @@ export const OpenBetsView: React.FC = () => {
         isOpen={!!selectedDetailBet}
         onClose={() => setSelectedDetailBet(null)}
         bet={selectedDetailBet}
+      />
+
+      {/* Match Results & Official End Match Scores Modal (Football API) */}
+      <MatchResultsModal
+        isOpen={isResultsModalOpen}
+        onClose={() => setIsResultsModalOpen(false)}
+        initialSearch={resultsSearchTeam}
       />
 
       {/* SportyBet Create Personal Page & CodeChat Modal (Matches Screenshot_20261009_130305_Chrome.jpg) */}
