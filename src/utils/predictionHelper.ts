@@ -31,7 +31,7 @@ export function resolveWinningPredictionDetails(sel: BetSelection): {
       ftScore: sel.ftScore,
       outcome: sel.outcome,
       pickText: `${sName} ${oddStr}`,
-      isWon: sel.isWon ?? true,
+      isWon: true,
       gameId,
       gameDate,
       formattedMatchTitle
@@ -133,6 +133,52 @@ export function resolveWinningPredictionDetails(sel: BetSelection): {
       gameId: '39102',
       gameDate: '26/09 18:30',
       formattedMatchTitle: 'RB Leipzig v FC Augsburg'
+    };
+  }
+
+  // LASK vs Liverpool support
+  if (lowerTitle.includes('lask') || (lowerTitle.includes('liverpool') && !lowerTitle.includes('everton'))) {
+    const defaultScore = /^\d+\s*[-:]\s*\d+$/.test(sName.trim()) ? sName.trim().replace(/\s*-\s*/, ':') : '1:3';
+    return {
+      ftScore: sel.ftScore || defaultScore,
+      outcome: sName.includes(':') || sName.includes('-') ? sName : (sName === '2' || sName.toLowerCase().includes('away') ? 'Away' : sName),
+      pickText: `${sName} ${oddStr}`,
+      isWon: true,
+      gameId: sel.gameId || '72911',
+      gameDate: sel.gameDate || '14/10 18:45',
+      formattedMatchTitle: 'LASK v Liverpool'
+    };
+  }
+
+  // Aston Villa vs Fenerbahce support
+  if (lowerTitle.includes('aston villa') || lowerTitle.includes('fenerbahce')) {
+    const defaultScore = /^\d+\s*[-:]\s*\d+$/.test(sName.trim()) ? sName.trim().replace(/\s*-\s*/, ':') : '2:1';
+    return {
+      ftScore: sel.ftScore || defaultScore,
+      outcome: sName.includes(':') || sName.includes('-') ? sName : (sName === '1' || sName.toLowerCase().includes('home') ? 'Home' : sName),
+      pickText: `${sName} ${oddStr}`,
+      isWon: true,
+      gameId: sel.gameId || '72912',
+      gameDate: sel.gameDate || '14/10 20:00',
+      formattedMatchTitle: 'Aston Villa v Fenerbahce'
+    };
+  }
+
+  // Correct Score Market (e.g. "Correct Score", "CS", or score selection like "1:3", "2:1", "0:0")
+  if (
+    mName.toLowerCase().includes('correct score') ||
+    mName.toLowerCase().includes('score') ||
+    /^\d+\s*[-:]\s*\d+$/.test(sName.trim())
+  ) {
+    const cleanScore = sName.trim().replace(/\s*-\s*/, ':');
+    return {
+      ftScore: cleanScore,
+      outcome: cleanScore,
+      pickText: `${sName} ${oddStr}`,
+      isWon: true,
+      gameId,
+      gameDate,
+      formattedMatchTitle
     };
   }
 

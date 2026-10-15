@@ -1095,13 +1095,13 @@ export const OpenBetsView: React.FC = () => {
 
                     {/* Right Ticket Card */}
                     <div className="flex-1 bg-[#141b24] border border-[#202b38] rounded-md overflow-hidden shadow-lg transition-all duration-200">
-                      {/* EXACT SOLID GREEN HEADER BANNER CIRCLED IN RED FROM SCREENSHOT */}
+                      {/* SOLID GREEN HEADER BANNER - CLICKING TOP TOGGLES DETAILS OPEN / CLOSED */}
                       <div
-                        onClick={() => setSelectedDetailBet(item)}
+                        onClick={() => toggleExpandHistoryBet(item.id)}
                         role="button"
                         tabIndex={0}
                         aria-expanded={isExpanded}
-                        title="Click to view full ticket details"
+                        title={isExpanded ? "Click to close bet details" : "Click to view all bet details"}
                         className="bg-[#00a826] hover:bg-[#009221] text-white px-3.5 py-2.5 flex items-center justify-between cursor-pointer select-none transition-colors active:opacity-95 rounded-t-md"
                       >
                         <span className="font-extrabold text-[15px] tracking-wide text-white">
@@ -1114,7 +1114,7 @@ export const OpenBetsView: React.FC = () => {
                               e.stopPropagation();
                               setSelectedDetailBet(item);
                             }}
-                            className="bg-black/25 hover:bg-black/40 text-white text-[11px] font-bold px-2 py-0.5 rounded transition-colors flex items-center space-x-1"
+                            className="bg-black/25 hover:bg-black/40 active:scale-95 text-white text-[11px] font-bold px-2 py-0.5 rounded transition-all flex items-center space-x-1 cursor-pointer"
                             title="View Full Ticket Slip"
                           >
                             <FileText className="w-3 h-3" />
@@ -1134,24 +1134,24 @@ export const OpenBetsView: React.FC = () => {
                               e.stopPropagation();
                               toggleExpandHistoryBet(item.id);
                             }}
-                            className="p-1 hover:bg-black/20 rounded transition-colors"
-                            title={isExpanded ? "Collapse inline preview" : "Expand inline preview"}
+                            className="p-1 hover:bg-black/20 rounded transition-colors cursor-pointer"
+                            title={isExpanded ? "Click to close match details" : "Click to view all match details"}
                           >
-                            {isExpanded ? (
-                              <ChevronDown className="w-4 h-4 text-white stroke-[2.5]" />
-                            ) : (
-                              <ChevronRight className="w-4 h-4 text-white stroke-[2.5]" />
-                            )}
+                            <ChevronDown
+                              className={`w-4 h-4 text-white stroke-[2.5] transition-transform duration-200 ${
+                                isExpanded ? 'rotate-180' : 'rotate-0'
+                              }`}
+                            />
                           </button>
                         </div>
                       </div>
 
-                      {/* COLLAPSED STATE (DEFAULT: DETAILS HIDDEN AS SHOWN IN SCREENSHOT) */}
+                      {/* COLLAPSED STATE (DEFAULT: DETAILS HIDDEN UNTIL USER CLICKS) */}
                       {!isExpanded && (
                         <div
-                          onClick={() => setSelectedDetailBet(item)}
+                          onClick={() => toggleExpandHistoryBet(item.id)}
                           className="p-3.5 space-y-2 cursor-pointer hover:bg-[#18222f] transition-colors select-none"
-                          title="Click to view full ticket details"
+                          title="Click to view all match details"
                         >
                           {/* Total Stake */}
                           <div className="flex items-center justify-between text-xs">

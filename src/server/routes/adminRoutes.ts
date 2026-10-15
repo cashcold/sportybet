@@ -211,13 +211,29 @@ adminRouter.post('/bets/settle-won', async (req: Request, res: Response) => {
       });
     }
 
-    // Credit user's wallet in MongoDB directly
+    // Credit users' wallets in MongoDB directly
     let newBalance = 5000.00;
-    const userDoc = await UserModel.findOne({ phone: '20******5' });
-    if (userDoc) {
-      userDoc.balance = parseFloat((userDoc.balance + totalPayout).toFixed(2));
-      await userDoc.save();
-      newBalance = userDoc.balance;
+    for (const bet of betsToSettle) {
+      const targetPhone = bet.userPhone || '20******5';
+      const uDoc = await UserModel.findOne({ phone: targetPhone });
+      if (uDoc) {
+        uDoc.balance = parseFloat((uDoc.balance + bet.potentialWin).toFixed(2));
+        await uDoc.save();
+        newBalance = uDoc.balance;
+      }
+      const cached = db.users.get(targetPhone);
+      if (cached) {
+        cached.balance = parseFloat((cached.balance + bet.potentialWin).toFixed(2));
+      }
+      // Update in-memory bet history
+      const uHistory = db.betHistory.get(targetPhone) || [];
+      const updatedBet = bet.toObject ? bet.toObject() : bet;
+      uHistory.unshift(updatedBet);
+      db.betHistory.set(targetPhone, uHistory);
+
+      // Remove from in-memory open bets
+      const uOpen = db.openBets.get(targetPhone) || [];
+      db.openBets.set(targetPhone, uOpen.filter((b: any) => b.id !== bet.id && b.ticketId !== bet.ticketId));
     }
 
     console.log(`[MongoDB Admin] Settled ${betsToSettle.length} bets as WON in MongoDB. Credited GHS ${totalPayout.toFixed(2)}.`);

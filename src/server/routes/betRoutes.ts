@@ -32,42 +32,62 @@ function generateTicketId(): string {
   return `B-GH-${randomDigits}`;
 }
 
+// Helper to resolve user from request headers (token or x-user-phone)
+async function resolveUserFromRequest(req: Request) {
+  const authHeader = req.headers.authorization;
+  const cleanToken = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
+  const phoneHeader = (req.headers['x-user-phone'] as string) || '';
+
+  await connectToDatabase();
+  let userDoc: any = null;
+  let userPhone = '';
+
+  if (isDbConnected()) {
+    if (cleanToken && cleanToken !== 'sporty-session-default') {
+      userDoc = await UserModel.findOne({ sessionTokens: cleanToken });
+    }
+    if (!userDoc && phoneHeader) {
+      userDoc = await UserModel.findOne({ phone: phoneHeader.trim() });
+    }
+    if (!userDoc && cleanToken) {
+      const cachedPhone = db.userSessions.get(cleanToken);
+      if (cachedPhone) userDoc = await UserModel.findOne({ phone: cachedPhone });
+    }
+    if (!userDoc) {
+      userDoc = (await UserModel.findOne({ phone: '20******5' })) || (await UserModel.findOne());
+    }
+    if (userDoc) {
+      userPhone = userDoc.phone;
+      if (cleanToken && userDoc.sessionTokens && !userDoc.sessionTokens.includes(cleanToken)) {
+        userDoc.sessionTokens.push(cleanToken);
+        await userDoc.save().catch(() => {});
+      }
+    }
+  }
+
+  const cachedUser =
+    db.getUserByToken(authHeader) ||
+    (phoneHeader ? db.users.get(phoneHeader) : null) ||
+    db.users.get('20******5') ||
+    db.users.get('0204891235');
+
+  if (!userPhone && cachedUser) {
+    userPhone = cachedUser.phone;
+  }
+  if (!userPhone) {
+    userPhone = phoneHeader || '20******5';
+  }
+
+  return { userDoc, userPhone, cachedUser };
+}
+
 // POST /api/bets/place
 betRouter.post('/place', async (req: Request, res: Response) => {
   try {
-    const authHeader = req.headers.authorization;
-    const cleanToken = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
+    const { userDoc, userPhone, cachedUser } = await resolveUserFromRequest(req);
 
-    if (!cleanToken) {
-      return res.status(401).json({ success: false, error: 'Please log in to place a bet' });
-    }
-
-    await connectToDatabase();
-    let userDoc: any = null;
-    let userPhone = '';
-
-    if (isDbConnected()) {
-      userDoc = await UserModel.findOne({ sessionTokens: cleanToken });
-      if (!userDoc) {
-        const cachedPhone = db.userSessions.get(cleanToken);
-        if (cachedPhone) userDoc = await UserModel.findOne({ phone: cachedPhone });
-      }
-      if (userDoc) {
-        userPhone = userDoc.phone;
-      }
-    }
-
-    const cachedUser = db.getUserByToken(authHeader);
-    if (!userPhone && cachedUser) {
-      userPhone = cachedUser.phone;
-    }
-
-    if (!userPhone) {
-      return res.status(401).json({ success: false, error: 'Session expired. Please log in again.' });
-    }
-
-    const balance = userDoc ? userDoc.balance : (cachedUser ? cachedUser.balance : 0.00);
-    const currency = userDoc ? userDoc.currency : (cachedUser ? cachedUser.currency : 'GHC');
+    const balance = userDoc ? userDoc.balance : cachedUser ? cachedUser.balance : 5000.0;
+    const currency = userDoc ? userDoc.currency : cachedUser ? cachedUser.currency : 'GHC';
 
     const { selections, stake } = req.body;
     const numStake = parseFloat(stake);
@@ -229,31 +249,25 @@ betRouter.post('/place', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/bets/open - Real-time MongoDB query
+// GET /api/bets/open - Real-time MongoDB query scoped to user
 betRouter.get('/open', async (req: Request, res: Response) => {
   try {
-    await connectToDatabase();
-    const authHeader = req.headers.authorization;
-    const cleanToken = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
-
-    let userPhone = '';
-    if (isDbConnected() && cleanToken) {
-      const u = await UserModel.findOne({ sessionTokens: cleanToken });
-      if (u) userPhone = u.phone;
-    }
+    const { userPhone } = await resolveUserFromRequest(req);
 
     let mongoBets: any[] = [];
     if (isDbConnected()) {
-      if (userPhone && userPhone !== '20******5') {
-        const phoneQueries = [userPhone];
-        if (userPhone.startsWith('0')) phoneQueries.push(userPhone.slice(1));
-        if (!userPhone.startsWith('0')) phoneQueries.push('0' + userPhone);
-        mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: 'open' }).sort({ createdAt: -1 });
-      }
+      const phoneQueries = [userPhone];
+      if (userPhone.startsWith('0')) phoneQueries.push(userPhone.slice(1));
+      if (!userPhone.startsWith('0')) phoneQueries.push('0' + userPhone);
 
-      // If no custom user-specific bets, query general open bets from MongoDB
+      mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: 'open' }).sort({ createdAt: -1 });
+
+      // Only check general open bets if this user has NEVER placed any bets at all
       if (mongoBets.length === 0) {
-        mongoBets = await BetModel.find({ status: 'open' }).sort({ createdAt: -1 });
+        const totalUserBets = await BetModel.countDocuments({ userPhone: { $in: phoneQueries } });
+        if (totalUserBets === 0) {
+          mongoBets = await BetModel.find({ status: 'open' }).sort({ createdAt: -1 });
+        }
       }
     }
 
@@ -278,8 +292,8 @@ betRouter.get('/open', async (req: Request, res: Response) => {
       winningsPaid: doc.winningsPaid
     }));
 
-    if (bets.length === 0) {
-      bets = db.openBets.get(userPhone) || db.openBets.get('0204891235') || db.openBets.get('20******5') || INITIAL_OPEN_BETS;
+    if (bets.length === 0 && !isDbConnected()) {
+      bets = db.openBets.get(userPhone) || INITIAL_OPEN_BETS;
     }
 
     return res.json({
@@ -293,30 +307,24 @@ betRouter.get('/open', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/bets/history - Real-time MongoDB query
+// GET /api/bets/history - Real-time MongoDB query scoped to user
 betRouter.get('/history', async (req: Request, res: Response) => {
   try {
-    await connectToDatabase();
-    const authHeader = req.headers.authorization;
-    const cleanToken = authHeader ? authHeader.replace('Bearer ', '').trim() : '';
-
-    let userPhone = '';
-    if (isDbConnected() && cleanToken) {
-      const u = await UserModel.findOne({ sessionTokens: cleanToken });
-      if (u) userPhone = u.phone;
-    }
+    const { userPhone } = await resolveUserFromRequest(req);
 
     let mongoBets: any[] = [];
     if (isDbConnected()) {
-      if (userPhone && userPhone !== '20******5') {
-        const phoneQueries = [userPhone];
-        if (userPhone.startsWith('0')) phoneQueries.push(userPhone.slice(1));
-        if (!userPhone.startsWith('0')) phoneQueries.push('0' + userPhone);
-        mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: { $ne: 'open' } }).sort({ createdAt: -1 });
-      }
+      const phoneQueries = [userPhone];
+      if (userPhone.startsWith('0')) phoneQueries.push(userPhone.slice(1));
+      if (!userPhone.startsWith('0')) phoneQueries.push('0' + userPhone);
+
+      mongoBets = await BetModel.find({ userPhone: { $in: phoneQueries }, status: { $ne: 'open' } }).sort({ createdAt: -1 });
 
       if (mongoBets.length === 0) {
-        mongoBets = await BetModel.find({ status: { $ne: 'open' } }).sort({ createdAt: -1 });
+        const totalUserBets = await BetModel.countDocuments({ userPhone: { $in: phoneQueries } });
+        if (totalUserBets === 0) {
+          mongoBets = await BetModel.find({ status: { $ne: 'open' } }).sort({ createdAt: -1 });
+        }
       }
     }
 
@@ -341,13 +349,8 @@ betRouter.get('/history', async (req: Request, res: Response) => {
       winningsPaid: doc.winningsPaid
     }));
 
-    if (bets.length === 0) {
-      bets = db.betHistory.get(userPhone) || db.betHistory.get('0204891235') || db.betHistory.get('20******5') || INITIAL_BET_HISTORY;
-    }
-
-    const hasCanonicalAtTop = bets[0]?.id === 'bet-hist-sporty-screenshot-1' || bets[0]?.ticketId === 'SBGH-7182-9921';
-    if (!hasCanonicalAtTop) {
-      bets = [...INITIAL_BET_HISTORY];
+    if (bets.length === 0 && !isDbConnected()) {
+      bets = db.betHistory.get(userPhone) || INITIAL_BET_HISTORY;
     }
 
     return res.json({

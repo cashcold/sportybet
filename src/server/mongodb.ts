@@ -37,32 +37,37 @@ export async function seedDefaultDatabase() {
       console.log('[MongoDB Seed] Initial User created in MongoDB.');
     }
 
-    // 2. Seed Bets if not exists
-    const betCount = await BetModel.countDocuments();
-    if (betCount === 0) {
-      const allInitialBets = [...INITIAL_OPEN_BETS, ...INITIAL_BET_HISTORY];
-      for (const b of allInitialBets) {
-        await BetModel.create({
-          id: b.id,
-          ticketId: b.ticketId,
-          transactionId: b.transactionId || `TX-GH-${Math.floor(100000000 + Math.random() * 900000000)}`,
-          userPhone: '20******5',
-          type: b.type,
-          date: b.date,
-          isLive: b.isLive,
-          selections: b.selections,
-          stake: b.stake,
-          totalOdds: b.totalOdds,
-          potentialWin: b.potentialWin,
-          status: b.status,
-          cashoutAvailable: b.cashoutAvailable,
-          cashoutAmount: b.cashoutAmount || b.stake * 0.9,
-          bookingCode: b.bookingCode || 'BD9812',
-          canRebet: b.canRebet ?? true,
-          isAllGreen: b.isAllGreen || false
-        });
+    // 2. Ensure Initial Bets exist in MongoDB
+    const allInitialBets = [...INITIAL_OPEN_BETS, ...INITIAL_BET_HISTORY];
+    for (const b of allInitialBets) {
+      try {
+        const exists = await BetModel.findOne({ $or: [{ id: b.id }, { ticketId: b.ticketId }] });
+        if (!exists) {
+          await BetModel.create({
+            id: b.id,
+            ticketId: b.ticketId,
+            transactionId: b.transactionId || `TX-GH-${Math.floor(100000000 + Math.random() * 900000000)}`,
+            userPhone: '20******5',
+            type: b.type,
+            date: b.date,
+            isLive: b.isLive,
+            selections: b.selections,
+            stake: b.stake,
+            totalOdds: b.totalOdds,
+            potentialWin: b.potentialWin,
+            status: b.status,
+            cashoutAvailable: b.cashoutAvailable,
+            cashoutAmount: b.cashoutAmount || b.stake * 0.9,
+            bookingCode: b.bookingCode || 'BD9812',
+            canRebet: b.canRebet ?? true,
+            isAllGreen: b.isAllGreen || false,
+            settledAt: b.settledAt,
+            winningsPaid: b.winningsPaid || false
+          });
+        }
+      } catch (e: any) {
+        // Ignore single duplicate key
       }
-      console.log(`[MongoDB Seed] ${allInitialBets.length} Initial Bet Slips created in MongoDB.`);
     }
   } catch (err: any) {
     console.warn('[MongoDB Seed Notice]', err?.message || err);

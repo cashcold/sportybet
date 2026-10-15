@@ -4,9 +4,18 @@ import { INITIAL_OPEN_BETS, INITIAL_BET_HISTORY } from '../data/mockData';
 
 function getAuthHeader(): Record<string, string> {
   const token = localStorage.getItem('sportybet_auth_token') || 'sporty-session-default';
+  let phone = '';
+  try {
+    const savedUser = localStorage.getItem('sportybet_user');
+    if (savedUser) {
+      const u = JSON.parse(savedUser);
+      if (u?.phone) phone = u.phone;
+    }
+  } catch {}
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
+    'Authorization': `Bearer ${token}`,
+    ...(phone ? { 'x-user-phone': phone } : {})
   };
 }
 
@@ -315,13 +324,13 @@ export const api = {
           headers: getAuthHeader()
         });
         const data = await parseJsonResponse(res, endpoint);
-        if (data && data.success && Array.isArray(data.bets) && data.bets.length > 0) {
+        if (data && data.success && Array.isArray(data.bets)) {
           return data;
         }
-        return { success: true, bets: INITIAL_OPEN_BETS };
+        return { success: true, bets: [] };
       } catch (err: any) {
-        console.warn(`[Open Bets Network Notice] ${err?.message || err}. Using verified open bets.`);
-        return { success: true, bets: INITIAL_OPEN_BETS };
+        console.warn(`[Open Bets Network Notice] ${err?.message || err}.`);
+        return { success: false, error: err?.message };
       }
     },
 
@@ -332,13 +341,13 @@ export const api = {
           headers: getAuthHeader()
         });
         const data = await parseJsonResponse(res, endpoint);
-        if (data && data.success && Array.isArray(data.bets) && data.bets.length > 0) {
+        if (data && data.success && Array.isArray(data.bets)) {
           return data;
         }
-        return { success: true, bets: INITIAL_BET_HISTORY };
+        return { success: true, bets: [] };
       } catch (err: any) {
-        console.warn(`[Bet History Network Notice] ${err?.message || err}. Using verified settled tickets.`);
-        return { success: true, bets: INITIAL_BET_HISTORY };
+        console.warn(`[Bet History Network Notice] ${err?.message || err}.`);
+        return { success: false, error: err?.message };
       }
     },
 

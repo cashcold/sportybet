@@ -180,13 +180,7 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const hasScreenshotBet = parsed.some((b: any) =>
-            b.id === 'bet-sporty-screenshot-1'
-          );
-          if (hasScreenshotBet) {
-            return parsed;
-          }
-          return INITIAL_OPEN_BETS;
+          return parsed;
         }
       } catch {
         return INITIAL_OPEN_BETS;
@@ -200,21 +194,11 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (
-          Array.isArray(parsed) &&
-          parsed.length > 0 &&
-          parsed[0]?.id === 'bet-hist-sporty-screenshot-1' &&
-          parsed[0]?.selections?.some((s: any) => s.matchTitle?.includes('England'))
-        ) {
+        if (Array.isArray(parsed) && parsed.length > 0) {
           return parsed;
         }
       } catch {}
     }
-    try {
-      localStorage.removeItem('sportybet_bet_history');
-      localStorage.removeItem('sportybet_bet_history_v2');
-      localStorage.removeItem('sportybet_bet_history_v3');
-    } catch {}
     return INITIAL_BET_HISTORY;
   });
 
@@ -277,8 +261,10 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         api.auth.getMe()
       ]);
 
-      if (openRes.status === 'fulfilled' && openRes.value?.success && Array.isArray(openRes.value.bets) && openRes.value.bets.length > 0) {
-        setOpenBets(openRes.value.bets);
+      if (openRes.status === 'fulfilled' && openRes.value?.success && Array.isArray(openRes.value.bets)) {
+        if (openRes.value.bets.length > 0 || (historyRes.status === 'fulfilled' && historyRes.value?.success && Array.isArray(historyRes.value.bets) && historyRes.value.bets.length > 0)) {
+          setOpenBets(openRes.value.bets);
+        }
       }
       if (historyRes.status === 'fulfilled' && historyRes.value?.success && Array.isArray(historyRes.value.bets) && historyRes.value.bets.length > 0) {
         setBetHistory(historyRes.value.bets);
@@ -566,34 +552,19 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // Initial sync from MongoDB backend
     const syncMongoData = async () => {
-      const token = localStorage.getItem('sportybet_auth_token');
-      if (!token) {
-        setOpenBets([]);
-        setBetHistory([]);
-        return;
-      }
       try {
         const [meRes, openRes, historyRes] = await Promise.allSettled([
           api.auth.getMe(),
           api.bets.getOpenBets(),
           api.bets.getBetHistory()
         ]);
-        if (meRes.status === 'fulfilled' && meRes.value.success && meRes.value.user) {
+        if (meRes.status === 'fulfilled' && meRes.value?.success && meRes.value.user) {
           setUser(meRes.value.user);
-        } else if (meRes.status === 'fulfilled' && !meRes.value.success) {
-          localStorage.removeItem('sportybet_auth_token');
-          localStorage.removeItem('sportybet_user');
-          localStorage.removeItem('sportybet_open_bets');
-          localStorage.removeItem('sportybet_bet_history');
-          setUser(INITIAL_USER);
-          setOpenBets([]);
-          setBetHistory([]);
-          return;
         }
-        if (openRes.status === 'fulfilled' && openRes.value.success && openRes.value.bets) {
+        if (openRes.status === 'fulfilled' && openRes.value?.success && Array.isArray(openRes.value.bets) && openRes.value.bets.length > 0) {
           setOpenBets(openRes.value.bets);
         }
-        if (historyRes.status === 'fulfilled' && historyRes.value.success && historyRes.value.bets) {
+        if (historyRes.status === 'fulfilled' && historyRes.value?.success && Array.isArray(historyRes.value.bets) && historyRes.value.bets.length > 0) {
           setBetHistory(historyRes.value.bets);
         }
       } catch (err) {
