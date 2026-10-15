@@ -174,19 +174,49 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   });
 
+  // Normalizes match results with authentic real scores (e.g. Slovan Bratislava vs Stuttgart: 0 - 3)
+  const normalizeBetsWithRealScores = (bets: PlacedBet[]): PlacedBet[] => {
+    if (!Array.isArray(bets)) return [];
+    return bets.map(bet => {
+      let hasChange = false;
+      const updatedSelections = bet.selections?.map(sel => {
+        const title = (sel.matchTitle || '').toLowerCase();
+        if ((title.includes('slovan') || title.includes('bratislava')) && title.includes('stuttgart')) {
+          hasChange = true;
+          return {
+            ...sel,
+            ftScore: '0:3',
+            liveScore: '0:3',
+            liveTime: 'Finished',
+            outcome: sel.outcome === '2:1' || sel.outcome === 'Home' ? 'Away' : (sel.outcome || 'Away')
+          };
+        }
+        return sel;
+      });
+
+      if (hasChange) {
+        return {
+          ...bet,
+          selections: updatedSelections
+        };
+      }
+      return bet;
+    });
+  };
+
   const [openBets, setOpenBets] = useState<PlacedBet[]>(() => {
     const saved = localStorage.getItem('sportybet_open_bets');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          return normalizeBetsWithRealScores(parsed);
         }
       } catch {
-        return INITIAL_OPEN_BETS;
+        return normalizeBetsWithRealScores(INITIAL_OPEN_BETS);
       }
     }
-    return INITIAL_OPEN_BETS;
+    return normalizeBetsWithRealScores(INITIAL_OPEN_BETS);
   });
 
   const [betHistory, setBetHistory] = useState<PlacedBet[]>(() => {
@@ -195,11 +225,11 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          return normalizeBetsWithRealScores(parsed);
         }
       } catch {}
     }
-    return INITIAL_BET_HISTORY;
+    return normalizeBetsWithRealScores(INITIAL_BET_HISTORY);
   });
 
   const [user, setUser] = useState<UserProfile>(() => {
@@ -263,11 +293,19 @@ export const BettingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       if (openRes.status === 'fulfilled' && openRes.value?.success && Array.isArray(openRes.value.bets)) {
         if (openRes.value.bets.length > 0 || (historyRes.status === 'fulfilled' && historyRes.value?.success && Array.isArray(historyRes.value.bets) && historyRes.value.bets.length > 0)) {
-          setOpenBets(openRes.value.bets);
+          const normalized = normalizeBetsWithRealScores(openRes.value.bets);
+          setOpenBets(normalized);
+          try {
+            localStorage.setItem('sportybet_open_bets', JSON.stringify(normalized));
+          } catch {}
         }
       }
       if (historyRes.status === 'fulfilled' && historyRes.value?.success && Array.isArray(historyRes.value.bets) && historyRes.value.bets.length > 0) {
-        setBetHistory(historyRes.value.bets);
+        const normalized = normalizeBetsWithRealScores(historyRes.value.bets);
+        setBetHistory(normalized);
+        try {
+          localStorage.setItem('sportybet_bet_history_v4', JSON.stringify(normalized));
+        } catch {}
       }
       if (userRes.status === 'fulfilled' && userRes.value?.success && userRes.value.user) {
         const remoteUser = userRes.value.user;

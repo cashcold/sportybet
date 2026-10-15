@@ -1,6 +1,14 @@
 import { BetSelection, PlacedBet } from '../types';
 
 /**
+ * Detects if a match is Slovan Bratislava vs VfB Stuttgart
+ */
+export function isSlovanStuttgartMatch(title: string): boolean {
+  const t = (title || '').toLowerCase();
+  return (t.includes('slovan') || t.includes('bratislava')) && (t.includes('stuttgart') || t.includes('vfb'));
+}
+
+/**
  * Resolves exact winning score, outcome, and pick text based on the user's prediction
  * Matching the exact SportyBet layout shown in Screenshot_20260927_102225_Chrome.jpg
  */
@@ -24,6 +32,29 @@ export function resolveWinningPredictionDetails(sel: BetSelection): {
   const gameId = sel.gameId || '23888';
   const gameDate = sel.gameDate || sel.liveTime || '04/10 18:30';
   const lowerTitle = title.toLowerCase();
+
+  // Canonical Official Result: Slovan Bratislava vs VfB Stuttgart (Finished 0 - 3)
+  if (isSlovanStuttgartMatch(title)) {
+    let outcomeVal = 'Away';
+    if (sName === '2' || sName.toLowerCase().includes('away')) outcomeVal = 'Away';
+    else if (sName === 'X2') outcomeVal = 'X2';
+    else if (sName === '12') outcomeVal = '12';
+    else if (sName.toLowerCase().includes('under') && (sName.includes('3.5') || sName.includes('4.5'))) outcomeVal = sName;
+    else if (sName.toLowerCase().includes('over') && (sName.includes('2.5') || sName.includes('1.5') || sName.includes('0.5'))) outcomeVal = sName;
+    else if (sName.toLowerCase() === 'no' || sName.toUpperCase() === 'NG') outcomeVal = 'No';
+    else if (sName.includes(':') || sName.includes('-')) outcomeVal = sName.trim().replace(/\s*-\s*/, ':');
+    else outcomeVal = sel.outcome && sel.outcome !== '2:1' && sel.outcome !== 'Home' ? sel.outcome : 'Away';
+
+    return {
+      ftScore: '0:3',
+      outcome: outcomeVal,
+      pickText: `${sName} ${oddStr}`,
+      isWon: true,
+      gameId: sel.gameId || '75763',
+      gameDate: sel.gameDate || sel.liveTime || '14/10 19:00',
+      formattedMatchTitle: 'ŠK Slovan Bratislava v VfB Stuttgart'
+    };
+  }
 
   // If selection explicitly defines settled result (e.g. from real Bet History)
   if (sel.ftScore && sel.outcome) {

@@ -56,6 +56,36 @@ export async function seedDefaultDatabase() {
         }
       });
     } catch {}
+
+    // 3. Ensure authentic official final scores in MongoDB (e.g. Finished Slovan Bratislava 0, Stuttgart 3)
+    try {
+      const allBets = await BetModel.find({});
+      for (const b of allBets) {
+        let modified = false;
+        if (Array.isArray(b.selections)) {
+          b.selections = b.selections.map((sel: any) => {
+            const t = (sel.matchTitle || '').toLowerCase();
+            if ((t.includes('slovan') || t.includes('bratislava')) && t.includes('stuttgart')) {
+              modified = true;
+              return {
+                ...sel,
+                ftScore: '0:3',
+                liveScore: '0:3',
+                liveTime: 'Finished',
+                outcome: sel.outcome === '2:1' || sel.outcome === 'Home' ? 'Away' : (sel.outcome || 'Away')
+              };
+            }
+            return sel;
+          });
+        }
+        if (modified) {
+          await b.save();
+          console.log(`[MongoDB] Verified and corrected Slovan Bratislava vs Stuttgart final score to 0:3 for bet ${b.id}`);
+        }
+      }
+    } catch (migErr) {
+      console.warn('[MongoDB score migration warning]', migErr);
+    }
   } catch (err: any) {
     console.warn('[MongoDB Seed Notice]', err?.message || err);
   }

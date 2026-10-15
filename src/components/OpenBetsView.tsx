@@ -268,7 +268,27 @@ export const OpenBetsView: React.FC = () => {
 
   const handleOpenSim = (bet: PlacedBet, matchTitle?: string) => {
     const title = matchTitle || bet.selections[0]?.matchTitle || 'England vs Spain';
-    const parts = title.split(' vs ');
+    const lowerTitle = title.toLowerCase();
+
+    if ((lowerTitle.includes('slovan') || lowerTitle.includes('bratislava')) && lowerTitle.includes('stuttgart')) {
+      setSimMatchData({
+        homeTeam: 'ŠK Slovan Bratislava',
+        awayTeam: 'VfB Stuttgart',
+        homeScore: 0,
+        awayScore: 3,
+        minute: 90,
+        action: 'Full Time: Finished ŠK Slovan Bratislava 0 - 3 VfB Stuttgart (Stuttgart away win)',
+        possessionHome: 38,
+        shotsHome: 5,
+        shotsAway: 18,
+        cornersHome: 2,
+        cornersAway: 8
+      });
+      setSimulatingBet(bet);
+      return;
+    }
+
+    const parts = title.includes(' v ') ? title.split(' v ') : title.split(' vs ');
     setSimMatchData({
       homeTeam: parts[0] || 'England',
       awayTeam: parts[1] || 'Spain',
