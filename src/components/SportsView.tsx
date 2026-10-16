@@ -711,6 +711,8 @@ export const SportsView: React.FC = () => {
         isOpen={isCodeHubOpen}
         onClose={() => setIsCodeHubOpen(false)}
         defaultTab={codeHubTab}
+      />
+
       {/* Official End Match Results & Scores Modal (Football API) */}
       <MatchResultsModal
         isOpen={isResultsModalOpen}

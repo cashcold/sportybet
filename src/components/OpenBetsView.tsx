@@ -57,6 +57,7 @@ export const OpenBetsView: React.FC = () => {
   const setActiveTab = setOpenBetsSubTab;
   const [filter, setFilter] = useState<'all' | 'cashout' | 'live'>('cashout');
   const [personalPageModalOpen, setPersonalPageModalOpen] = useState(false);
+  const [forceCreateNew, setForceCreateNew] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'join'>('login');
   const [recommendedCodesOpen, setRecommendedCodesOpen] = useState(false);
@@ -410,150 +411,140 @@ export const OpenBetsView: React.FC = () => {
         </div>
 
         {/* =================================================================== */}
-        {/* 3. MAIN CONTENT: GUEST PROMPT (Exact match to uploaded screenshot)   */}
+        {/* VIEW A: OPEN BETS (Always shows filter bar + Red Circle Create New) */}
         {/* =================================================================== */}
-        {!user.isLoggedIn && activeTab === 'open' ? (
-          <div className="flex-1 flex flex-col items-center justify-center px-4 py-28 text-center select-none">
-            <p className="text-white text-[16px] leading-[1.6] font-normal max-w-sm">
-              Please Log In to see your Open Bets<br />
-              and Cashout Bets
-            </p>
-
-            <div className="mt-6 flex flex-col items-center space-y-2.5">
-              <button
-                onClick={() => {
-                  setAuthMode('login');
-                  setAuthModalOpen(true);
-                }}
-                className="px-8 py-1.5 rounded-[4px] border border-[#00df59] bg-transparent text-[#00df59] text-[15px] font-medium hover:bg-[#00df59]/10 active:scale-95 transition-all cursor-pointer"
-              >
-                Login
-              </button>
-              <button
-                onClick={async () => {
-                  await login('0204891235', 'demo1234');
-                  showToast('Logged into Account (0204891235)');
-                }}
-                className="text-xs text-[#00df59] hover:underline"
-              >
-                1-Tap Quick Demo Login (0204891235)
-              </button>
-            </div>
-          </div>
-        ) : (
-        <>
-          {/* Guest notification on History tab */}
-          {!user.isLoggedIn && activeTab === 'history' && (
-            <div className="px-3.5 py-2.5 bg-[#172332] border-b border-[#23354c] flex items-center justify-between text-xs">
-              <div className="flex items-center space-x-2 text-neutral-300">
-                <span className="w-2 h-2 rounded-full bg-[#00df59] animate-pulse shrink-0" />
-                <span>Viewing authentic settled tickets preview</span>
-              </div>
-              <button
-                onClick={async () => {
-                  await login('0204891235', 'demo1234');
-                  showToast('Logged into Account (0204891235)');
-                }}
-                className="text-[11px] font-bold text-[#00df59] bg-[#00df59]/10 px-2 py-0.5 rounded border border-[#00df59]/30 hover:bg-[#00df59]/20 transition-colors"
-              >
-                1-Tap Login
-              </button>
-            </div>
-          )}
-          {/* =================================================================== */}
-          {/* VIEW A: OPEN BETS (Screenshot 6)                                    */}
-          {/* =================================================================== */}
-          {activeTab === 'open' && (
-        <div>
-          {/* Filter Pills Bar: All | Cashout Available | Live Games | Grid Icon */}
-          <div className="px-3.5 py-2.5 flex items-center justify-between bg-[#121922] border-b border-[#1f2835]">
-            <div className="flex items-center space-x-2 text-xs font-bold">
-              <button
-                onClick={() => setFilter('all')}
-                className={`px-3 py-1.5 rounded transition-colors ${
-                  filter === 'all'
-                    ? 'bg-[#79889b] text-[#121922] font-black'
-                    : 'bg-[#242f3d] text-neutral-300 hover:bg-[#2e3b4d]'
-                }`}
-              >
-                All
-              </button>
-
-              <button
-                onClick={() => setFilter('cashout')}
-                className={`px-3 py-1.5 rounded transition-colors ${
-                  filter === 'cashout'
-                    ? 'bg-[#79889b] text-[#121922] font-black'
-                    : 'bg-[#242f3d] text-neutral-300 hover:bg-[#2e3b4d]'
-                }`}
-              >
-                Cashout Available
-              </button>
-
-              <button
-                onClick={() => setFilter('live')}
-                className={`px-3 py-1.5 rounded transition-colors ${
-                  filter === 'live'
-                    ? 'bg-[#79889b] text-[#121922] font-black'
-                    : 'bg-[#242f3d] text-neutral-300 hover:bg-[#2e3b4d]'
-                }`}
-              >
-                Live Games
-              </button>
-            </div>
-
-            {/* Right icons: Green CodeChat/Personal Page button with red dot + 2x2 LayoutGrid (Matches Screenshot) */}
-            <div className="flex items-center space-x-2.5 shrink-0 pl-1">
-              <button
-                onClick={() => setPersonalPageModalOpen(true)}
-                className="relative p-1 text-[#00df59] hover:text-emerald-300 active:scale-95 transition-all cursor-pointer flex items-center justify-center rounded"
-                title="Create Personal Page & Unlock CodeChat"
-                aria-label="Create Personal Page and CodeChat"
-              >
-                {/* Authentic SportyBet ticket-note chat icon from screenshot */}
-                <svg
-                  className="w-5 h-5 text-[#00df59]"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+        {activeTab === 'open' && (
+          <div>
+            {/* Filter Pills Bar: All | Cashout Available | Live Games | Right Icons */}
+            <div className="px-3.5 py-2.5 flex items-center justify-between bg-[#121922] border-b border-[#1f2835]">
+              <div className="flex items-center space-x-2 text-xs font-bold">
+                <button
+                  onClick={() => setFilter('all')}
+                  className={`px-3 py-1.5 rounded transition-colors cursor-pointer ${
+                    filter === 'all'
+                      ? 'bg-[#79889b] text-[#121922] font-black'
+                      : 'bg-[#242f3d] text-neutral-300 hover:bg-[#2e3b4d]'
+                  }`}
                 >
-                  <rect x="3" y="3" width="13" height="13" rx="2" />
-                  <path d="M7 7h5" />
-                  <path d="M7 10h3" />
-                  <path d="M11 12h5a2 2 0 0 1 2 2v4l-3-2h-4a2 2 0 0 1-2-2v-2" />
-                </svg>
+                  All
+                </button>
 
-                {/* Red notification dot from screenshot (Screenshot_20261009_130247_Chrome.jpg) */}
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#e41b23] rounded-full ring-2 ring-[#121922]" />
-              </button>
+                <button
+                  onClick={() => setFilter('cashout')}
+                  className={`px-3 py-1.5 rounded transition-colors cursor-pointer ${
+                    filter === 'cashout'
+                      ? 'bg-[#79889b] text-[#121922] font-black'
+                      : 'bg-[#242f3d] text-neutral-300 hover:bg-[#2e3b4d]'
+                  }`}
+                >
+                  Cashout Available
+                </button>
 
-              <button
-                onClick={() => {
-                  setResultsSearchTeam('');
-                  setIsResultsModalOpen(true);
-                }}
-                className="flex items-center space-x-1 px-2 py-1 bg-[#1a2b3d] hover:bg-[#23384f] border border-[#2e4766] text-[#00df59] rounded text-[11px] font-bold cursor-pointer transition-colors shadow-sm"
-                title="View End Match Results from Football API"
-              >
-                <Trophy className="w-3 h-3 text-[#00df59]" />
-                <span>Results</span>
-              </button>
+                <button
+                  onClick={() => setFilter('live')}
+                  className={`px-3 py-1.5 rounded transition-colors cursor-pointer ${
+                    filter === 'live'
+                      ? 'bg-[#79889b] text-[#121922] font-black'
+                      : 'bg-[#242f3d] text-neutral-300 hover:bg-[#2e3b4d]'
+                  }`}
+                >
+                  Live Games
+                </button>
+              </div>
 
-              <button
-                onClick={() => showToast('Grid view toggle')}
-                className="p-1 text-neutral-400 hover:text-white cursor-pointer"
-                title="Grid View"
-              >
-                <LayoutGrid className="w-4 h-4 stroke-[2]" />
-              </button>
+              {/* Right icons: Green CodeChat/Personal Page button with red circle dot + Results + 2x2 LayoutGrid */}
+              <div className="flex items-center space-x-2.5 shrink-0 pl-1">
+                <button
+                  onClick={() => {
+                    setForceCreateNew(true);
+                    setPersonalPageModalOpen(true);
+                  }}
+                  className="relative p-1 text-[#00df59] hover:text-emerald-300 active:scale-95 transition-all cursor-pointer flex items-center justify-center rounded group"
+                  title="Create New (Click to open)"
+                  aria-label="Create New"
+                >
+                  {/* Authentic SportyBet ticket-note chat icon from screenshot */}
+                  <svg
+                    className="w-5 h-5 text-[#00df59] group-hover:brightness-110"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="3" width="13" height="13" rx="2" />
+                    <path d="M7 7h5" />
+                    <path d="M7 10h3" />
+                    <path d="M11 12h5a2 2 0 0 1 2 2v4l-3-2h-4a2 2 0 0 1-2-2v-2" />
+                  </svg>
+
+                  {/* Red circle dot from screenshot (Screenshot_20261009_130247_Chrome.jpg) - Clicking opens Create New */}
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setForceCreateNew(true);
+                      setPersonalPageModalOpen(true);
+                    }}
+                    className="absolute -top-1 -right-1 w-3 h-3 bg-[#e41b23] hover:bg-red-400 rounded-full ring-2 ring-[#121922] cursor-pointer animate-pulse transition-transform hover:scale-125 shadow-sm"
+                    title="Create New"
+                  />
+                </button>
+
+                <button
+                  onClick={() => {
+                    setResultsSearchTeam('');
+                    setIsResultsModalOpen(true);
+                  }}
+                  className="flex items-center space-x-1 px-2 py-1 bg-[#1a2b3d] hover:bg-[#23384f] border border-[#2e4766] text-[#00df59] rounded text-[11px] font-bold cursor-pointer transition-colors shadow-sm"
+                  title="View End Match Results from Football API"
+                >
+                  <Trophy className="w-3 h-3 text-[#00df59]" />
+                  <span>Results</span>
+                </button>
+
+                <button
+                  onClick={() => showToast('Grid view toggle')}
+                  className="p-1 text-neutral-400 hover:text-white cursor-pointer"
+                  title="Grid View"
+                >
+                  <LayoutGrid className="w-4 h-4 stroke-[2]" />
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Open Bets Cards List (Exact match to Screenshot 6) */}
-          <div className="p-3 space-y-3">
+            {/* If NOT logged in: Show Guest Prompt below the filter bar */}
+            {!user.isLoggedIn ? (
+              <div className="flex-1 flex flex-col items-center justify-center px-4 py-24 text-center select-none">
+                <p className="text-white text-[16px] leading-[1.6] font-normal max-w-sm">
+                  Please Log In to see your Open Bets<br />
+                  and Cashout Bets
+                </p>
+
+                <div className="mt-6 flex flex-col items-center space-y-2.5">
+                  <button
+                    onClick={() => {
+                      setAuthMode('login');
+                      setAuthModalOpen(true);
+                    }}
+                    className="px-8 py-1.5 rounded-[4px] border border-[#00df59] bg-transparent text-[#00df59] text-[15px] font-medium hover:bg-[#00df59]/10 active:scale-95 transition-all cursor-pointer"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={async () => {
+                      await login('0204891235', 'demo1234');
+                      showToast('Logged into Account (0204891235)');
+                    }}
+                    className="text-xs text-[#00df59] hover:underline cursor-pointer"
+                  >
+                    1-Tap Quick Demo Login (0204891235)
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Open Bets Cards List (Exact match to Screenshot 6) */
+              <div className="p-3 space-y-3">
             {filteredOpenBets.length === 0 ? (
               <div className="py-12 text-center text-xs text-neutral-400 space-y-3">
                 <div className="w-12 h-12 rounded-full bg-[#1c2635] flex items-center justify-center mx-auto text-neutral-500">
@@ -1010,6 +1001,26 @@ export const OpenBetsView: React.FC = () => {
               })
             )}
           </div>
+        )}
+      </div>
+    )}
+
+      {/* Guest notification on History tab */}
+      {!user.isLoggedIn && activeTab === 'history' && (
+        <div className="px-3.5 py-2.5 bg-[#172332] border-b border-[#23354c] flex items-center justify-between text-xs">
+          <div className="flex items-center space-x-2 text-neutral-300">
+            <span className="w-2 h-2 rounded-full bg-[#00df59] animate-pulse shrink-0" />
+            <span>Viewing authentic settled tickets preview</span>
+          </div>
+          <button
+            onClick={async () => {
+              await login('0204891235', 'demo1234');
+              showToast('Logged into Account (0204891235)');
+            }}
+            className="text-[11px] font-bold text-[#00df59] bg-[#00df59]/10 px-2 py-0.5 rounded border border-[#00df59]/30 hover:bg-[#00df59]/20 transition-colors"
+          >
+            1-Tap Login
+          </button>
         </div>
       )}
 
@@ -1516,8 +1527,6 @@ export const OpenBetsView: React.FC = () => {
           </div>
         </div>
       )}
-    </>
-  )}
       </div>
 
       {/* =================================================================== */}
@@ -1941,7 +1950,11 @@ export const OpenBetsView: React.FC = () => {
       {/* SportyBet Create Personal Page & CodeChat Modal (Matches Screenshot_20261009_130305_Chrome.jpg) */}
       <CreatePersonalPageModal
         isOpen={personalPageModalOpen}
-        onClose={() => setPersonalPageModalOpen(false)}
+        onClose={() => {
+          setPersonalPageModalOpen(false);
+          setForceCreateNew(false);
+        }}
+        forceCreateNew={forceCreateNew}
       />
     </div>
   );
