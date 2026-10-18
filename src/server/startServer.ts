@@ -9,13 +9,6 @@ import { connectToDatabase } from './mongodb';
 const PORT = 3000;
 
 export async function startServer() {
-  // Connect to MongoDB if configured
-  try {
-    await connectToDatabase();
-  } catch (err: any) {
-    console.warn('[MongoDB Startup Notice]', err?.message || err);
-  }
-
   const distPath = path.join(process.cwd(), 'dist');
   const indexPath = path.join(distPath, 'index.html');
   const hasDist = fs.existsSync(indexPath);
@@ -23,7 +16,10 @@ export async function startServer() {
   // Mount Vite middleware in development or when dist bundle is missing
   if (process.env.NODE_ENV !== 'production' || !hasDist) {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: false, // HMR disabled per environment constraints to avoid WebSocket collisions
+      },
       appType: 'spa',
     });
 
@@ -72,10 +68,40 @@ export async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  // Start HTTP server immediately so port 3000 is open in <100ms
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`SportyBet Ghana Full-Stack Server running on port ${PORT}`);
   });
+
+  server.on('error', (err: any) => {
+    if (err.code === 'EADDRINUSE') {
+      console.warn(`[Server] Port ${PORT} temporarily in use, retrying in 1s...`);
+      setTimeout(() => {
+        server.close();
+        server.listen(PORT, '0.0.0.0', () => {
+          console.log(`SportyBet Ghana Full-Stack Server running on port ${PORT}`);
+        });
+      }, 1000);
+    } else {
+      console.error('[Server Error]', err);
+    }
+  });
+
+  // Handle process shutdown cleanly
+  const shutdown = () => {
+    server.close(() => {
+      process.exit(0);
+    });
+  };
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
+
+  // Connect to MongoDB asynchronously in the background so it never blocks dev server startup
+  connectToDatabase().catch((err: any) => {
+    console.warn('[MongoDB Startup Notice]', err?.message || err);
+  });
+
+  return server;
 }
 
 startServer();
-
